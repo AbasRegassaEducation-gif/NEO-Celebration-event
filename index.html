@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Case File — Charter School Detective Activity</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f1ead8;
+    --paper-2: #ebe2c8;
+    --ink: #1a1a1a;
+    --ink-soft: #3d3a35;
+    --muted: #6b6558;
+    --rule: #c9bf9f;
+    --accent: #a8321e;
+    --accent-soft: #e9c8c0;
+    --stamp: #b03a26;
+    --good: #3f7d4c;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    min-height: 100vh;
+  }
+  body::before {
+    content: "";
+    position: fixed; inset: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.06 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    opacity: 0.7; z-index: 0;
+  }
+  .wrap {
+    position: relative; z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 28px 24px 80px;
+  }
+
+  header.top {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 14px; margin-bottom: 28px;
+    gap: 16px; flex-wrap: wrap;
+  }
+  .brand {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: clamp(22px, 3.2vw, 32px);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .brand .em { color: var(--accent); font-style: italic; }
+  .meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    text-align: right;
+  }
+  .meta strong { color: var(--ink); }
+
+  .stamp {
+    display: inline-block;
+    border: 3px solid var(--stamp);
+    color: var(--stamp);
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: 0.3em;
+    padding: 4px 10px 3px;
+    transform: rotate(-3deg);
+    text-transform: uppercase;
+    opacity: 0.85;
+  }
+
+  .view { display: none; animation: fade .35s ease; }
+  .view.active { display: block; }
+  @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  .card {
+    background: #fbf6e7;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 28px 28px 26px;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.04), 0 14px 30px -22px rgba(0,0,0,0.4);
+  }
+  .card + .card { margin-top: 18px; }
+
+  /* HERO */
+  .hero {
+    display: grid; grid-template-columns: 1.2fr 1fr; gap: 0;
+    border: 1px solid var(--ink);
+  }
+  @media (max-width: 740px) { .hero { grid-template-columns: 1fr; } }
+  .hero-left {
+    background: var(--paper-2);
+    padding: 36px 32px;
+    border-right: 1px solid var(--ink);
+  }
+  @media (max-width: 740px) { .hero-left { border-right: none; border-bottom: 1px solid var(--ink); } }
+  .hero-right { padding: 36px 32px; background: #fbf6e7; }
+  .kicker {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 14px;
+  }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: clamp(34px, 5vw, 54px);
+    line-height: 0.98;
+    letter-spacing: -0.025em;
+    margin: 0 0 18px;
+  }
+  h1 .underline { background: linear-gradient(transparent 60%, var(--accent-soft) 60%); padding: 0 4px; }
+  .lede { font-size: 16px; color: var(--ink-soft); line-height: 1.55; margin-bottom: 22px; }
+
+  /* FORM */
+  label.field-label {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 8px;
+  }
+  input[type="text"] {
+    width: 100%;
+    background: var(--paper);
+    border: none;
+    border-bottom: 2px solid var(--ink);
+    padding: 10px 0 8px;
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    color: var(--ink);
+    outline: none;
+    border-radius: 0;
+  }
+  input[type="text"]:focus { border-bottom-color: var(--accent); }
+  textarea {
+    width: 100%;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    border: 1px solid var(--rule);
+    padding: 14px 16px;
+    background: #fdfaef;
+    min-height: 120px;
+    color: var(--ink);
+    outline: none;
+    resize: vertical;
+    border-radius: 0;
+  }
+  textarea:focus { border-color: var(--accent); }
+  .field + .field { margin-top: 22px; }
+
+  /* BUTTONS */
+  .btn {
+    appearance: none; cursor: pointer;
+    background: var(--ink); color: var(--paper);
+    border: none; border-radius: 0;
+    padding: 14px 22px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    transition: transform .15s ease, background .2s ease;
+  }
+  .btn:hover { background: var(--accent); transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink); }
+  .btn:active { transform: none; box-shadow: none; }
+  .btn.ghost {
+    background: transparent; color: var(--ink);
+    border: 1.5px solid var(--ink);
+  }
+  .btn.ghost:hover { background: var(--ink); color: var(--paper); box-shadow: none; }
+  .btn-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 26px; }
+
+  /* CASE */
+  .case-head {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    border-bottom: 1px dashed var(--rule); padding-bottom: 18px; margin-bottom: 22px;
+    gap: 18px; flex-wrap: wrap;
+  }
+  .case-id {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--muted);
+  }
+  .case-id strong { color: var(--accent); }
+  h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: clamp(26px, 3.6vw, 38px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin: 4px 0 0;
+  }
+  .case-body p {
+    font-size: 16px; line-height: 1.7; color: var(--ink-soft);
+    margin: 0 0 14px;
+  }
+  .evidence {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin: 22px 0 8px;
+  }
+  .evidence .item {
+    background: var(--paper-2);
+    border-left: 3px solid var(--accent);
+    padding: 12px 14px;
+  }
+  .evidence .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 4px;
+  }
+  .evidence .val {
+    font-family: 'Fraunces', serif; font-weight: 600;
+    font-size: 20px; line-height: 1.1;
+  }
+  .prompt-box {
+    background: #fdfaef;
+    border: 1.5px solid var(--ink);
+    padding: 18px 20px;
+    margin-top: 22px;
+  }
+  .prompt-box .kicker { color: var(--ink); margin-bottom: 8px; }
+  .prompt-box p { margin: 0; font-size: 16px; line-height: 1.55; }
+
+  /* SECTIONED CHECKLIST */
+  .findings-section { margin-top: 8px; }
+  .findings-section + .findings-section { margin-top: 28px; }
+  .findings-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 14px;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 8px;
+  }
+  .findings-title {
+    font-family: 'Fraunces', serif; font-weight: 800;
+    font-size: 22px; letter-spacing: -0.01em;
+    margin: 0;
+  }
+  .findings-counter {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--muted);
+  }
+  .findings-counter strong { color: var(--accent); }
+  .findings-hint {
+    font-size: 13px; color: var(--muted);
+    margin: 0 0 16px;
+    font-style: italic;
+  }
+  .group-block + .group-block { margin-top: 18px; }
+  .group-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--muted);
+    border-left: 3px solid var(--accent);
+    padding-left: 10px;
+    margin-bottom: 10px;
+  }
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 16px;
+  }
+  @media (max-width: 640px) { .options-grid { grid-template-columns: 1fr; } }
+
+  .opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 10px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background .15s ease, border-color .15s ease;
+    user-select: none;
+  }
+  .opt:hover { background: rgba(168,50,30,0.05); border-color: var(--rule); }
+  .opt input { display: none; }
+  .opt .box {
+    flex-shrink: 0;
+    width: 18px; height: 18px;
+    border: 1.5px solid var(--ink);
+    background: var(--paper);
+    margin-top: 2px;
+    position: relative;
+    transition: background .15s ease;
+  }
+  .opt input:checked + .box {
+    background: var(--ink);
+  }
+  .opt input:checked + .box::after {
+    content: "";
+    position: absolute;
+    left: 4px; top: 0px;
+    width: 6px; height: 12px;
+    border: solid var(--paper);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+  .opt .text {
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--ink-soft);
+  }
+  .opt input:checked ~ .text {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .opt.checked {
+    background: rgba(168,50,30,0.07);
+    border-color: var(--accent);
+  }
+
+  /* ROOM */
+  .room-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .room-head h2 { margin: 0; }
+  .live-pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--good);
+  }
+  .live-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--good);
+    box-shadow: 0 0 0 0 rgba(63,125,76,0.6);
+    animation: pulse 1.6s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(63,125,76,0.5); }
+    70% { box-shadow: 0 0 0 10px rgba(63,125,76,0); }
+    100% { box-shadow: 0 0 0 0 rgba(63,125,76,0); }
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0;
+    border: 1px solid var(--ink);
+    margin-bottom: 22px;
+  }
+  .stat {
+    padding: 16px 18px;
+    border-right: 1px solid var(--ink);
+    background: #fbf6e7;
+  }
+  .stat:last-child { border-right: none; }
+  @media (max-width: 600px) {
+    .stat { border-right: none; border-bottom: 1px solid var(--ink); }
+    .stat:last-child { border-bottom: none; }
+  }
+  .stat .val {
+    font-family: 'Fraunces', serif; font-weight: 800;
+    font-size: 32px; line-height: 1; letter-spacing: -0.02em;
+  }
+  .stat .lbl {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--muted); margin-top: 6px;
+  }
+
+  .dash-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+    margin-bottom: 28px;
+  }
+  @media (max-width: 820px) { .dash-grid { grid-template-columns: 1fr; } }
+
+  .section-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: 22px;
+    letter-spacing: -0.01em;
+    margin: 0 0 4px;
+  }
+  .section-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 16px;
+  }
+
+  .leader-list { display: flex; flex-direction: column; gap: 8px; }
+  .leader-row {
+    display: grid;
+    grid-template-columns: 1fr 60px 30px;
+    gap: 10px; align-items: center;
+  }
+  .leader-label {
+    font-size: 13px; line-height: 1.3;
+    color: var(--ink);
+  }
+  .leader-bar-track {
+    background: var(--paper-2);
+    height: 10px;
+    border: 1px solid var(--rule);
+    position: relative;
+  }
+  .leader-bar-fill {
+    height: 100%;
+    transition: width .6s cubic-bezier(.2,.8,.2,1);
+  }
+  .leader-count {
+    font-family: 'Fraunces', serif; font-weight: 700; font-size: 14px;
+    text-align: right;
+  }
+
+  .theme-bars { display: flex; flex-direction: column; gap: 10px; }
+  .theme-row {
+    display: grid;
+    grid-template-columns: 110px 1fr 36px;
+    gap: 10px; align-items: center;
+  }
+  .theme-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .theme-bar-track {
+    background: var(--paper-2);
+    height: 18px;
+    position: relative;
+    border: 1px solid var(--rule);
+  }
+  .theme-bar-fill { height: 100%; transition: width .6s cubic-bezier(.2,.8,.2,1); }
+  .theme-count {
+    font-family: 'Fraunces', serif; font-weight: 700; font-size: 14px;
+    text-align: right;
+  }
+
+  /* SUBMISSIONS */
+  .submissions { display: grid; gap: 14px; }
+  .sub-card {
+    background: #fbf6e7;
+    border: 1px solid var(--rule);
+    border-left: 4px solid var(--accent);
+    padding: 18px 20px;
+  }
+  .sub-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    gap: 12px; flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .sub-team {
+    font-family: 'Fraunces', serif; font-weight: 700;
+    font-size: 19px; letter-spacing: -0.01em;
+  }
+  .sub-time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--muted);
+  }
+  .sub-block { margin-bottom: 10px; }
+  .sub-block-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 6px;
+  }
+  .sub-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+  .pill {
+    font-size: 12px;
+    padding: 3px 9px;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    line-height: 1.3;
+  }
+  .sub-notes {
+    font-size: 14px; line-height: 1.55; color: var(--ink-soft);
+    margin: 0;
+    background: var(--paper);
+    border-left: 2px solid var(--rule);
+    padding: 8px 12px;
+    font-style: italic;
+  }
+  mark {
+    background: var(--accent-soft);
+    color: var(--ink);
+    padding: 0 2px;
+    border-radius: 2px;
+    font-style: normal;
+  }
+
+  .empty {
+    text-align: center; padding: 30px 20px;
+    color: var(--muted);
+    font-family: 'Fraunces', serif; font-style: italic;
+    font-size: 15px;
+  }
+
+  .footer-nav {
+    margin-top: 30px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--muted);
+    border-top: 1px solid var(--rule);
+    padding-top: 18px;
+    flex-wrap: wrap; gap: 12px;
+  }
+  .footer-nav a { color: var(--accent); cursor: pointer; }
+
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--ink); color: var(--paper);
+    padding: 12px 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+    z-index: 100;
+    opacity: 0; pointer-events: none;
+    transition: opacity .25s ease, transform .25s ease;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div>
+      <div class="brand">CASE FILE <span class="em">№</span> 2026<span class="em">/</span>014</div>
+      <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); margin-top:6px;">
+        Charter School Detective Activity · NEO
+      </div>
+    </div>
+    <div class="meta">
+      <div>Status: <strong>OPEN</strong></div>
+      <div>Filed: <strong id="filed-date">—</strong></div>
+    </div>
+  </header>
+
+  <!-- VIEW 1: Welcome -->
+  <section class="view active" id="view-welcome">
+    <div class="hero">
+      <div class="hero-left">
+        <div class="kicker">▸ Operation Briefing</div>
+        <h1>The schools are <span class="underline">in trouble</span>. You're the investigators.</h1>
+        <p class="lede">
+          Form your detective team, review the case file, and submit your findings.
+          You'll see what every other team in the room thinks — in real time —
+          and where the evidence is leading.
+        </p>
+        <div class="stamp">Confidential</div>
+      </div>
+      <div class="hero-right">
+        <div class="kicker">▸ Step 1 — Register Your Team</div>
+        <div class="field">
+          <label class="field-label" for="team-name">Detective Team Name</label>
+          <input type="text" id="team-name" placeholder="e.g. The Whiteboard Wolves" autocomplete="off" maxlength="60" />
+        </div>
+        <div class="field">
+          <label class="field-label" for="team-members">Investigators (optional)</label>
+          <input type="text" id="team-members" placeholder="Names, separated by commas" autocomplete="off" maxlength="200" />
+        </div>
+        <div class="btn-row">
+          <button class="btn" id="start-btn">Open the case file ▸</button>
+          <button class="btn ghost" id="view-room-btn">War room ▸</button>
+        </div>
+      </div>
+    </div>
+    <div class="footer-nav" style="border-top:none; padding-top:24px;">
+      <span>Multi-device · scan & solve · live shared</span>
+      <span>v0.2 prototype</span>
+    </div>
+  </section>
+
+  <!-- VIEW 2: Case file + Submission -->
+  <section class="view" id="view-case">
+    <div class="card">
+      <div class="case-head">
+        <div>
+          <div class="case-id">Case <strong>№ 2026/014</strong> · Westview Discovery Academy</div>
+          <h2>The school that started losing.</h2>
+        </div>
+        <span class="stamp">Eyes Only</span>
+      </div>
+
+      <div class="case-body">
+        <p>
+          Westview Discovery Academy is a K–8 charter school in its sixth year of operation.
+          When it opened in 2020, it had a 200-family waitlist and a reputation for project-based learning.
+          Today the picture looks different.
+        </p>
+        <p>
+          Enrollment has fallen for two consecutive years. Two of its most respected veteran teachers
+          resigned in February citing burnout and pay. Standardized test scores dropped below the
+          district average for the first time. Parents have started speaking up at board meetings,
+          and the authorizer's renewal review is in nine months.
+        </p>
+
+        <div class="evidence">
+          <div class="item">
+            <div class="label">Enrollment</div>
+            <div class="val">280 / 400</div>
+          </div>
+          <div class="item">
+            <div class="label">2-yr trend</div>
+            <div class="val">−18%</div>
+          </div>
+          <div class="item">
+            <div class="label">Teacher turnover</div>
+            <div class="val">31%</div>
+          </div>
+          <div class="item">
+            <div class="label">Authorizer review</div>
+            <div class="val">9 mo</div>
+          </div>
+        </div>
+
+        <div class="prompt-box">
+          <div class="kicker">▸ Your Assignment</div>
+          <p>
+            As a detective team, identify the <strong>suspected causes</strong> of the decline,
+            select the <strong>actions you'd recommend</strong> for the next 90 days, and add
+            any reasoning, additional ideas, or counter-evidence in the notes.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="kicker">▸ Step 2 — File Your Findings</div>
+      <div style="font-family:'Fraunces',serif; font-size:18px; margin-bottom:6px;">
+        Team <span id="team-name-echo" style="color:var(--accent); font-weight:700;">—</span>
+      </div>
+      <div style="font-size:13px; color:var(--muted); margin-bottom:24px;">
+        Pick everything that applies. There are no wrong answers — your reasoning is what matters.
+      </div>
+
+      <!-- SUSPECTED CAUSES -->
+      <div class="findings-section">
+        <div class="findings-head">
+          <h3 class="findings-title">Suspected Causes</h3>
+          <div class="findings-counter"><strong id="count-causes">0</strong> selected</div>
+        </div>
+        <p class="findings-hint">What do you think is really driving the decline? (Pick the ones you'd argue for.)</p>
+        <div id="causes-container"></div>
+      </div>
+
+      <!-- RECOMMENDED ACTIONS -->
+      <div class="findings-section">
+        <div class="findings-head">
+          <h3 class="findings-title">Recommended Actions</h3>
+          <div class="findings-counter"><strong id="count-actions">0</strong> selected</div>
+        </div>
+        <p class="findings-hint">What concrete moves should leadership make in the next 90 days?</p>
+        <div id="actions-container"></div>
+      </div>
+
+      <!-- DETECTIVE'S NOTES -->
+      <div class="findings-section">
+        <div class="findings-head">
+          <h3 class="findings-title">Detective's Notes</h3>
+          <div class="findings-counter">Optional</div>
+        </div>
+        <p class="findings-hint">Add reasoning, your top priority, ideas not in the lists, or what you'd want to know more about.</p>
+        <textarea id="notes" placeholder="Write what your team is really thinking..."></textarea>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn" id="submit-btn">Submit findings ▸</button>
+        <button class="btn ghost" id="back-btn">◂ Back</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIEW 3: War Room -->
+  <section class="view" id="view-room">
+    <div class="room-head">
+      <div>
+        <div class="case-id">Case <strong>№ 2026/014</strong> · Live war room</div>
+        <h2>What the room is finding.</h2>
+      </div>
+      <div class="live-pill"><span class="live-dot"></span>Live · auto-updating</div>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="val" id="stat-teams">0</div><div class="lbl">Teams reporting</div></div>
+      <div class="stat"><div class="val" id="stat-causes-total">0</div><div class="lbl">Causes flagged</div></div>
+      <div class="stat"><div class="val" id="stat-actions-total">0</div><div class="lbl">Actions endorsed</div></div>
+      <div class="stat"><div class="val" id="stat-consensus">—</div><div class="lbl">Top theme</div></div>
+    </div>
+
+    <div class="dash-grid">
+      <div>
+        <h3 class="section-title">Top suspects</h3>
+        <div class="section-sub">▸ Causes most teams flagged</div>
+        <div class="leader-list" id="top-causes"></div>
+      </div>
+      <div>
+        <h3 class="section-title">Top actions</h3>
+        <div class="section-sub">▸ Moves the room is endorsing</div>
+        <div class="leader-list" id="top-actions"></div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:28px;">
+      <h3 class="section-title">Theme convergence</h3>
+      <div class="section-sub">▸ Where the evidence is pointing across all teams</div>
+      <div class="theme-bars" id="theme-bars"></div>
+    </div>
+
+    <div>
+      <h3 class="section-title">All teams' findings</h3>
+      <div class="section-sub">▸ Each team's picks, plus their notes</div>
+      <div class="submissions" id="submissions-list">
+        <div class="empty">No findings filed yet. Be the first detective on the scene.</div>
+      </div>
+    </div>
+
+    <div class="footer-nav">
+      <a id="add-another">◂ File more findings</a>
+      <a id="reset-btn" style="color:var(--muted);">Reset case (facilitator)</a>
+    </div>
+  </section>
+
+</div>
+
+<div class="toast" id="toast">Saved.</div>
+
+<script>
+  // ============================================================
+  // CONFIG — NEO can edit this whole block to swap content.
+  // ============================================================
+  const CASE_ID = 'westview-2026-014';
+
+  const THEMES = {
+    staffing:    { label: 'Staffing',    color: '#2d5d63' },
+    academics:   { label: 'Academics',   color: '#3f7d4c' },
+    community:   { label: 'Community',   color: '#7a4f9b' },
+    enrollment:  { label: 'Enrollment',  color: '#b08a3e' },
+    operations:  { label: 'Operations',  color: '#5b6f8a' },
+    governance:  { label: 'Governance',  color: '#444444' },
+    funding:     { label: 'Funding',     color: '#a8321e' },
+    equity:      { label: 'Equity',      color: '#c45a00' },
+  };
+
+  // 15 suspected causes across 5 sub-groups
+  const CAUSES = [
+    { group: 'Staffing & Culture', items: [
+      { id: 'c-pay',       label: 'Teacher pay below regional market',           theme: 'staffing' },
+      { id: 'c-burnout',   label: 'Educator burnout from understaffing',         theme: 'staffing' },
+      { id: 'c-veterans',  label: 'Loss of veteran teachers / weak bench',       theme: 'staffing' },
+    ]},
+    { group: 'Academics', items: [
+      { id: 'c-drift',     label: 'Curriculum drift from founding mission',      theme: 'academics' },
+      { id: 'c-quality',   label: 'Inconsistent instructional quality',          theme: 'academics' },
+      { id: 'c-mtss',      label: 'Weak academic intervention / MTSS systems',   theme: 'academics' },
+      { id: 'c-services',  label: 'IEP/ELL services under-resourced',            theme: 'equity' },
+    ]},
+    { group: 'Community & Enrollment', items: [
+      { id: 'c-marketing', label: 'Weak family marketing & outreach',            theme: 'enrollment' },
+      { id: 'c-trust',     label: 'Loss of trust with current parent community', theme: 'community' },
+      { id: 'c-competition', label: 'New school competition in the area',        theme: 'enrollment' },
+      { id: 'c-demo',      label: 'Demographic shifts in the service area',      theme: 'enrollment' },
+    ]},
+    { group: 'Operations', items: [
+      { id: 'c-facility',  label: 'Aging facility / poor learning environment',  theme: 'operations' },
+      { id: 'c-tech',      label: 'Outdated technology infrastructure',          theme: 'operations' },
+    ]},
+    { group: 'Governance & Leadership', items: [
+      { id: 'c-board',     label: 'Board governance gaps',                       theme: 'governance' },
+      { id: 'c-leadership', label: 'School leadership turnover',                 theme: 'governance' },
+    ]},
+  ];
+
+  // 18 recommended actions across 5 sub-groups
+  const ACTIONS = [
+    { group: 'Staffing & Culture', items: [
+      { id: 'a-comp',       label: 'Compensation study + adjust teacher pay',     theme: 'staffing' },
+      { id: 'a-stay',       label: 'Stay interviews & build retention plan',      theme: 'staffing' },
+      { id: 'a-coach',      label: 'Hire instructional coach / academic dean',    theme: 'staffing' },
+      { id: 'a-wellness',   label: 'Add staff wellness & mental health support',  theme: 'staffing' },
+    ]},
+    { group: 'Academics', items: [
+      { id: 'a-audit',      label: 'Curriculum audit & alignment review',         theme: 'academics' },
+      { id: 'a-tier',       label: 'Strengthen MTSS / tiered intervention',       theme: 'academics' },
+      { id: 'a-diagnostic', label: 'Diagnostic testing + targeted reteaching',    theme: 'academics' },
+      { id: 'a-sped',       label: 'Strengthen SPED & ELL staffing',              theme: 'equity' },
+    ]},
+    { group: 'Community & Enrollment', items: [
+      { id: 'a-listen',     label: 'Launch parent listening tour',                theme: 'community' },
+      { id: 'a-marketing',  label: 'Targeted enrollment marketing campaign',      theme: 'enrollment' },
+      { id: 'a-referral',   label: 'Family referral program & open houses',       theme: 'enrollment' },
+      { id: 'a-mission',    label: 'Re-tell founding mission story to community', theme: 'community' },
+    ]},
+    { group: 'Operations', items: [
+      { id: 'a-techplan',   label: 'Technology upgrade plan',                     theme: 'operations' },
+      { id: 'a-facility',   label: 'Facility improvement plan',                   theme: 'operations' },
+    ]},
+    { group: 'Governance & Strategy', items: [
+      { id: 'a-bdtraining', label: 'Board governance training',                   theme: 'governance' },
+      { id: 'a-strat',      label: 'Strategic plan refresh with staff input',     theme: 'governance' },
+      { id: 'a-authorizer', label: 'Authorizer transparency briefing',            theme: 'governance' },
+      { id: 'a-survey',     label: 'Family/student survey & action loop',         theme: 'community' },
+    ]},
+  ];
+
+  const THEME_KEYWORDS = {
+    staffing:   ['teacher','teachers','staff','staffing','hire','retention','retain','salary','pay','wage','burnout','training','recruit','turnover','mentor','coach'],
+    academics:  ['curriculum','academic','instruction','learning','assessment','rigor','literacy','math','reading','project-based','pbl','stem','tutoring'],
+    community:  ['parent','parents','community','family','families','engagement','partnership','volunteer','communication','trust','listening'],
+    enrollment: ['enrollment','enroll','marketing','outreach','waitlist','capacity','attract','disenroll'],
+    operations: ['facility','facilities','building','space','lease','transportation','technology','tech','classroom','operations'],
+    governance: ['authorizer','charter','audit','regulation','accountability','renewal','board','governance','strategic'],
+    funding:    ['funding','budget','money','financial','grant','revenue','cost','fundraising','donation','tuition'],
+    equity:     ['equity','equitable','access','diverse','inclusion','iep','ell','disability','sped','underserved'],
+  };
+
+  // ============================================================
+  // STORAGE
+  // ============================================================
+  const KEY = `submissions:${CASE_ID}`;
+  async function loadSubmissions() {
+    try {
+      const r = await window.storage.get(KEY, true);
+      if (!r) return [];
+      return JSON.parse(r.value);
+    } catch (e) { return []; }
+  }
+  async function saveSubmissions(list) {
+    try { await window.storage.set(KEY, JSON.stringify(list), true); return true; }
+    catch (e) { console.error('Save failed', e); return false; }
+  }
+  async function clearSubmissions() {
+    try { await window.storage.delete(KEY, true); } catch (e) {}
+  }
+
+  // ============================================================
+  // RENDER FORM
+  // ============================================================
+  function renderOptionGroup(containerId, groups) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+    groups.forEach(grp => {
+      const block = document.createElement('div');
+      block.className = 'group-block';
+      block.innerHTML = `<div class="group-label">${grp.group}</div>`;
+      const grid = document.createElement('div');
+      grid.className = 'options-grid';
+      grp.items.forEach(it => {
+        const lbl = document.createElement('label');
+        lbl.className = 'opt';
+        lbl.dataset.id = it.id;
+        lbl.innerHTML = `
+          <input type="checkbox" value="${it.id}">
+          <span class="box"></span>
+          <span class="text">${it.label}</span>
+        `;
+        const cb = lbl.querySelector('input');
+        cb.addEventListener('change', () => {
+          lbl.classList.toggle('checked', cb.checked);
+          updateCounters();
+        });
+        grid.appendChild(lbl);
+      });
+      block.appendChild(grid);
+      container.appendChild(block);
+    });
+  }
+
+  function getChecked(containerId) {
+    return Array.from(document.querySelectorAll(`#${containerId} input[type=checkbox]:checked`))
+      .map(cb => cb.value);
+  }
+  function clearChecked(containerId) {
+    document.querySelectorAll(`#${containerId} input[type=checkbox]:checked`).forEach(cb => {
+      cb.checked = false;
+      cb.closest('.opt').classList.remove('checked');
+    });
+  }
+  function updateCounters() {
+    document.getElementById('count-causes').textContent = getChecked('causes-container').length;
+    document.getElementById('count-actions').textContent = getChecked('actions-container').length;
+  }
+
+  renderOptionGroup('causes-container', CAUSES);
+  renderOptionGroup('actions-container', ACTIONS);
+
+  // ============================================================
+  // ANALYSIS
+  // ============================================================
+  const ALL_OPTIONS = {};
+  [...CAUSES, ...ACTIONS].forEach(g => g.items.forEach(it => ALL_OPTIONS[it.id] = it));
+
+  function analyzeNotes(text) {
+    const lower = (text || '').toLowerCase();
+    const matched = {};
+    for (const [theme, kws] of Object.entries(THEME_KEYWORDS)) {
+      for (const kw of kws) {
+        const re = new RegExp(`(^|[^a-z])${kw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}([^a-z]|$)`, 'g');
+        if (re.test(lower)) {
+          if (!matched[theme]) matched[theme] = new Set();
+          matched[theme].add(kw);
+        }
+      }
+    }
+    const out = {};
+    for (const [t, set] of Object.entries(matched)) out[t] = Array.from(set);
+    return out;
+  }
+
+  function highlightNotes(text, themesMatched) {
+    const allKw = [];
+    for (const [theme, kws] of Object.entries(themesMatched)) {
+      kws.forEach(k => allKw.push({ kw: k, color: THEMES[theme].color }));
+    }
+    if (!allKw.length) return escapeHtml(text);
+    allKw.sort((a,b) => b.kw.length - a.kw.length);
+    let safe = escapeHtml(text);
+    for (const { kw, color } of allKw) {
+      const re = new RegExp(`(^|[^a-zA-Z])(${kw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})([^a-zA-Z]|$)`, 'gi');
+      safe = safe.replace(re, (m, p1, p2, p3) => `${p1}<mark style="background:${color}33;">${p2}</mark>${p3}`);
+    }
+    return safe;
+  }
+
+  function escapeHtml(s) {
+    return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function combinedThemes(submission) {
+    const themeSet = new Set();
+    [...(submission.causes||[]), ...(submission.actions||[])].forEach(id => {
+      const opt = ALL_OPTIONS[id];
+      if (opt) themeSet.add(opt.theme);
+    });
+    Object.keys(submission.notesThemes || {}).forEach(t => themeSet.add(t));
+    return Array.from(themeSet);
+  }
+
+  // ============================================================
+  // VIEWS
+  // ============================================================
+  const views = {
+    welcome: document.getElementById('view-welcome'),
+    case:    document.getElementById('view-case'),
+    room:    document.getElementById('view-room'),
+  };
+  function showView(name) {
+    Object.values(views).forEach(v => v.classList.remove('active'));
+    views[name].classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (name === 'room') startPolling(); else stopPolling();
+  }
+
+  // ============================================================
+  // STATE & EVENTS
+  // ============================================================
+  let currentTeam = '';
+  let currentMembers = '';
+
+  document.getElementById('filed-date').textContent =
+    new Date().toLocaleDateString('en-US', { month:'short', day:'2-digit', year:'numeric'}).toUpperCase();
+
+  document.getElementById('start-btn').addEventListener('click', () => {
+    const name = document.getElementById('team-name').value.trim();
+    if (!name) { toast('Enter a team name first'); return; }
+    currentTeam = name;
+    currentMembers = document.getElementById('team-members').value.trim();
+    document.getElementById('team-name-echo').textContent = currentTeam;
+    showView('case');
+  });
+
+  document.getElementById('view-room-btn').addEventListener('click', () => showView('room'));
+  document.getElementById('back-btn').addEventListener('click', () => showView('welcome'));
+  document.getElementById('add-another').addEventListener('click', () => showView('welcome'));
+
+  document.getElementById('submit-btn').addEventListener('click', async () => {
+    const causes = getChecked('causes-container');
+    const actions = getChecked('actions-container');
+    const notes = document.getElementById('notes').value.trim();
+    if (causes.length === 0 && actions.length === 0 && !notes) {
+      toast('Pick at least a few items or write a note'); return;
+    }
+    const submission = {
+      id: 'sub_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
+      team: currentTeam || 'Anonymous Team',
+      members: currentMembers,
+      causes, actions,
+      notes,
+      notesThemes: analyzeNotes(notes),
+      timestamp: Date.now(),
+    };
+    const list = await loadSubmissions();
+    list.push(submission);
+    const ok = await saveSubmissions(list);
+    if (!ok) { toast('Save failed — try again'); return; }
+    toast('Findings filed.');
+    clearChecked('causes-container');
+    clearChecked('actions-container');
+    document.getElementById('notes').value = '';
+    updateCounters();
+    showView('room');
+  });
+
+  document.getElementById('reset-btn').addEventListener('click', async () => {
+    if (!confirm('Reset all submissions for this case? This cannot be undone.')) return;
+    await clearSubmissions();
+    toast('Case reset.');
+    renderRoom([]);
+  });
+
+  // ============================================================
+  // RENDER WAR ROOM
+  // ============================================================
+  function renderRoom(list) {
+    document.getElementById('stat-teams').textContent = list.length;
+    let causesTotal = 0, actionsTotal = 0;
+    const causeCount = {}, actionCount = {}, themeCount = {};
+    for (const s of list) {
+      (s.causes || []).forEach(id => { causeCount[id] = (causeCount[id]||0)+1; causesTotal++; });
+      (s.actions || []).forEach(id => { actionCount[id] = (actionCount[id]||0)+1; actionsTotal++; });
+      for (const t of combinedThemes(s)) themeCount[t] = (themeCount[t]||0)+1;
+    }
+    document.getElementById('stat-causes-total').textContent = causesTotal;
+    document.getElementById('stat-actions-total').textContent = actionsTotal;
+
+    let topTheme = null, topN = 0;
+    for (const [t, c] of Object.entries(themeCount)) if (c > topN) { topN = c; topTheme = t; }
+    document.getElementById('stat-consensus').textContent = topTheme ? THEMES[topTheme].label : '—';
+
+    renderLeaderList('top-causes', causeCount, 6);
+    renderLeaderList('top-actions', actionCount, 6);
+
+    const totalTeams = Math.max(1, list.length);
+    const bars = document.getElementById('theme-bars');
+    bars.innerHTML = '';
+    for (const [t, def] of Object.entries(THEMES)) {
+      const c = themeCount[t] || 0;
+      const pct = (c / totalTeams) * 100;
+      const row = document.createElement('div');
+      row.className = 'theme-row';
+      row.innerHTML = `
+        <div class="theme-name">${def.label}</div>
+        <div class="theme-bar-track">
+          <div class="theme-bar-fill" style="width:${pct}%; background:${def.color};"></div>
+        </div>
+        <div class="theme-count">${c}</div>
+      `;
+      bars.appendChild(row);
+    }
+
+    const subs = document.getElementById('submissions-list');
+    if (!list.length) {
+      subs.innerHTML = '<div class="empty">No findings filed yet. Be the first detective on the scene.</div>';
+      return;
+    }
+    const sorted = [...list].sort((a,b) => b.timestamp - a.timestamp);
+    subs.innerHTML = sorted.map(s => {
+      const themes = combinedThemes(s);
+      const primaryTheme = themes[0] || null;
+      const borderColor = primaryTheme ? THEMES[primaryTheme].color : 'var(--accent)';
+      const causePills = (s.causes || []).map(id => {
+        const opt = ALL_OPTIONS[id]; if (!opt) return '';
+        const c = THEMES[opt.theme].color;
+        return `<span class="pill" style="border-color:${c}; color:${c};">${opt.label}</span>`;
+      }).join('');
+      const actionPills = (s.actions || []).map(id => {
+        const opt = ALL_OPTIONS[id]; if (!opt) return '';
+        const c = THEMES[opt.theme].color;
+        return `<span class="pill" style="border-color:${c}; color:${c};">${opt.label}</span>`;
+      }).join('');
+      const time = new Date(s.timestamp).toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit'});
+      const notesHtml = s.notes
+        ? `<div class="sub-block"><div class="sub-block-label">Notes</div><p class="sub-notes">${highlightNotes(s.notes, s.notesThemes || {})}</p></div>`
+        : '';
+      return `
+        <div class="sub-card" style="border-left-color:${borderColor};">
+          <div class="sub-head">
+            <div>
+              <div class="sub-team">${escapeHtml(s.team)}</div>
+              ${s.members ? `<div style="font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace;">${escapeHtml(s.members)}</div>` : ''}
+            </div>
+            <div class="sub-time">${time}</div>
+          </div>
+          ${causePills ? `<div class="sub-block"><div class="sub-block-label">Suspected Causes</div><div class="sub-tags">${causePills}</div></div>` : ''}
+          ${actionPills ? `<div class="sub-block"><div class="sub-block-label">Recommended Actions</div><div class="sub-tags">${actionPills}</div></div>` : ''}
+          ${notesHtml}
+        </div>
+      `;
+    }).join('');
+  }
+
+  function renderLeaderList(elId, counts, topN) {
+    const el = document.getElementById(elId);
+    const entries = Object.entries(counts).sort((a,b) => b[1] - a[1]).slice(0, topN);
+    if (!entries.length) {
+      el.innerHTML = '<div class="empty" style="padding:18px 8px;">No data yet.</div>';
+      return;
+    }
+    const max = Math.max(...entries.map(([,c]) => c));
+    el.innerHTML = entries.map(([id, c]) => {
+      const opt = ALL_OPTIONS[id]; if (!opt) return '';
+      const color = THEMES[opt.theme].color;
+      const pct = (c / max) * 100;
+      return `
+        <div class="leader-row">
+          <div class="leader-label">${opt.label}</div>
+          <div class="leader-bar-track"><div class="leader-bar-fill" style="width:${pct}%; background:${color};"></div></div>
+          <div class="leader-count">${c}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ============================================================
+  // POLLING
+  // ============================================================
+  let pollTimer = null;
+  async function refreshRoom() {
+    const list = await loadSubmissions();
+    renderRoom(list);
+  }
+  function startPolling() {
+    refreshRoom();
+    if (pollTimer) clearInterval(pollTimer);
+    pollTimer = setInterval(refreshRoom, 4000);
+  }
+  function stopPolling() {
+    if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+  }
+
+  // ============================================================
+  // TOAST
+  // ============================================================
+  let toastTimer = null;
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+  }
+</script>
+</body>
+</html>
