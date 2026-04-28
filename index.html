@@ -65,6 +65,19 @@
     text-align: right;
   }
   .meta strong { color: var(--ink); }
+  .conn-status {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+  }
+  .conn-status .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--muted);
+  }
+  .conn-status.connected .dot { background: var(--good); animation: pulse 1.6s infinite; }
+  .conn-status.error .dot { background: var(--accent); }
+  .conn-status.connected { color: var(--good); }
+  .conn-status.error { color: var(--accent); }
 
   .stamp {
     display: inline-block;
@@ -93,7 +106,6 @@
   }
   .card + .card { margin-top: 18px; }
 
-  /* HERO */
   .hero {
     display: grid; grid-template-columns: 1.2fr 1fr; gap: 0;
     border: 1px solid var(--ink);
@@ -122,7 +134,6 @@
   h1 .underline { background: linear-gradient(transparent 60%, var(--accent-soft) 60%); padding: 0 4px; }
   .lede { font-size: 16px; color: var(--ink-soft); line-height: 1.55; margin-bottom: 22px; }
 
-  /* FORM */
   label.field-label {
     display: block;
     font-family: 'JetBrains Mono', monospace;
@@ -159,7 +170,6 @@
   textarea:focus { border-color: var(--accent); }
   .field + .field { margin-top: 22px; }
 
-  /* BUTTONS */
   .btn {
     appearance: none; cursor: pointer;
     background: var(--ink); color: var(--paper);
@@ -172,6 +182,7 @@
   }
   .btn:hover { background: var(--accent); transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink); }
   .btn:active { transform: none; box-shadow: none; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
   .btn.ghost {
     background: transparent; color: var(--ink);
     border: 1.5px solid var(--ink);
@@ -179,7 +190,6 @@
   .btn.ghost:hover { background: var(--ink); color: var(--paper); box-shadow: none; }
   .btn-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 26px; }
 
-  /* CASE */
   .case-head {
     display: flex; justify-content: space-between; align-items: flex-start;
     border-bottom: 1px dashed var(--rule); padding-bottom: 18px; margin-bottom: 22px;
@@ -232,7 +242,6 @@
   .prompt-box .kicker { color: var(--ink); margin-bottom: 8px; }
   .prompt-box p { margin: 0; font-size: 16px; line-height: 1.55; }
 
-  /* SECTIONED CHECKLIST */
   .findings-section { margin-top: 8px; }
   .findings-section + .findings-section { margin-top: 28px; }
   .findings-head {
@@ -294,9 +303,7 @@
     position: relative;
     transition: background .15s ease;
   }
-  .opt input:checked + .box {
-    background: var(--ink);
-  }
+  .opt input:checked + .box { background: var(--ink); }
   .opt input:checked + .box::after {
     content: "";
     position: absolute;
@@ -320,7 +327,6 @@
     border-color: var(--accent);
   }
 
-  /* ROOM */
   .room-head {
     display: flex; align-items: center; justify-content: space-between; gap: 16px;
     flex-wrap: wrap;
@@ -440,7 +446,6 @@
     text-align: right;
   }
 
-  /* SUBMISSIONS */
   .submissions { display: grid; gap: 14px; }
   .sub-card {
     background: #fbf6e7;
@@ -522,6 +527,33 @@
     transition: opacity .25s ease, transform .25s ease;
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+
+  /* Setup screen */
+  .setup-screen {
+    background: #fbf6e7;
+    border: 2px solid var(--accent);
+    padding: 36px 36px 30px;
+  }
+  .setup-screen h2 { margin-top: 0; }
+  .setup-screen ol { padding-left: 22px; line-height: 1.7; font-size: 15px; }
+  .setup-screen ol li { margin-bottom: 10px; }
+  .setup-screen code {
+    background: var(--paper-2);
+    padding: 2px 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    border: 1px solid var(--rule);
+  }
+  .setup-screen pre {
+    background: #1a1a1a;
+    color: #f1ead8;
+    padding: 16px 18px;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    border: none;
+  }
 </style>
 </head>
 <body>
@@ -535,13 +567,41 @@
       </div>
     </div>
     <div class="meta">
-      <div>Status: <strong>OPEN</strong></div>
-      <div>Filed: <strong id="filed-date">—</strong></div>
+      <div id="conn-indicator" class="conn-status"><span class="dot"></span><span id="conn-text">Connecting...</span></div>
+      <div style="margin-top:4px;">Filed: <strong id="filed-date">—</strong></div>
     </div>
   </header>
 
+  <!-- VIEW 0: Setup (shown if Firebase not configured) -->
+  <section class="view" id="view-setup">
+    <div class="setup-screen">
+      <div class="kicker">▸ One-time setup needed</div>
+      <h2>Connect a database first.</h2>
+      <p>This app needs a free Firebase database to share submissions across devices. Takes about 5 minutes.</p>
+      <ol>
+        <li>Go to <a href="https://console.firebase.google.com" target="_blank"><code>console.firebase.google.com</code></a> and sign in with a Google account.</li>
+        <li>Click <strong>Add project</strong> → name it (e.g. <em>charter-detective</em>) → skip Google Analytics → <strong>Create project</strong>.</li>
+        <li>In the left sidebar, go to <strong>Build → Realtime Database → Create Database</strong>. Pick any location, then choose <strong>Start in test mode</strong>.</li>
+        <li>Click the gear icon (top left) → <strong>Project settings</strong>. Scroll to <em>Your apps</em> and click the <strong>&lt;/&gt;</strong> (web) icon.</li>
+        <li>Give the app a nickname → <strong>Register app</strong>. Firebase will show you a <code>firebaseConfig</code> block.</li>
+        <li>Open this HTML file, find the <code>firebaseConfig</code> block near the bottom of the <code>&lt;script&gt;</code>, and replace the placeholder values with yours.</li>
+      </ol>
+      <p style="margin-top:18px; font-size:13px; color:var(--muted);">Paste-ready format Firebase will give you:</p>
+      <pre>const firebaseConfig = {
+  apiKey: "AIzaSy...",
+  authDomain: "your-project.firebaseapp.com",
+  databaseURL: "https://your-project-default-rtdb.firebaseio.com",
+  projectId: "your-project",
+  storageBucket: "your-project.appspot.com",
+  messagingSenderId: "1234567890",
+  appId: "1:1234..."
+};</pre>
+      <p style="margin-top:18px; font-size:13px; color:var(--muted);">Once pasted, save the file, refresh the browser, and you're live.</p>
+    </div>
+  </section>
+
   <!-- VIEW 1: Welcome -->
-  <section class="view active" id="view-welcome">
+  <section class="view" id="view-welcome">
     <div class="hero">
       <div class="hero-left">
         <div class="kicker">▸ Operation Briefing</div>
@@ -571,7 +631,7 @@
     </div>
     <div class="footer-nav" style="border-top:none; padding-top:24px;">
       <span>Multi-device · scan & solve · live shared</span>
-      <span>v0.2 prototype</span>
+      <span>v0.3 · Firebase-powered</span>
     </div>
   </section>
 
@@ -600,22 +660,10 @@
         </p>
 
         <div class="evidence">
-          <div class="item">
-            <div class="label">Enrollment</div>
-            <div class="val">280 / 400</div>
-          </div>
-          <div class="item">
-            <div class="label">2-yr trend</div>
-            <div class="val">−18%</div>
-          </div>
-          <div class="item">
-            <div class="label">Teacher turnover</div>
-            <div class="val">31%</div>
-          </div>
-          <div class="item">
-            <div class="label">Authorizer review</div>
-            <div class="val">9 mo</div>
-          </div>
+          <div class="item"><div class="label">Enrollment</div><div class="val">280 / 400</div></div>
+          <div class="item"><div class="label">2-yr trend</div><div class="val">−18%</div></div>
+          <div class="item"><div class="label">Teacher turnover</div><div class="val">31%</div></div>
+          <div class="item"><div class="label">Authorizer review</div><div class="val">9 mo</div></div>
         </div>
 
         <div class="prompt-box">
@@ -638,7 +686,6 @@
         Pick everything that applies. There are no wrong answers — your reasoning is what matters.
       </div>
 
-      <!-- SUSPECTED CAUSES -->
       <div class="findings-section">
         <div class="findings-head">
           <h3 class="findings-title">Suspected Causes</h3>
@@ -648,7 +695,6 @@
         <div id="causes-container"></div>
       </div>
 
-      <!-- RECOMMENDED ACTIONS -->
       <div class="findings-section">
         <div class="findings-head">
           <h3 class="findings-title">Recommended Actions</h3>
@@ -658,7 +704,6 @@
         <div id="actions-container"></div>
       </div>
 
-      <!-- DETECTIVE'S NOTES -->
       <div class="findings-section">
         <div class="findings-head">
           <h3 class="findings-title">Detective's Notes</h3>
@@ -729,9 +774,23 @@
 
 <div class="toast" id="toast">Saved.</div>
 
-<script>
+<script type="module">
   // ============================================================
-  // CONFIG — NEO can edit this whole block to swap content.
+  // 🔥 FIREBASE CONFIG — REPLACE THESE VALUES WITH YOUR OWN 🔥
+  // (See the setup screen for instructions if this isn't done.)
+  // ============================================================
+  const firebaseConfig = {
+    apiKey: "AIzaSyD7NKQSuojAOzbxZxGsgRa5JMFUHHYBj6Q",
+    authDomain: "charter-detective.firebaseapp.com",
+    databaseURL: "https://charter-detective-default-rtdb.firebaseio.com",
+    projectId: "charter-detective",
+    storageBucket: "charter-detective.firebasestorage.app",
+    messagingSenderId: "901262767504",
+    appId: "1:901262767504:web:2106e6872896d4b426af15"
+  };
+
+  // ============================================================
+  // CASE CONTENT — NEO can edit everything below for new cases.
   // ============================================================
   const CASE_ID = 'westview-2026-014';
 
@@ -746,7 +805,6 @@
     equity:      { label: 'Equity',      color: '#c45a00' },
   };
 
-  // 15 suspected causes across 5 sub-groups
   const CAUSES = [
     { group: 'Staffing & Culture', items: [
       { id: 'c-pay',       label: 'Teacher pay below regional market',           theme: 'staffing' },
@@ -775,7 +833,6 @@
     ]},
   ];
 
-  // 18 recommended actions across 5 sub-groups
   const ACTIONS = [
     { group: 'Staffing & Culture', items: [
       { id: 'a-comp',       label: 'Compensation study + adjust teacher pay',     theme: 'staffing' },
@@ -819,26 +876,72 @@
   };
 
   // ============================================================
-  // STORAGE
+  // CHECK CONFIG — show setup screen if not configured
   // ============================================================
-  const KEY = `submissions:${CASE_ID}`;
-  async function loadSubmissions() {
-    try {
-      const r = await window.storage.get(KEY, true);
-      if (!r) return [];
-      return JSON.parse(r.value);
-    } catch (e) { return []; }
-  }
-  async function saveSubmissions(list) {
-    try { await window.storage.set(KEY, JSON.stringify(list), true); return true; }
-    catch (e) { console.error('Save failed', e); return false; }
-  }
-  async function clearSubmissions() {
-    try { await window.storage.delete(KEY, true); } catch (e) {}
+  const CONFIG_OK = firebaseConfig.apiKey && !firebaseConfig.apiKey.startsWith('PASTE_');
+
+  if (!CONFIG_OK) {
+    document.getElementById('view-setup').classList.add('active');
+    document.getElementById('conn-text').textContent = 'Not configured';
+    document.getElementById('conn-indicator').classList.add('error');
+  } else {
+    document.getElementById('view-welcome').classList.add('active');
+    initializeApp();
   }
 
   // ============================================================
-  // RENDER FORM
+  // FIREBASE INIT — only runs if config is set
+  // ============================================================
+  let db, submissionsRef;
+  let pushFn, setFn, removeFn, onValueFn, refFn;
+
+  async function initializeApp() {
+    try {
+      const { initializeApp: initFb } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+      const { getDatabase, ref, onValue, push, set, remove } =
+        await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js');
+
+      const app = initFb(firebaseConfig);
+      db = getDatabase(app);
+      refFn = ref; pushFn = push; setFn = set; removeFn = remove; onValueFn = onValue;
+      submissionsRef = ref(db, `submissions/${CASE_ID}`);
+
+      // Real-time listener — fires whenever any team submits anywhere
+      onValue(submissionsRef, (snapshot) => {
+        const data = snapshot.val() || {};
+        const list = Object.entries(data).map(([key, sub]) => ({ ...sub, _key: key }));
+        renderRoom(list);
+        document.getElementById('conn-text').textContent = 'Connected';
+        document.getElementById('conn-indicator').classList.remove('error');
+        document.getElementById('conn-indicator').classList.add('connected');
+      }, (error) => {
+        console.error('Firebase listener error:', error);
+        document.getElementById('conn-text').textContent = 'Connection error';
+        document.getElementById('conn-indicator').classList.add('error');
+      });
+    } catch (e) {
+      console.error('Firebase init failed:', e);
+      document.getElementById('conn-text').textContent = 'Setup error — check config';
+      document.getElementById('conn-indicator').classList.add('error');
+      toast('Could not connect to database — check config');
+    }
+  }
+
+  // ============================================================
+  // STORAGE OPS
+  // ============================================================
+  async function pushSubmission(submission) {
+    if (!submissionsRef) throw new Error('Database not initialized');
+    const newRef = pushFn(submissionsRef);
+    await setFn(newRef, submission);
+  }
+  async function clearAllSubmissions() {
+    if (!submissionsRef) return;
+    await removeFn(submissionsRef);
+  }
+
+  // ============================================================
+  // FORM RENDERING
   // ============================================================
   function renderOptionGroup(containerId, groups) {
     const container = document.getElementById(containerId);
@@ -901,19 +1004,17 @@
       for (const kw of kws) {
         const re = new RegExp(`(^|[^a-z])${kw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}([^a-z]|$)`, 'g');
         if (re.test(lower)) {
-          if (!matched[theme]) matched[theme] = new Set();
-          matched[theme].add(kw);
+          if (!matched[theme]) matched[theme] = [];
+          if (!matched[theme].includes(kw)) matched[theme].push(kw);
         }
       }
     }
-    const out = {};
-    for (const [t, set] of Object.entries(matched)) out[t] = Array.from(set);
-    return out;
+    return matched;
   }
 
   function highlightNotes(text, themesMatched) {
     const allKw = [];
-    for (const [theme, kws] of Object.entries(themesMatched)) {
+    for (const [theme, kws] of Object.entries(themesMatched || {})) {
       kws.forEach(k => allKw.push({ kw: k, color: THEMES[theme].color }));
     }
     if (!allKw.length) return escapeHtml(text);
@@ -941,9 +1042,10 @@
   }
 
   // ============================================================
-  // VIEWS
+  // VIEW MGMT
   // ============================================================
   const views = {
+    setup:   document.getElementById('view-setup'),
     welcome: document.getElementById('view-welcome'),
     case:    document.getElementById('view-case'),
     room:    document.getElementById('view-room'),
@@ -952,7 +1054,6 @@
     Object.values(views).forEach(v => v.classList.remove('active'));
     views[name].classList.add('active');
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    if (name === 'room') startPolling(); else stopPolling();
   }
 
   // ============================================================
@@ -965,6 +1066,7 @@
     new Date().toLocaleDateString('en-US', { month:'short', day:'2-digit', year:'numeric'}).toUpperCase();
 
   document.getElementById('start-btn').addEventListener('click', () => {
+    if (!CONFIG_OK) { toast('Configure Firebase first'); return; }
     const name = document.getElementById('team-name').value.trim();
     if (!name) { toast('Enter a team name first'); return; }
     currentTeam = name;
@@ -973,7 +1075,10 @@
     showView('case');
   });
 
-  document.getElementById('view-room-btn').addEventListener('click', () => showView('room'));
+  document.getElementById('view-room-btn').addEventListener('click', () => {
+    if (!CONFIG_OK) { toast('Configure Firebase first'); return; }
+    showView('room');
+  });
   document.getElementById('back-btn').addEventListener('click', () => showView('welcome'));
   document.getElementById('add-another').addEventListener('click', () => showView('welcome'));
 
@@ -985,31 +1090,42 @@
       toast('Pick at least a few items or write a note'); return;
     }
     const submission = {
-      id: 'sub_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
       team: currentTeam || 'Anonymous Team',
-      members: currentMembers,
+      members: currentMembers || '',
       causes, actions,
-      notes,
+      notes: notes || '',
       notesThemes: analyzeNotes(notes),
       timestamp: Date.now(),
     };
-    const list = await loadSubmissions();
-    list.push(submission);
-    const ok = await saveSubmissions(list);
-    if (!ok) { toast('Save failed — try again'); return; }
-    toast('Findings filed.');
-    clearChecked('causes-container');
-    clearChecked('actions-container');
-    document.getElementById('notes').value = '';
-    updateCounters();
-    showView('room');
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.textContent = 'Filing...';
+    try {
+      await pushSubmission(submission);
+      toast('Findings filed.');
+      clearChecked('causes-container');
+      clearChecked('actions-container');
+      document.getElementById('notes').value = '';
+      updateCounters();
+      showView('room');
+    } catch (e) {
+      console.error(e);
+      toast('Save failed — check connection');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Submit findings ▸';
+    }
   });
 
   document.getElementById('reset-btn').addEventListener('click', async () => {
     if (!confirm('Reset all submissions for this case? This cannot be undone.')) return;
-    await clearSubmissions();
-    toast('Case reset.');
-    renderRoom([]);
+    try {
+      await clearAllSubmissions();
+      toast('Case reset.');
+    } catch (e) {
+      console.error(e);
+      toast('Reset failed');
+    }
   });
 
   // ============================================================
@@ -1057,7 +1173,7 @@
       subs.innerHTML = '<div class="empty">No findings filed yet. Be the first detective on the scene.</div>';
       return;
     }
-    const sorted = [...list].sort((a,b) => b.timestamp - a.timestamp);
+    const sorted = [...list].sort((a,b) => (b.timestamp||0) - (a.timestamp||0));
     subs.innerHTML = sorted.map(s => {
       const themes = combinedThemes(s);
       const primaryTheme = themes[0] || null;
@@ -1072,7 +1188,7 @@
         const c = THEMES[opt.theme].color;
         return `<span class="pill" style="border-color:${c}; color:${c};">${opt.label}</span>`;
       }).join('');
-      const time = new Date(s.timestamp).toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit'});
+      const time = s.timestamp ? new Date(s.timestamp).toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit'}) : '';
       const notesHtml = s.notes
         ? `<div class="sub-block"><div class="sub-block-label">Notes</div><p class="sub-notes">${highlightNotes(s.notes, s.notesThemes || {})}</p></div>`
         : '';
@@ -1113,23 +1229,6 @@
         </div>
       `;
     }).join('');
-  }
-
-  // ============================================================
-  // POLLING
-  // ============================================================
-  let pollTimer = null;
-  async function refreshRoom() {
-    const list = await loadSubmissions();
-    renderRoom(list);
-  }
-  function startPolling() {
-    refreshRoom();
-    if (pollTimer) clearInterval(pollTimer);
-    pollTimer = setInterval(refreshRoom, 4000);
-  }
-  function stopPolling() {
-    if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
   }
 
   // ============================================================
