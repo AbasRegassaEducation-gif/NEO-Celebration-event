@@ -3,40 +3,40 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Case File — Charter School Detective Activity</title>
+<title>The Roundtable · NEO</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --paper: #f1ead8;
-    --paper-2: #ebe2c8;
-    --ink: #1a1a1a;
-    --ink-soft: #3d3a35;
-    --muted: #6b6558;
-    --rule: #c9bf9f;
-    --accent: #a8321e;
-    --accent-soft: #e9c8c0;
-    --stamp: #b03a26;
-    --good: #3f7d4c;
+    --bg: #f7f4ee;
+    --bg-2: #efeae0;
+    --surface: #ffffff;
+    --ink: #1f2937;
+    --ink-soft: #4b5563;
+    --muted: #6b7280;
+    --rule: #e5dfd0;
+    --primary: #2d6a4f;
+    --primary-soft: #d8ebe1;
+    --primary-deep: #1b4332;
+    --accent: #d97706;
+    --accent-soft: #fde9c4;
+    --sky: #4a7ba6;
+    --sky-soft: #d6e6f3;
+    --berry: #9d4e6c;
+    --good: #2d6a4f;
+    --neo: #1d4e89;
+    --neo-soft: #dde8f5;
   }
   * { box-sizing: border-box; }
   html, body {
     margin: 0; padding: 0;
-    background: var(--paper);
+    background: var(--bg);
     color: var(--ink);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     min-height: 100vh;
   }
-  body::before {
-    content: "";
-    position: fixed; inset: 0;
-    pointer-events: none;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.06 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-    opacity: 0.7; z-index: 0;
-  }
   .wrap {
-    position: relative; z-index: 1;
     max-width: 1100px;
     margin: 0 auto;
     padding: 28px 24px 80px;
@@ -44,170 +44,265 @@
 
   header.top {
     display: flex; align-items: flex-end; justify-content: space-between;
-    border-bottom: 2px solid var(--ink);
-    padding-bottom: 14px; margin-bottom: 28px;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 18px; margin-bottom: 32px;
     gap: 16px; flex-wrap: wrap;
   }
   .brand {
     font-family: 'Fraunces', serif;
-    font-weight: 800;
-    font-size: clamp(22px, 3.2vw, 32px);
+    font-weight: 700;
+    font-size: clamp(22px, 3vw, 30px);
     letter-spacing: -0.02em;
     line-height: 1;
+    color: var(--ink);
   }
-  .brand .em { color: var(--accent); font-style: italic; }
+  .brand .em { color: var(--primary); }
+  .sub-brand {
+    font-size: 12px; color: var(--muted);
+    margin-top: 6px;
+  }
   .meta {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
+    font-size: 12px;
     color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
     text-align: right;
   }
-  .meta strong { color: var(--ink); }
+  .meta strong { color: var(--ink); font-weight: 600; }
   .conn-status {
     display: inline-flex; align-items: center; gap: 6px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+    font-size: 11px;
   }
   .conn-status .dot {
     width: 7px; height: 7px; border-radius: 50%;
     background: var(--muted);
   }
   .conn-status.connected .dot { background: var(--good); animation: pulse 1.6s infinite; }
-  .conn-status.error .dot { background: var(--accent); }
+  .conn-status.error .dot { background: #b94a48; }
   .conn-status.connected { color: var(--good); }
-  .conn-status.error { color: var(--accent); }
-
-  .stamp {
-    display: inline-block;
-    border: 3px solid var(--stamp);
-    color: var(--stamp);
-    font-family: 'Fraunces', serif;
-    font-weight: 800;
-    font-size: 13px;
-    letter-spacing: 0.3em;
-    padding: 4px 10px 3px;
-    transform: rotate(-3deg);
-    text-transform: uppercase;
-    opacity: 0.85;
+  .conn-status.error { color: #b94a48; }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(45,106,79,0.5); }
+    70% { box-shadow: 0 0 0 8px rgba(45,106,79,0); }
+    100% { box-shadow: 0 0 0 0 rgba(45,106,79,0); }
   }
 
   .view { display: none; animation: fade .35s ease; }
   .view.active { display: block; }
-  @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
   .card {
-    background: #fbf6e7;
+    background: var(--surface);
     border: 1px solid var(--rule);
-    border-radius: 2px;
-    padding: 28px 28px 26px;
-    box-shadow: 0 1px 0 rgba(0,0,0,0.04), 0 14px 30px -22px rgba(0,0,0,0.4);
+    border-radius: 12px;
+    padding: 32px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 8px 24px -16px rgba(0,0,0,0.08);
   }
   .card + .card { margin-top: 18px; }
 
+  /* HERO */
   .hero {
-    display: grid; grid-template-columns: 1.2fr 1fr; gap: 0;
-    border: 1px solid var(--ink);
+    display: grid; grid-template-columns: 1.15fr 1fr; gap: 0;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 12px 32px -20px rgba(0,0,0,0.12);
   }
   @media (max-width: 740px) { .hero { grid-template-columns: 1fr; } }
   .hero-left {
-    background: var(--paper-2);
-    padding: 36px 32px;
-    border-right: 1px solid var(--ink);
+    background: linear-gradient(135deg, var(--primary-soft) 0%, var(--bg-2) 100%);
+    padding: 44px 36px;
+    position: relative;
   }
-  @media (max-width: 740px) { .hero-left { border-right: none; border-bottom: 1px solid var(--ink); } }
-  .hero-right { padding: 36px 32px; background: #fbf6e7; }
+  .hero-left::after {
+    content: "";
+    position: absolute;
+    bottom: -40px; right: -40px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, var(--accent-soft) 0%, transparent 70%);
+    opacity: 0.6;
+    pointer-events: none;
+  }
+  .hero-right { padding: 44px 36px; }
   .kicker {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
-    color: var(--accent); margin-bottom: 14px;
+    display: inline-block;
+    font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--primary);
+    background: var(--primary-soft);
+    padding: 5px 11px;
+    border-radius: 999px;
+    font-weight: 600;
+    margin-bottom: 18px;
   }
   h1 {
     font-family: 'Fraunces', serif;
-    font-weight: 800;
-    font-size: clamp(34px, 5vw, 54px);
-    line-height: 0.98;
-    letter-spacing: -0.025em;
+    font-weight: 700;
+    font-size: clamp(34px, 4.6vw, 48px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
     margin: 0 0 18px;
+    color: var(--ink);
   }
-  h1 .underline { background: linear-gradient(transparent 60%, var(--accent-soft) 60%); padding: 0 4px; }
-  .lede { font-size: 16px; color: var(--ink-soft); line-height: 1.55; margin-bottom: 22px; }
+  h1 em { font-style: italic; color: var(--primary); }
+  .lede {
+    font-size: 16.5px; color: var(--ink-soft); line-height: 1.6;
+    margin-bottom: 0;
+  }
 
   label.field-label {
     display: block;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--muted); margin-bottom: 8px;
+    font-size: 12px; font-weight: 600;
+    color: var(--ink); margin-bottom: 8px;
   }
   input[type="text"] {
     width: 100%;
-    background: var(--paper);
-    border: none;
-    border-bottom: 2px solid var(--ink);
-    padding: 10px 0 8px;
-    font-family: 'Fraunces', serif;
-    font-size: 18px;
+    background: var(--bg);
+    border: 1.5px solid var(--rule);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
     color: var(--ink);
     outline: none;
-    border-radius: 0;
+    transition: border-color .15s ease;
   }
-  input[type="text"]:focus { border-bottom-color: var(--accent); }
+  input[type="text"]:focus { border-color: var(--primary); background: var(--surface); }
   textarea {
     width: 100%;
     font-family: 'Inter', sans-serif;
     font-size: 15px;
     line-height: 1.55;
-    border: 1px solid var(--rule);
+    border: 1.5px solid var(--rule);
+    border-radius: 8px;
     padding: 14px 16px;
-    background: #fdfaef;
+    background: var(--bg);
     min-height: 120px;
     color: var(--ink);
     outline: none;
     resize: vertical;
-    border-radius: 0;
+    transition: border-color .15s ease;
   }
-  textarea:focus { border-color: var(--accent); }
-  .field + .field { margin-top: 22px; }
+  textarea:focus { border-color: var(--primary); background: var(--surface); }
+  .field + .field { margin-top: 18px; }
+
+  /* GROUP PICKER */
+  .group-picker {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-top: 6px;
+  }
+  @media (max-width: 460px) {
+    .group-picker { grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  }
+  .group-pick {
+    cursor: pointer;
+    text-align: center;
+    padding: 14px 4px;
+    background: var(--bg);
+    border: 1.5px solid var(--rule);
+    border-radius: 8px;
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--ink);
+    transition: all .15s ease;
+  }
+  .group-pick:hover {
+    border-color: var(--primary);
+    background: var(--primary-soft);
+  }
+  .group-pick.selected {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+    box-shadow: 0 4px 12px -4px rgba(45,106,79,0.4);
+  }
+  .group-pick .label-tiny {
+    display: block;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-top: 4px;
+    opacity: 0.7;
+  }
 
   .btn {
     appearance: none; cursor: pointer;
-    background: var(--ink); color: var(--paper);
-    border: none; border-radius: 0;
-    padding: 14px 22px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px; font-weight: 700;
-    letter-spacing: 0.2em; text-transform: uppercase;
-    transition: transform .15s ease, background .2s ease;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 13px 22px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px; font-weight: 600;
+    letter-spacing: 0.01em;
+    transition: all .15s ease;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05), 0 4px 12px -6px rgba(45,106,79,0.4);
   }
-  .btn:hover { background: var(--accent); transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink); }
-  .btn:active { transform: none; box-shadow: none; }
-  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn:hover { background: var(--primary-deep); transform: translateY(-1px); box-shadow: 0 2px 4px rgba(0,0,0,0.06), 0 8px 20px -8px rgba(45,106,79,0.5); }
+  .btn:active { transform: none; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
   .btn.ghost {
-    background: transparent; color: var(--ink);
-    border: 1.5px solid var(--ink);
+    background: transparent;
+    color: var(--ink);
+    border: 1.5px solid var(--rule);
+    box-shadow: none;
   }
-  .btn.ghost:hover { background: var(--ink); color: var(--paper); box-shadow: none; }
-  .btn-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 26px; }
+  .btn.ghost:hover { background: var(--bg-2); border-color: var(--ink-soft); transform: none; box-shadow: none; }
+  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 26px; }
+
+  .scenario-banner {
+    display: flex; align-items: center; gap: 14px;
+    background: var(--primary-soft);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 22px;
+  }
+  .scenario-banner .badge {
+    flex-shrink: 0;
+    width: 42px; height: 42px;
+    background: var(--primary);
+    color: white;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 18px;
+  }
+  .scenario-banner .text {
+    flex: 1; min-width: 0;
+  }
+  .scenario-banner .small {
+    font-size: 11px; color: var(--primary-deep);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    font-weight: 600;
+  }
+  .scenario-banner .name {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--ink);
+    margin-top: 2px;
+  }
 
   .case-head {
-    display: flex; justify-content: space-between; align-items: flex-start;
-    border-bottom: 1px dashed var(--rule); padding-bottom: 18px; margin-bottom: 22px;
-    gap: 18px; flex-wrap: wrap;
+    border-bottom: 1px solid var(--rule); padding-bottom: 18px; margin-bottom: 22px;
   }
   .case-id {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
-    color: var(--muted);
+    font-size: 12px; color: var(--muted);
+    margin-bottom: 6px;
   }
-  .case-id strong { color: var(--accent); }
+  .case-id strong { color: var(--primary); font-weight: 600; }
   h2 {
     font-family: 'Fraunces', serif;
-    font-weight: 800;
-    font-size: clamp(26px, 3.6vw, 38px);
-    line-height: 1.05;
+    font-weight: 700;
+    font-size: clamp(26px, 3.2vw, 34px);
+    line-height: 1.1;
     letter-spacing: -0.02em;
-    margin: 4px 0 0;
+    margin: 0;
+    color: var(--ink);
   }
   .case-body p {
     font-size: 16px; line-height: 1.7; color: var(--ink-soft);
@@ -216,69 +311,185 @@
   .evidence {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 12px;
+    gap: 10px;
     margin: 22px 0 8px;
   }
   .evidence .item {
-    background: var(--paper-2);
-    border-left: 3px solid var(--accent);
-    padding: 12px 14px;
+    background: var(--bg);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 14px 16px;
   }
   .evidence .label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
-    color: var(--muted); margin-bottom: 4px;
+    font-size: 11px; color: var(--muted);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
   }
   .evidence .val {
-    font-family: 'Fraunces', serif; font-weight: 600;
-    font-size: 20px; line-height: 1.1;
+    font-family: 'Fraunces', serif; font-weight: 700;
+    font-size: 22px; line-height: 1.1;
+    color: var(--ink);
   }
   .prompt-box {
-    background: #fdfaef;
-    border: 1.5px solid var(--ink);
-    padding: 18px 20px;
+    background: var(--accent-soft);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 16px 20px;
     margin-top: 22px;
   }
-  .prompt-box .kicker { color: var(--ink); margin-bottom: 8px; }
-  .prompt-box p { margin: 0; font-size: 16px; line-height: 1.55; }
+  .prompt-box .kicker {
+    color: var(--accent); background: rgba(217,119,6,0.12);
+    margin-bottom: 8px;
+  }
+  .prompt-box p { margin: 0; font-size: 15.5px; line-height: 1.6; color: var(--ink-soft); }
+
+  /* Evidence sections — trend, voices, timeline, strengths */
+  .evidence-block {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid var(--rule);
+  }
+  .evidence-block-label {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+  }
+  .evidence-unit {
+    color: var(--muted);
+    font-size: 10px;
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 400;
+    margin-left: 4px;
+  }
+  .chart-wrap {
+    background: var(--bg);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 8px 10px;
+  }
+  .voices-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 10px;
+  }
+  .voice-card {
+    background: var(--bg);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--berry);
+    border-radius: 6px;
+    padding: 12px 14px 11px;
+  }
+  .voice-quote {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 14.5px;
+    line-height: 1.5;
+    color: var(--ink);
+    margin: 0 0 8px;
+  }
+  .voice-role {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+  .timeline-list {
+    display: flex; flex-direction: column;
+    gap: 8px;
+  }
+  .timeline-row {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 14px;
+    align-items: baseline;
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--rule);
+  }
+  .timeline-row:last-child { border-bottom: none; }
+  @media (max-width: 540px) {
+    .timeline-row { grid-template-columns: 1fr; gap: 2px; }
+  }
+  .timeline-when {
+    font-size: 11px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+  }
+  .timeline-what {
+    font-size: 14.5px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+  .strengths-block {
+    background: var(--primary-soft);
+    border-radius: 8px;
+    padding: 16px 20px 14px;
+    border-top: none;
+    margin-top: 22px;
+  }
+  .strengths-list {
+    margin: 0;
+    padding-left: 22px;
+    list-style: none;
+  }
+  .strengths-list li {
+    font-size: 14.5px;
+    line-height: 1.55;
+    color: var(--ink);
+    margin-bottom: 6px;
+    position: relative;
+  }
+  .strengths-list li::before {
+    content: "✓";
+    position: absolute;
+    left: -22px;
+    color: var(--primary);
+    font-weight: 700;
+  }
+  .strengths-list li:last-child { margin-bottom: 0; }
 
   .findings-section { margin-top: 8px; }
   .findings-section + .findings-section { margin-top: 28px; }
   .findings-head {
     display: flex; justify-content: space-between; align-items: baseline;
-    margin-bottom: 14px;
-    border-bottom: 1px solid var(--ink);
-    padding-bottom: 8px;
+    margin-bottom: 6px;
   }
   .findings-title {
-    font-family: 'Fraunces', serif; font-weight: 800;
-    font-size: 22px; letter-spacing: -0.01em;
+    font-family: 'Fraunces', serif; font-weight: 700;
+    font-size: 20px; letter-spacing: -0.01em;
     margin: 0;
+    color: var(--ink);
   }
   .findings-counter {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+    font-size: 12px;
     color: var(--muted);
   }
-  .findings-counter strong { color: var(--accent); }
+  .findings-counter strong { color: var(--primary); font-weight: 600; }
   .findings-hint {
-    font-size: 13px; color: var(--muted);
-    margin: 0 0 16px;
-    font-style: italic;
+    font-size: 13.5px; color: var(--muted);
+    margin: 0 0 14px;
   }
   .group-block + .group-block { margin-top: 18px; }
   .group-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
-    color: var(--muted);
-    border-left: 3px solid var(--accent);
-    padding-left: 10px;
-    margin-bottom: 10px;
+    font-size: 11px; font-weight: 600;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px dashed var(--rule);
   }
   .options-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 6px 16px;
+    gap: 6px 12px;
   }
   @media (max-width: 640px) { .options-grid { grid-template-columns: 1fr; } }
 
@@ -286,123 +497,168 @@
     display: flex;
     align-items: flex-start;
     gap: 10px;
-    padding: 8px 10px;
+    padding: 9px 12px;
     cursor: pointer;
-    border: 1px solid transparent;
-    transition: background .15s ease, border-color .15s ease;
+    border: 1.5px solid var(--rule);
+    border-radius: 8px;
+    transition: all .15s ease;
+    background: var(--bg);
     user-select: none;
   }
-  .opt:hover { background: rgba(168,50,30,0.05); border-color: var(--rule); }
+  .opt:hover {
+    border-color: var(--primary);
+    background: var(--primary-soft);
+  }
   .opt input { display: none; }
   .opt .box {
     flex-shrink: 0;
     width: 18px; height: 18px;
-    border: 1.5px solid var(--ink);
-    background: var(--paper);
-    margin-top: 2px;
+    border: 1.5px solid var(--ink-soft);
+    background: var(--surface);
+    border-radius: 4px;
+    margin-top: 1px;
     position: relative;
-    transition: background .15s ease;
+    transition: all .15s ease;
   }
-  .opt input:checked + .box { background: var(--ink); }
+  .opt input:checked + .box {
+    background: var(--primary);
+    border-color: var(--primary);
+  }
   .opt input:checked + .box::after {
     content: "";
     position: absolute;
     left: 4px; top: 0px;
     width: 6px; height: 12px;
-    border: solid var(--paper);
+    border: solid white;
     border-width: 0 2px 2px 0;
     transform: rotate(45deg);
   }
   .opt .text {
     font-size: 14px;
     line-height: 1.4;
-    color: var(--ink-soft);
-  }
-  .opt input:checked ~ .text {
     color: var(--ink);
-    font-weight: 500;
   }
   .opt.checked {
-    background: rgba(168,50,30,0.07);
-    border-color: var(--accent);
+    background: var(--primary-soft);
+    border-color: var(--primary);
   }
 
   .room-head {
     display: flex; align-items: center; justify-content: space-between; gap: 16px;
     flex-wrap: wrap;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
   }
   .room-head h2 { margin: 0; }
   .live-pill {
     display: inline-flex; align-items: center; gap: 8px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+    font-size: 12px;
     color: var(--good);
+    font-weight: 500;
+    background: var(--primary-soft);
+    padding: 6px 12px;
+    border-radius: 999px;
   }
-  .live-dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: var(--good);
-    box-shadow: 0 0 0 0 rgba(63,125,76,0.6);
-    animation: pulse 1.6s infinite;
+
+  .scenario-tabs {
+    display: flex; gap: 4px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 22px;
+    overflow-x: auto;
+    padding-bottom: 0;
   }
-  @keyframes pulse {
-    0% { box-shadow: 0 0 0 0 rgba(63,125,76,0.5); }
-    70% { box-shadow: 0 0 0 10px rgba(63,125,76,0); }
-    100% { box-shadow: 0 0 0 0 rgba(63,125,76,0); }
+  .scenario-tab {
+    padding: 10px 16px;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    font-family: 'Inter', sans-serif;
+    font-size: 13.5px;
+    color: var(--muted);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    white-space: nowrap;
+    transition: all .15s ease;
+    font-weight: 500;
+  }
+  .scenario-tab:hover { color: var(--ink); }
+  .scenario-tab.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+    font-weight: 600;
+  }
+  .scenario-tab .count {
+    display: inline-block;
+    margin-left: 6px;
+    background: var(--bg-2);
+    color: var(--ink-soft);
+    border-radius: 999px;
+    padding: 1px 7px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .scenario-tab.active .count {
+    background: var(--primary-soft);
+    color: var(--primary);
   }
 
   .stats {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 0;
-    border: 1px solid var(--ink);
-    margin-bottom: 22px;
+    gap: 10px;
+    margin-bottom: 24px;
   }
   .stat {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
     padding: 16px 18px;
-    border-right: 1px solid var(--ink);
-    background: #fbf6e7;
-  }
-  .stat:last-child { border-right: none; }
-  @media (max-width: 600px) {
-    .stat { border-right: none; border-bottom: 1px solid var(--ink); }
-    .stat:last-child { border-bottom: none; }
   }
   .stat .val {
-    font-family: 'Fraunces', serif; font-weight: 800;
-    font-size: 32px; line-height: 1; letter-spacing: -0.02em;
+    font-family: 'Fraunces', serif; font-weight: 700;
+    font-size: 28px; line-height: 1; letter-spacing: -0.01em;
+    color: var(--ink);
   }
   .stat .lbl {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--muted); margin-top: 6px;
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 6px;
+    font-weight: 600;
   }
 
   .dash-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 22px;
-    margin-bottom: 28px;
+    gap: 18px;
+    margin-bottom: 24px;
   }
   @media (max-width: 820px) { .dash-grid { grid-template-columns: 1fr; } }
 
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    padding: 22px 24px;
+  }
   .section-title {
     font-family: 'Fraunces', serif;
-    font-weight: 800;
-    font-size: 22px;
+    font-weight: 700;
+    font-size: 19px;
     letter-spacing: -0.01em;
     margin: 0 0 4px;
+    color: var(--ink);
   }
   .section-sub {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
-    color: var(--muted); margin-bottom: 16px;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 16px;
   }
 
   .leader-list { display: flex; flex-direction: column; gap: 8px; }
   .leader-row {
     display: grid;
-    grid-template-columns: 1fr 60px 30px;
+    grid-template-columns: 1fr 60px 26px;
     gap: 10px; align-items: center;
   }
   .leader-label {
@@ -410,149 +666,318 @@
     color: var(--ink);
   }
   .leader-bar-track {
-    background: var(--paper-2);
-    height: 10px;
-    border: 1px solid var(--rule);
-    position: relative;
+    background: var(--bg-2);
+    height: 8px;
+    border-radius: 999px;
+    overflow: hidden;
   }
   .leader-bar-fill {
     height: 100%;
+    border-radius: 999px;
     transition: width .6s cubic-bezier(.2,.8,.2,1);
   }
   .leader-count {
     font-family: 'Fraunces', serif; font-weight: 700; font-size: 14px;
     text-align: right;
+    color: var(--ink);
   }
 
   .theme-bars { display: flex; flex-direction: column; gap: 10px; }
   .theme-row {
     display: grid;
-    grid-template-columns: 110px 1fr 36px;
+    grid-template-columns: 110px 1fr 32px;
     gap: 10px; align-items: center;
   }
   .theme-name {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    font-size: 12px;
+    color: var(--ink);
+    font-weight: 500;
   }
   .theme-bar-track {
-    background: var(--paper-2);
-    height: 18px;
-    position: relative;
-    border: 1px solid var(--rule);
+    background: var(--bg-2);
+    height: 14px;
+    border-radius: 999px;
+    overflow: hidden;
   }
-  .theme-bar-fill { height: 100%; transition: width .6s cubic-bezier(.2,.8,.2,1); }
+  .theme-bar-fill { height: 100%; border-radius: 999px; transition: width .6s cubic-bezier(.2,.8,.2,1); }
   .theme-count {
     font-family: 'Fraunces', serif; font-weight: 700; font-size: 14px;
     text-align: right;
+    color: var(--ink);
   }
 
-  .submissions { display: grid; gap: 14px; }
-  .sub-card {
-    background: #fbf6e7;
+  .submissions { display: grid; gap: 12px; }
+  .group-aggregate-card {
+    background: linear-gradient(135deg, var(--surface) 0%, var(--primary-soft) 200%);
+    border: 1.5px solid var(--primary);
+    border-radius: 14px;
+    padding: 24px 28px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.03), 0 12px 28px -16px rgba(45,106,79,0.25);
+    margin-bottom: 4px;
+  }
+  .agg-head {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 12px; flex-wrap: wrap;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .agg-tag {
+    display: inline-block;
+    font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--primary);
+    background: var(--primary-soft);
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .agg-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--ink);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+  }
+  .agg-meta {
+    font-size: 13px; color: var(--ink-soft);
+    background: var(--bg);
+    padding: 6px 12px;
+    border-radius: 999px;
     border: 1px solid var(--rule);
-    border-left: 4px solid var(--accent);
-    padding: 18px 20px;
+    font-weight: 500;
+  }
+  .agg-section {
+    margin-top: 16px;
+  }
+  .agg-section-label {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+  }
+  .agg-notes-list {
+    display: grid; gap: 10px;
+  }
+  .agg-note {
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 10px 14px;
+    border: 1px solid var(--rule);
+  }
+  .agg-note-author {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--ink);
+  }
+  .individual-toggle-wrap {
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px dashed var(--rule);
+    text-align: center;
+  }
+  .individual-toggle-wrap .submissions {
+    text-align: left;
+  }
+  .sub-card {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-left: 4px solid var(--primary);
+    border-radius: 10px;
+    padding: 18px 22px;
   }
   .sub-head {
     display: flex; justify-content: space-between; align-items: baseline;
     gap: 12px; flex-wrap: wrap;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
   }
   .sub-team {
     font-family: 'Fraunces', serif; font-weight: 700;
-    font-size: 19px; letter-spacing: -0.01em;
+    font-size: 18px; letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  .sub-scenario-tag {
+    display: inline-block;
+    font-size: 11px;
+    color: var(--primary);
+    background: var(--primary-soft);
+    padding: 3px 9px;
+    border-radius: 999px;
+    margin-left: 8px;
+    font-weight: 600;
+    vertical-align: middle;
   }
   .sub-time {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+    font-size: 11px;
     color: var(--muted);
   }
   .sub-block { margin-bottom: 10px; }
   .sub-block-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--muted); margin-bottom: 6px;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
   }
   .sub-tags { display: flex; flex-wrap: wrap; gap: 5px; }
   .pill {
     font-size: 12px;
-    padding: 3px 9px;
-    border: 1px solid var(--ink);
-    background: var(--paper);
-    line-height: 1.3;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: var(--bg);
+    border: 1px solid var(--rule);
+    color: var(--ink-soft);
+    line-height: 1.4;
   }
   .sub-notes {
     font-size: 14px; line-height: 1.55; color: var(--ink-soft);
     margin: 0;
-    background: var(--paper);
-    border-left: 2px solid var(--rule);
-    padding: 8px 12px;
-    font-style: italic;
+    background: var(--bg);
+    border-radius: 6px;
+    padding: 10px 14px;
   }
   mark {
     background: var(--accent-soft);
     color: var(--ink);
-    padding: 0 2px;
-    border-radius: 2px;
-    font-style: normal;
+    padding: 0 3px;
+    border-radius: 3px;
+    font-weight: 500;
   }
 
   .empty {
     text-align: center; padding: 30px 20px;
     color: var(--muted);
-    font-family: 'Fraunces', serif; font-style: italic;
-    font-size: 15px;
+    font-style: italic;
+    font-size: 14.5px;
   }
 
   .footer-nav {
     margin-top: 30px;
     display: flex; justify-content: space-between; align-items: center;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+    font-size: 13px;
     color: var(--muted);
     border-top: 1px solid var(--rule);
     padding-top: 18px;
     flex-wrap: wrap; gap: 12px;
   }
-  .footer-nav a { color: var(--accent); cursor: pointer; }
+  .footer-nav a { color: var(--primary); cursor: pointer; font-weight: 500; }
+  .footer-nav a:hover { text-decoration: underline; }
 
   .toast {
     position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-    background: var(--ink); color: var(--paper);
-    padding: 12px 20px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+    background: var(--ink);
+    color: white;
+    padding: 12px 22px;
+    border-radius: 999px;
+    font-size: 13px; font-weight: 500;
     z-index: 100;
     opacity: 0; pointer-events: none;
     transition: opacity .25s ease, transform .25s ease;
+    box-shadow: 0 8px 24px -8px rgba(0,0,0,0.4);
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(-4px); }
 
-  /* Setup screen */
+  /* NEO branding */
+  .neo-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--neo);
+    color: white;
+    padding: 5px 11px 5px 9px;
+    border-radius: 6px;
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    text-decoration: none;
+    box-shadow: 0 1px 2px rgba(29,78,137,0.2);
+  }
+  .neo-badge .neo-mark {
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+  }
+  .header-brand-row {
+    display: flex; align-items: center; gap: 12px;
+    flex-wrap: wrap;
+  }
+  .neo-credit {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px dashed var(--rule);
+    display: flex; align-items: center; gap: 10px;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    flex-wrap: wrap;
+  }
+  .neo-credit .label-text {
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .neo-credit .neo-name {
+    color: var(--neo);
+    font-weight: 600;
+  }
+  .neo-credit .neo-name em {
+    font-style: normal;
+    color: var(--ink-soft);
+    font-weight: 400;
+  }
+  .footer-neo {
+    margin-top: 36px;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .footer-neo .neo-line {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 13.5px;
+    color: var(--neo);
+    margin-bottom: 4px;
+  }
+  .footer-neo .neo-line em {
+    font-style: normal;
+    color: var(--ink-soft);
+    font-weight: 400;
+  }
+
   .setup-screen {
-    background: #fbf6e7;
+    background: var(--surface);
     border: 2px solid var(--accent);
-    padding: 36px 36px 30px;
+    border-radius: 12px;
+    padding: 36px;
   }
   .setup-screen h2 { margin-top: 0; }
   .setup-screen ol { padding-left: 22px; line-height: 1.7; font-size: 15px; }
   .setup-screen ol li { margin-bottom: 10px; }
   .setup-screen code {
-    background: var(--paper-2);
+    background: var(--bg-2);
     padding: 2px 6px;
+    border-radius: 4px;
     font-family: 'JetBrains Mono', monospace;
     font-size: 13px;
-    border: 1px solid var(--rule);
   }
   .setup-screen pre {
-    background: #1a1a1a;
-    color: #f1ead8;
+    background: #1f2937;
+    color: #f3f4f6;
     padding: 16px 18px;
+    border-radius: 8px;
     overflow-x: auto;
     font-family: 'JetBrains Mono', monospace;
     font-size: 12px;
     line-height: 1.5;
-    border: none;
   }
 </style>
 </head>
@@ -561,42 +986,29 @@
 
   <header class="top">
     <div>
-      <div class="brand">CASE FILE <span class="em">№</span> 2026<span class="em">/</span>014</div>
-      <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); margin-top:6px;">
-        Charter School Detective Activity · NEO
+      <div class="header-brand-row">
+        <div class="brand">The <span class="em">Roundtable</span></div>
+        <span class="neo-badge"><span class="neo-mark"></span>NEO</span>
       </div>
+      <div class="sub-brand">A leadership session for charter school changemakers</div>
     </div>
     <div class="meta">
       <div id="conn-indicator" class="conn-status"><span class="dot"></span><span id="conn-text">Connecting...</span></div>
-      <div style="margin-top:4px;">Filed: <strong id="filed-date">—</strong></div>
+      <div style="margin-top:4px;">Session: <strong id="filed-date">—</strong></div>
     </div>
   </header>
 
-  <!-- VIEW 0: Setup (shown if Firebase not configured) -->
+  <!-- VIEW 0: Setup (only shown if Firebase not configured) -->
   <section class="view" id="view-setup">
     <div class="setup-screen">
-      <div class="kicker">▸ One-time setup needed</div>
+      <div class="kicker">One-time setup needed</div>
       <h2>Connect a database first.</h2>
-      <p>This app needs a free Firebase database to share submissions across devices. Takes about 5 minutes.</p>
+      <p>This app needs a free Firebase database to share submissions across devices.</p>
       <ol>
-        <li>Go to <a href="https://console.firebase.google.com" target="_blank"><code>console.firebase.google.com</code></a> and sign in with a Google account.</li>
-        <li>Click <strong>Add project</strong> → name it (e.g. <em>charter-detective</em>) → skip Google Analytics → <strong>Create project</strong>.</li>
-        <li>In the left sidebar, go to <strong>Build → Realtime Database → Create Database</strong>. Pick any location, then choose <strong>Start in test mode</strong>.</li>
-        <li>Click the gear icon (top left) → <strong>Project settings</strong>. Scroll to <em>Your apps</em> and click the <strong>&lt;/&gt;</strong> (web) icon.</li>
-        <li>Give the app a nickname → <strong>Register app</strong>. Firebase will show you a <code>firebaseConfig</code> block.</li>
-        <li>Open this HTML file, find the <code>firebaseConfig</code> block near the bottom of the <code>&lt;script&gt;</code>, and replace the placeholder values with yours.</li>
+        <li>Go to <a href="https://console.firebase.google.com" target="_blank"><code>console.firebase.google.com</code></a> and sign in.</li>
+        <li>Create a project, add a Realtime Database in test mode, and register a web app.</li>
+        <li>Paste your <code>firebaseConfig</code> values into the script block at the bottom of this HTML.</li>
       </ol>
-      <p style="margin-top:18px; font-size:13px; color:var(--muted);">Paste-ready format Firebase will give you:</p>
-      <pre>const firebaseConfig = {
-  apiKey: "AIzaSy...",
-  authDomain: "your-project.firebaseapp.com",
-  databaseURL: "https://your-project-default-rtdb.firebaseio.com",
-  projectId: "your-project",
-  storageBucket: "your-project.appspot.com",
-  messagingSenderId: "1234567890",
-  appId: "1:1234..."
-};</pre>
-      <p style="margin-top:18px; font-size:13px; color:var(--muted);">Once pasted, save the file, refresh the browser, and you're live.</p>
     </div>
   </section>
 
@@ -604,171 +1016,171 @@
   <section class="view" id="view-welcome">
     <div class="hero">
       <div class="hero-left">
-        <div class="kicker">▸ Operation Briefing</div>
-        <h1>The schools are <span class="underline">in trouble</span>. You're the investigators.</h1>
+        <div class="kicker">Welcome to the session</div>
+        <h1>Five schools. Five challenges. <em>One room of leaders.</em></h1>
         <p class="lede">
-          Form your detective team, review the case file, and submit your findings.
-          You'll see what every other team in the room thinks — in real time —
-          and where the evidence is leading.
+          You and your group are joining other charter school leaders today to think through
+          a real-world scenario — and to learn from how others approach theirs.
+          Pick your group number, dig into your scenario, and share what you'd do.
         </p>
-        <div class="stamp">Confidential</div>
+        <div class="neo-credit">
+          <span class="label-text">Presented by</span>
+          <span class="neo-name">NEO <em>· Novation Education Opportunities</em></span>
+        </div>
       </div>
       <div class="hero-right">
-        <div class="kicker">▸ Step 1 — Register Your Team</div>
+        <div style="font-size:13px; font-weight:600; color:var(--ink); margin-bottom:14px;">Step 1 — Get started</div>
         <div class="field">
-          <label class="field-label" for="team-name">Detective Team Name</label>
-          <input type="text" id="team-name" placeholder="e.g. The Whiteboard Wolves" autocomplete="off" maxlength="60" />
+          <label class="field-label" for="team-name">Your group's name</label>
+          <input type="text" id="team-name" placeholder="e.g. The Lakeview Leaders" autocomplete="off" maxlength="60" />
         </div>
         <div class="field">
-          <label class="field-label" for="team-members">Investigators (optional)</label>
+          <label class="field-label" for="team-members">Members (optional)</label>
           <input type="text" id="team-members" placeholder="Names, separated by commas" autocomplete="off" maxlength="200" />
         </div>
+        <div class="field">
+          <label class="field-label">Pick your group number</label>
+          <div class="group-picker" id="group-picker">
+            <div class="group-pick" data-group="1">1<span class="label-tiny">Group</span></div>
+            <div class="group-pick" data-group="2">2<span class="label-tiny">Group</span></div>
+            <div class="group-pick" data-group="3">3<span class="label-tiny">Group</span></div>
+            <div class="group-pick" data-group="4">4<span class="label-tiny">Group</span></div>
+            <div class="group-pick" data-group="5">5<span class="label-tiny">Group</span></div>
+          </div>
+        </div>
         <div class="btn-row">
-          <button class="btn" id="start-btn">Open the case file ▸</button>
-          <button class="btn ghost" id="view-room-btn">War room ▸</button>
+          <button class="btn" id="start-btn">Open my scenario →</button>
+          <button class="btn ghost" id="view-room-btn">The Roundtable →</button>
         </div>
       </div>
     </div>
     <div class="footer-nav" style="border-top:none; padding-top:24px;">
-      <span>Multi-device · scan & solve · live shared</span>
-      <span>v0.3 · Firebase-powered</span>
+      <span>Multi-device · live shared · five scenarios</span>
+      <span>v0.4</span>
     </div>
   </section>
 
-  <!-- VIEW 2: Case file + Submission -->
+  <!-- VIEW 2: Scenario + Submission -->
   <section class="view" id="view-case">
+
     <div class="card">
-      <div class="case-head">
-        <div>
-          <div class="case-id">Case <strong>№ 2026/014</strong> · Westview Discovery Academy</div>
-          <h2>The school that started losing.</h2>
+      <div class="scenario-banner">
+        <div class="badge" id="scenario-badge">—</div>
+        <div class="text">
+          <div class="small">Group <span id="scenario-group-num">—</span> · <span id="scenario-area">—</span></div>
+          <div class="name" id="scenario-name">—</div>
         </div>
-        <span class="stamp">Eyes Only</span>
       </div>
 
-      <div class="case-body">
-        <p>
-          Westview Discovery Academy is a K–8 charter school in its sixth year of operation.
-          When it opened in 2020, it had a 200-family waitlist and a reputation for project-based learning.
-          Today the picture looks different.
-        </p>
-        <p>
-          Enrollment has fallen for two consecutive years. Two of its most respected veteran teachers
-          resigned in February citing burnout and pay. Standardized test scores dropped below the
-          district average for the first time. Parents have started speaking up at board meetings,
-          and the authorizer's renewal review is in nine months.
-        </p>
+      <div class="case-head">
+        <div class="case-id">Scenario · <strong id="case-id-label">—</strong></div>
+        <h2 id="case-title">—</h2>
+      </div>
 
-        <div class="evidence">
-          <div class="item"><div class="label">Enrollment</div><div class="val">280 / 400</div></div>
-          <div class="item"><div class="label">2-yr trend</div><div class="val">−18%</div></div>
-          <div class="item"><div class="label">Teacher turnover</div><div class="val">31%</div></div>
-          <div class="item"><div class="label">Authorizer review</div><div class="val">9 mo</div></div>
-        </div>
-
-        <div class="prompt-box">
-          <div class="kicker">▸ Your Assignment</div>
-          <p>
-            As a detective team, identify the <strong>suspected causes</strong> of the decline,
-            select the <strong>actions you'd recommend</strong> for the next 90 days, and add
-            any reasoning, additional ideas, or counter-evidence in the notes.
-          </p>
-        </div>
+      <div class="case-body" id="case-body">
+        <!-- Filled in by JS -->
       </div>
     </div>
 
     <div class="card">
-      <div class="kicker">▸ Step 2 — File Your Findings</div>
+      <div style="font-size:13px; font-weight:600; color:var(--ink); margin-bottom:6px;">Step 2 — Share what you'd do</div>
       <div style="font-family:'Fraunces',serif; font-size:18px; margin-bottom:6px;">
-        Team <span id="team-name-echo" style="color:var(--accent); font-weight:700;">—</span>
+        Group <span id="team-name-echo" style="color:var(--primary); font-weight:700;">—</span>
       </div>
-      <div style="font-size:13px; color:var(--muted); margin-bottom:24px;">
-        Pick everything that applies. There are no wrong answers — your reasoning is what matters.
+      <div style="font-size:13.5px; color:var(--muted); margin-bottom:24px;">
+        Pick the items that match your group's thinking. You can choose as many as you want — and use the notes section to add anything that's not in the lists.
       </div>
 
       <div class="findings-section">
         <div class="findings-head">
-          <h3 class="findings-title">Suspected Causes</h3>
+          <h3 class="findings-title">What we think is contributing</h3>
           <div class="findings-counter"><strong id="count-causes">0</strong> selected</div>
         </div>
-        <p class="findings-hint">What do you think is really driving the decline? (Pick the ones you'd argue for.)</p>
+        <p class="findings-hint">The factors your group believes are at the root of this challenge.</p>
         <div id="causes-container"></div>
       </div>
 
       <div class="findings-section">
         <div class="findings-head">
-          <h3 class="findings-title">Recommended Actions</h3>
+          <h3 class="findings-title">What we'd do about it</h3>
           <div class="findings-counter"><strong id="count-actions">0</strong> selected</div>
         </div>
-        <p class="findings-hint">What concrete moves should leadership make in the next 90 days?</p>
+        <p class="findings-hint">The moves your group would recommend over the next 90 days.</p>
         <div id="actions-container"></div>
       </div>
 
       <div class="findings-section">
         <div class="findings-head">
-          <h3 class="findings-title">Detective's Notes</h3>
+          <h3 class="findings-title">Our group's thinking</h3>
           <div class="findings-counter">Optional</div>
         </div>
-        <p class="findings-hint">Add reasoning, your top priority, ideas not in the lists, or what you'd want to know more about.</p>
-        <textarea id="notes" placeholder="Write what your team is really thinking..."></textarea>
+        <p class="findings-hint">Add reasoning, a top priority, ideas not in the lists, or what you'd want to know more about.</p>
+        <textarea id="notes" placeholder="What's your group's perspective?"></textarea>
       </div>
 
       <div class="btn-row">
-        <button class="btn" id="submit-btn">Submit findings ▸</button>
-        <button class="btn ghost" id="back-btn">◂ Back</button>
+        <button class="btn" id="submit-btn">Share with the Roundtable →</button>
+        <button class="btn ghost" id="back-btn">← Back</button>
       </div>
     </div>
   </section>
 
-  <!-- VIEW 3: War Room -->
+  <!-- VIEW 3: The Roundtable -->
   <section class="view" id="view-room">
     <div class="room-head">
       <div>
-        <div class="case-id">Case <strong>№ 2026/014</strong> · Live war room</div>
-        <h2>What the room is finding.</h2>
+        <div class="case-id">Live session</div>
+        <h2>The Roundtable</h2>
       </div>
-      <div class="live-pill"><span class="live-dot"></span>Live · auto-updating</div>
+      <div class="live-pill"><span class="conn-status connected"><span class="dot"></span></span>Live · auto-updating</div>
     </div>
 
+    <div class="scenario-tabs" id="scenario-tabs"></div>
+
     <div class="stats">
-      <div class="stat"><div class="val" id="stat-teams">0</div><div class="lbl">Teams reporting</div></div>
-      <div class="stat"><div class="val" id="stat-causes-total">0</div><div class="lbl">Causes flagged</div></div>
+      <div class="stat"><div class="val" id="stat-teams">0</div><div class="lbl">Groups sharing</div></div>
+      <div class="stat"><div class="val" id="stat-causes-total">0</div><div class="lbl">Factors flagged</div></div>
       <div class="stat"><div class="val" id="stat-actions-total">0</div><div class="lbl">Actions endorsed</div></div>
       <div class="stat"><div class="val" id="stat-consensus">—</div><div class="lbl">Top theme</div></div>
     </div>
 
     <div class="dash-grid">
-      <div>
-        <h3 class="section-title">Top suspects</h3>
-        <div class="section-sub">▸ Causes most teams flagged</div>
+      <div class="panel">
+        <h3 class="section-title">Most-flagged factors</h3>
+        <div class="section-sub" id="top-causes-sub">What groups are pointing to as contributing</div>
         <div class="leader-list" id="top-causes"></div>
       </div>
-      <div>
-        <h3 class="section-title">Top actions</h3>
-        <div class="section-sub">▸ Moves the room is endorsing</div>
+      <div class="panel">
+        <h3 class="section-title">Most-endorsed actions</h3>
+        <div class="section-sub" id="top-actions-sub">The moves leaders are recommending</div>
         <div class="leader-list" id="top-actions"></div>
       </div>
     </div>
 
-    <div style="margin-bottom:28px;">
-      <h3 class="section-title">Theme convergence</h3>
-      <div class="section-sub">▸ Where the evidence is pointing across all teams</div>
+    <div class="panel" style="margin-bottom:18px;">
+      <h3 class="section-title">Where the thinking is converging</h3>
+      <div class="section-sub" id="theme-sub">Themes across all groups' responses</div>
       <div class="theme-bars" id="theme-bars"></div>
     </div>
 
-    <div>
-      <h3 class="section-title">All teams' findings</h3>
-      <div class="section-sub">▸ Each team's picks, plus their notes</div>
+    <div class="panel">
+      <h3 class="section-title" id="responses-section-title">Each group's response</h3>
+      <div class="section-sub" id="responses-section-sub">Selections and notes from every group sharing</div>
       <div class="submissions" id="submissions-list">
-        <div class="empty">No findings filed yet. Be the first detective on the scene.</div>
+        <div class="empty">No responses yet. Be the first to share with the Roundtable.</div>
       </div>
     </div>
 
     <div class="footer-nav">
-      <a id="add-another">◂ File more findings</a>
-      <a id="reset-btn" style="color:var(--muted);">Reset case (facilitator)</a>
+      <a id="add-another">← Add another response</a>
+      <a id="reset-btn" style="color:var(--muted);">Reset session (facilitator)</a>
     </div>
   </section>
+
+  <div class="footer-neo">
+    <div class="neo-line">NEO <em>· Novation Education Opportunities</em></div>
+    <div>Empowering charter school leaders through collaborative learning.</div>
+  </div>
 
 </div>
 
@@ -776,8 +1188,7 @@
 
 <script type="module">
   // ============================================================
-  // 🔥 FIREBASE CONFIG — REPLACE THESE VALUES WITH YOUR OWN 🔥
-  // (See the setup screen for instructions if this isn't done.)
+  // 🔥 FIREBASE CONFIG
   // ============================================================
   const firebaseConfig = {
     apiKey: "AIzaSyD7NKQSuojAOzbxZxGsgRa5JMFUHHYBj6Q",
@@ -790,93 +1201,305 @@
   };
 
   // ============================================================
-  // CASE CONTENT — NEO can edit everything below for new cases.
+  // SESSION ID — change this to start a fresh session
   // ============================================================
-  const CASE_ID = 'westview-2026-014';
+  const SESSION_ID = 'roundtable-2026-01';
 
+  // ============================================================
+  // SCENARIOS — NEO can edit any of these. One per group (1-5).
+  // Each scenario has:
+  //   - paragraphs: 2-3 paragraph framing
+  //   - evidence: 4 quick-stat cards
+  //   - trend: a small line/bar chart of one metric over time
+  //   - voices: 2-3 short anonymous quotes from school stakeholders
+  //   - timeline: 3-4 recent events
+  //   - strengths: 2-3 things the school already has going for it
+  //   - prompt: the discussion question
+  // ============================================================
+  const SCENARIOS = {
+    1: {
+      group: 1,
+      area: 'Staff Culture & Retention',
+      name: 'Maple Grove Charter',
+      title: 'Building a school where great teachers want to stay.',
+      paragraphs: [
+        'Maple Grove Charter is a K–8 school entering its eighth year. The school has a passionate teaching staff and strong academic results, but turnover has been creeping up — three of the school\'s most experienced teachers left last spring, and exit conversations pointed to burnout, lack of growth pathways, and feeling unheard in school decisions.',
+        'The leadership team genuinely values their educators and wants to build a culture where teachers thrive long-term. They have some flexibility in the budget and the board\'s full support to invest in staff. The question is where to focus first — and how to make sure changes feel meaningful, not performative.',
+      ],
+      evidence: [
+        { label: 'Teacher retention', val: '74%' },
+        { label: 'Avg tenure', val: '2.8 yrs' },
+        { label: 'Staff survey morale', val: '6.2 / 10' },
+        { label: 'Open positions', val: '4' },
+      ],
+      trend: {
+        title: 'Teacher retention over time',
+        unit: '%',
+        labels: ['2020', '2021', '2022', '2023', '2024', '2025'],
+        values: [92, 89, 85, 81, 78, 74],
+      },
+      voices: [
+        { role: '8th-grade teacher, 5 years', quote: 'I love this school and the kids. But I\'m planning the same units I planned three years ago, and there\'s no clear path to grow without leaving the classroom.' },
+        { role: 'Newer teacher, 2 years', quote: 'Onboarding was overwhelming. I had a mentor on paper, but in practice we both ran out of time.' },
+        { role: 'Department lead', quote: 'When decisions get made about scheduling or initiatives, teachers find out at the all-staff meeting. That\'s the part that wears on people.' },
+      ],
+      timeline: [
+        { when: 'Last May', what: 'Three veteran teachers (10+ years) gave notice within two weeks of each other.' },
+        { when: 'Last August', what: 'Two open positions remained unfilled at start of school year; classes covered by long-term subs.' },
+        { when: 'Last October', what: 'Anonymous staff climate survey showed morale dropped from 7.4 to 6.2.' },
+        { when: 'This January', what: 'Board approved a 4% budget reserve to invest in staff initiatives.' },
+      ],
+      strengths: [
+        'Strong academic outcomes and a recognized school culture among families.',
+        'Engaged, mission-aligned core staff and a supportive board.',
+        '$180K of flexible budget reserve available for staff investment.',
+      ],
+      prompt: 'As leaders, what do you think is contributing to retention challenges, and what would you prioritize over the next 90 days to build a school culture where great teachers stay and grow?',
+    },
+    2: {
+      group: 2,
+      area: 'Enrollment & Visibility',
+      name: 'Riverside Discovery Academy',
+      title: 'Growing the school families are looking for.',
+      paragraphs: [
+        'Riverside Discovery Academy is a strong K–6 charter with a project-based learning model. Current families love the school — parent satisfaction sits at 91% — but enrollment has plateaued for two years. The waitlist that once stretched into the hundreds has shrunk, and several families have shared they nearly chose a different school because they hadn\'t heard much about Riverside.',
+        'The leadership team believes Riverside\'s story is one worth telling. They want to grow back to capacity over the next year, while keeping the close-knit community that makes the school special. They\'re curious about how to balance visibility with intentionality.',
+      ],
+      evidence: [
+        { label: 'Current enrollment', val: '305 / 380' },
+        { label: 'Waitlist (last yr)', val: '12' },
+        { label: 'Parent satisfaction', val: '91%' },
+        { label: 'New competitors nearby', val: '2' },
+      ],
+      trend: {
+        title: 'Enrollment over time',
+        unit: 'students',
+        labels: ['2020', '2021', '2022', '2023', '2024', '2025'],
+        values: [380, 380, 365, 340, 320, 305],
+      },
+      voices: [
+        { role: 'Current parent, 3 years at school', quote: 'We tell every neighbor about Riverside. But we\'re basically doing the marketing — the school doesn\'t do much of it.' },
+        { role: 'Prospective parent who chose elsewhere', quote: 'I heard great things about Riverside from a friend, but the website made it hard to figure out what made it different.' },
+        { role: 'Kindergarten teacher', quote: 'The kids who come in already know they want to be here. We just don\'t have as many of them showing up as we used to.' },
+      ],
+      timeline: [
+        { when: '2 years ago', what: 'New charter school opened 4 miles away with a STEM-focused model.' },
+        { when: 'Last spring', what: 'Open house attendance dropped from 80 families to 32.' },
+        { when: 'Last summer', what: 'A district magnet school launched a project-based program for K–5.' },
+        { when: 'This fall', what: 'New family inquiries down 28% compared to two years ago.' },
+      ],
+      strengths: [
+        '91% parent satisfaction — among the highest in the city.',
+        'Strong, distinctive project-based learning model that families remember.',
+        'Active parent community willing to refer and recruit when asked.',
+      ],
+      prompt: 'What do you think is shaping enrollment trends here, and what concrete moves would your group recommend to grow Riverside back to full capacity in a way that protects what families love?',
+    },
+    3: {
+      group: 3,
+      area: 'Academic Growth & Instruction',
+      name: 'Northstar Prep',
+      title: 'Lifting every student\'s academic experience.',
+      paragraphs: [
+        'Northstar Prep serves grades 6–12 and has built a reputation for college readiness. Graduation and college acceptance rates remain strong, but recent benchmark data shows that growth in math and literacy has slowed in the middle grades, and the gap between top-performing and struggling students has widened over the past two years.',
+        'The leadership team wants to deepen the academic program for every student — not just the highest performers. They have engaged teachers and recent investment in curriculum materials, but they\'re thinking carefully about how to focus the next 90 days for the biggest impact.',
+      ],
+      evidence: [
+        { label: 'Math growth (mid-grade)', val: '+0.8%' },
+        { label: 'Reading growth', val: '+1.2%' },
+        { label: 'Performance gap', val: '+14%' },
+        { label: 'Avg class size', val: '24' },
+      ],
+      trend: {
+        title: 'Performance gap (top vs. struggling students)',
+        unit: '% gap',
+        labels: ['2020', '2021', '2022', '2023', '2024', '2025'],
+        values: [22, 24, 27, 30, 34, 36],
+      },
+      voices: [
+        { role: '7th-grade math teacher', quote: 'I have students reading three grades below level sitting next to students two grades above. I don\'t have the systems to serve both well at once.' },
+        { role: 'High school senior', quote: 'I felt prepared by senior year, but middle school I kind of coasted. Some friends never caught back up.' },
+        { role: 'Instructional coach', quote: 'Our teachers are working hard. The challenge is we don\'t have a consistent way to identify and respond to where each student is.' },
+      ],
+      timeline: [
+        { when: '3 years ago', what: 'New literacy curriculum adopted in grades 6–8; rollout was uneven across teachers.' },
+        { when: 'Last year', what: 'First diagnostic data revealed widening performance gap between students in middle grades.' },
+        { when: 'Last fall', what: 'Two new instructional coaches hired; coaching model still being defined.' },
+        { when: 'This spring', what: 'Board flagged middle-grade growth as the school\'s top academic priority.' },
+      ],
+      strengths: [
+        'Strong college acceptance and graduation outcomes — 96% college acceptance.',
+        'Engaged, mission-aligned teaching staff with low turnover.',
+        'Recent investment in curriculum and two new coaching positions.',
+      ],
+      prompt: 'What factors does your group think are slowing academic growth, and what would you recommend to lift the experience for every learner — especially in the middle grades?',
+    },
+    4: {
+      group: 4,
+      area: 'Family & Community Engagement',
+      name: 'Cedar Heights Community School',
+      title: 'Strengthening the partnership between school and families.',
+      paragraphs: [
+        'Cedar Heights serves a beautifully diverse K–8 community. The school has long-standing strengths in serving multilingual learners and students with IEPs. Recently, though, family engagement at school events has dropped, fewer parents are attending board meetings, and a recent survey showed that some families feel uncertain about how decisions get made at the school.',
+        'The leadership team sees this as an opportunity to deepen real partnership with families — not just attendance numbers, but trust, transparency, and shared ownership. They believe Cedar Heights\' diversity is a strength worth building on.',
+      ],
+      evidence: [
+        { label: 'Family event attendance', val: '38%' },
+        { label: 'Multilingual families', val: '47%' },
+        { label: 'Survey: "I feel heard"', val: '62%' },
+        { label: 'Board meeting attendees', val: '8 avg' },
+      ],
+      trend: {
+        title: 'Family event attendance over time',
+        unit: '%',
+        labels: ['2020', '2021', '2022', '2023', '2024', '2025'],
+        values: [68, 64, 58, 52, 44, 38],
+      },
+      voices: [
+        { role: 'Spanish-speaking parent', quote: 'The communication often comes only in English. By the time I get it translated, the moment to weigh in has passed.' },
+        { role: 'Long-time parent volunteer', quote: 'I used to know everyone here. Now I see new faces I\'ve never met. We need to rebuild those connections.' },
+        { role: 'Family liaison staff member', quote: 'Families ask great questions when we go to them. The events we host at school just aren\'t reaching everyone.' },
+      ],
+      timeline: [
+        { when: '2 years ago', what: 'Long-time family liaison retired; replacement role was vacant for 7 months.' },
+        { when: 'Last year', what: 'School moved to a new family communication platform that not all families adopted.' },
+        { when: 'Last spring', what: 'Annual family climate survey showed 38% of families "not sure how decisions get made."' },
+        { when: 'This fall', what: 'New family liaison hired; building monthly listening rotations with cultural communities.' },
+      ],
+      strengths: [
+        'Cedar Heights\' diversity is a defining strength — 47% multilingual families, deep cultural richness.',
+        'Strong record serving students with IEPs and English Language Learners.',
+        'New family liaison position is now filled with a bilingual hire.',
+      ],
+      prompt: 'What does your group think is at the heart of the engagement challenge, and what would you recommend to build deeper partnership with all of Cedar Heights\' families over the next 90 days?',
+    },
+    5: {
+      group: 5,
+      area: 'Financial Sustainability',
+      name: 'Summit Pathways Charter',
+      title: 'Building a financially strong school for the long term.',
+      paragraphs: [
+        'Summit Pathways is a thriving K–12 charter with full enrollment, a strong waitlist, and a respected academic program. The challenge is on the financial side: rising facility costs, growing program ambitions, and a still-developing fundraising muscle have left the school running tighter margins than leadership wants for a school of Summit\'s size.',
+        'The board and leadership team want to put Summit on a stronger financial footing — not by cutting what makes the school special, but by building sustainable revenue, smart partnerships, and disciplined planning. They have a year to set the trajectory.',
+      ],
+      evidence: [
+        { label: 'Operating margin', val: '2.1%' },
+        { label: 'Reserves (months)', val: '1.4' },
+        { label: 'Annual fundraising', val: '$48K' },
+        { label: 'Facility costs (% budget)', val: '23%' },
+      ],
+      trend: {
+        title: 'Operating margin over time',
+        unit: '%',
+        labels: ['2020', '2021', '2022', '2023', '2024', '2025'],
+        values: [6.4, 5.8, 4.9, 3.7, 2.8, 2.1],
+      },
+      voices: [
+        { role: 'Board treasurer', quote: 'We have a great school and a tight budget. One unexpected expense and we\'re making decisions we don\'t want to make.' },
+        { role: 'Director of Operations', quote: 'Facility costs have outpaced our per-pupil revenue every year for four years. That math doesn\'t work long-term.' },
+        { role: 'Development volunteer', quote: 'Our families would absolutely give if we asked. We just haven\'t built the muscle to ask consistently.' },
+      ],
+      timeline: [
+        { when: '4 years ago', what: 'Lease renegotiation increased annual facility costs by 18%.' },
+        { when: '2 years ago', what: 'School expanded high school program; per-pupil costs grew faster than revenue.' },
+        { when: 'Last year', what: 'First director of development hired part-time; annual fund raised $48K.' },
+        { when: 'This spring', what: 'Board passed resolution to grow reserves to 3 months by 2027.' },
+      ],
+      strengths: [
+        'Full enrollment and a 60-family waitlist — strong demand signals.',
+        'Engaged board and parent community willing to support development efforts.',
+        'Respected academic program and stable leadership team.',
+      ],
+      prompt: 'What does your group see as the key drivers of Summit\'s tight margins, and what would you recommend to build a stronger financial foundation while protecting the school\'s academic mission?',
+    },
+  };
+
+  // ============================================================
+  // THEMES, OPTIONS, KEYWORDS — broad enough to fit all 5 scenarios
+  // ============================================================
   const THEMES = {
-    staffing:    { label: 'Staffing',    color: '#2d5d63' },
-    academics:   { label: 'Academics',   color: '#3f7d4c' },
-    community:   { label: 'Community',   color: '#7a4f9b' },
-    enrollment:  { label: 'Enrollment',  color: '#b08a3e' },
+    staffing:    { label: 'Staffing',    color: '#2d6a4f' },
+    academics:   { label: 'Academics',   color: '#4a7ba6' },
+    community:   { label: 'Community',   color: '#9d4e6c' },
+    enrollment:  { label: 'Enrollment',  color: '#d97706' },
     operations:  { label: 'Operations',  color: '#5b6f8a' },
-    governance:  { label: 'Governance',  color: '#444444' },
+    governance:  { label: 'Governance',  color: '#6b7280' },
     funding:     { label: 'Funding',     color: '#a8321e' },
     equity:      { label: 'Equity',      color: '#c45a00' },
   };
 
   const CAUSES = [
-    { group: 'Staffing & Culture', items: [
-      { id: 'c-pay',       label: 'Teacher pay below regional market',           theme: 'staffing' },
-      { id: 'c-burnout',   label: 'Educator burnout from understaffing',         theme: 'staffing' },
-      { id: 'c-veterans',  label: 'Loss of veteran teachers / weak bench',       theme: 'staffing' },
+    { group: 'Staff Culture', items: [
+      { id: 'c-pay',       label: 'Compensation below regional benchmarks',     theme: 'staffing' },
+      { id: 'c-burnout',   label: 'Educator burnout from workload',             theme: 'staffing' },
+      { id: 'c-growth',    label: 'Limited career growth pathways',             theme: 'staffing' },
     ]},
     { group: 'Academics', items: [
-      { id: 'c-drift',     label: 'Curriculum drift from founding mission',      theme: 'academics' },
-      { id: 'c-quality',   label: 'Inconsistent instructional quality',          theme: 'academics' },
-      { id: 'c-mtss',      label: 'Weak academic intervention / MTSS systems',   theme: 'academics' },
-      { id: 'c-services',  label: 'IEP/ELL services under-resourced',            theme: 'equity' },
+      { id: 'c-drift',     label: 'Drift from founding instructional vision',   theme: 'academics' },
+      { id: 'c-quality',   label: 'Inconsistent instructional quality',         theme: 'academics' },
+      { id: 'c-mtss',      label: 'Underdeveloped intervention systems',        theme: 'academics' },
+      { id: 'c-services',  label: 'Specialized services under-resourced',       theme: 'equity' },
     ]},
-    { group: 'Community & Enrollment', items: [
-      { id: 'c-marketing', label: 'Weak family marketing & outreach',            theme: 'enrollment' },
-      { id: 'c-trust',     label: 'Loss of trust with current parent community', theme: 'community' },
-      { id: 'c-competition', label: 'New school competition in the area',        theme: 'enrollment' },
-      { id: 'c-demo',      label: 'Demographic shifts in the service area',      theme: 'enrollment' },
+    { group: 'Community & Families', items: [
+      { id: 'c-marketing', label: 'Limited family-facing storytelling',         theme: 'enrollment' },
+      { id: 'c-trust',     label: 'Communication gaps with current families',   theme: 'community' },
+      { id: 'c-competition', label: 'Stronger options nearby drawing families', theme: 'enrollment' },
+      { id: 'c-demo',      label: 'Shifting demographics in service area',      theme: 'enrollment' },
     ]},
-    { group: 'Operations', items: [
-      { id: 'c-facility',  label: 'Aging facility / poor learning environment',  theme: 'operations' },
-      { id: 'c-tech',      label: 'Outdated technology infrastructure',          theme: 'operations' },
+    { group: 'Operations & Resources', items: [
+      { id: 'c-facility',  label: 'Aging facility or learning environment',     theme: 'operations' },
+      { id: 'c-funding',   label: 'Tight budget limits flexibility',            theme: 'funding' },
     ]},
     { group: 'Governance & Leadership', items: [
-      { id: 'c-board',     label: 'Board governance gaps',                       theme: 'governance' },
-      { id: 'c-leadership', label: 'School leadership turnover',                 theme: 'governance' },
+      { id: 'c-board',     label: 'Board governance gaps',                      theme: 'governance' },
+      { id: 'c-leadership', label: 'Leadership transitions or stretch',         theme: 'governance' },
     ]},
   ];
 
   const ACTIONS = [
-    { group: 'Staffing & Culture', items: [
-      { id: 'a-comp',       label: 'Compensation study + adjust teacher pay',     theme: 'staffing' },
-      { id: 'a-stay',       label: 'Stay interviews & build retention plan',      theme: 'staffing' },
-      { id: 'a-coach',      label: 'Hire instructional coach / academic dean',    theme: 'staffing' },
-      { id: 'a-wellness',   label: 'Add staff wellness & mental health support',  theme: 'staffing' },
+    { group: 'Staff Culture', items: [
+      { id: 'a-comp',       label: 'Compensation review and adjustment',         theme: 'staffing' },
+      { id: 'a-stay',       label: 'Stay interviews and retention plan',         theme: 'staffing' },
+      { id: 'a-coach',      label: 'Add instructional coach or academic dean',   theme: 'staffing' },
+      { id: 'a-wellness',   label: 'Staff wellness and workload review',         theme: 'staffing' },
     ]},
     { group: 'Academics', items: [
-      { id: 'a-audit',      label: 'Curriculum audit & alignment review',         theme: 'academics' },
-      { id: 'a-tier',       label: 'Strengthen MTSS / tiered intervention',       theme: 'academics' },
-      { id: 'a-diagnostic', label: 'Diagnostic testing + targeted reteaching',    theme: 'academics' },
-      { id: 'a-sped',       label: 'Strengthen SPED & ELL staffing',              theme: 'equity' },
+      { id: 'a-audit',      label: 'Curriculum audit and alignment review',      theme: 'academics' },
+      { id: 'a-tier',       label: 'Strengthen tiered intervention systems',     theme: 'academics' },
+      { id: 'a-diagnostic', label: 'Diagnostic data and targeted support',       theme: 'academics' },
+      { id: 'a-sped',       label: 'Strengthen specialized program staffing',    theme: 'equity' },
     ]},
-    { group: 'Community & Enrollment', items: [
-      { id: 'a-listen',     label: 'Launch parent listening tour',                theme: 'community' },
-      { id: 'a-marketing',  label: 'Targeted enrollment marketing campaign',      theme: 'enrollment' },
-      { id: 'a-referral',   label: 'Family referral program & open houses',       theme: 'enrollment' },
-      { id: 'a-mission',    label: 'Re-tell founding mission story to community', theme: 'community' },
+    { group: 'Community & Families', items: [
+      { id: 'a-listen',     label: 'Launch family listening sessions',           theme: 'community' },
+      { id: 'a-marketing',  label: 'Targeted enrollment outreach',               theme: 'enrollment' },
+      { id: 'a-referral',   label: 'Family referral and open house program',     theme: 'enrollment' },
+      { id: 'a-mission',    label: 'Re-tell the school\'s story to community',   theme: 'community' },
     ]},
-    { group: 'Operations', items: [
-      { id: 'a-techplan',   label: 'Technology upgrade plan',                     theme: 'operations' },
-      { id: 'a-facility',   label: 'Facility improvement plan',                   theme: 'operations' },
+    { group: 'Operations & Resources', items: [
+      { id: 'a-techplan',   label: 'Technology and infrastructure plan',         theme: 'operations' },
+      { id: 'a-facility',   label: 'Facility improvement roadmap',               theme: 'operations' },
+      { id: 'a-fundraise',  label: 'Build fundraising and partnerships',         theme: 'funding' },
     ]},
     { group: 'Governance & Strategy', items: [
-      { id: 'a-bdtraining', label: 'Board governance training',                   theme: 'governance' },
-      { id: 'a-strat',      label: 'Strategic plan refresh with staff input',     theme: 'governance' },
-      { id: 'a-authorizer', label: 'Authorizer transparency briefing',            theme: 'governance' },
-      { id: 'a-survey',     label: 'Family/student survey & action loop',         theme: 'community' },
+      { id: 'a-bdtraining', label: 'Board development and training',             theme: 'governance' },
+      { id: 'a-strat',      label: 'Strategic plan refresh with staff input',    theme: 'governance' },
+      { id: 'a-survey',     label: 'Family and student feedback loop',           theme: 'community' },
     ]},
   ];
 
   const THEME_KEYWORDS = {
-    staffing:   ['teacher','teachers','staff','staffing','hire','retention','retain','salary','pay','wage','burnout','training','recruit','turnover','mentor','coach'],
-    academics:  ['curriculum','academic','instruction','learning','assessment','rigor','literacy','math','reading','project-based','pbl','stem','tutoring'],
-    community:  ['parent','parents','community','family','families','engagement','partnership','volunteer','communication','trust','listening'],
-    enrollment: ['enrollment','enroll','marketing','outreach','waitlist','capacity','attract','disenroll'],
-    operations: ['facility','facilities','building','space','lease','transportation','technology','tech','classroom','operations'],
-    governance: ['authorizer','charter','audit','regulation','accountability','renewal','board','governance','strategic'],
-    funding:    ['funding','budget','money','financial','grant','revenue','cost','fundraising','donation','tuition'],
-    equity:     ['equity','equitable','access','diverse','inclusion','iep','ell','disability','sped','underserved'],
+    staffing:   ['teacher','teachers','staff','staffing','hire','retention','retain','salary','pay','wage','burnout','training','recruit','turnover','mentor','coach','growth','wellness'],
+    academics:  ['curriculum','academic','instruction','learning','assessment','rigor','literacy','math','reading','project-based','pbl','stem','tutoring','intervention'],
+    community:  ['parent','parents','community','family','families','engagement','partnership','volunteer','communication','trust','listening','transparency'],
+    enrollment: ['enrollment','enroll','marketing','outreach','waitlist','capacity','attract','referral','open house','visibility'],
+    operations: ['facility','facilities','building','space','lease','transportation','technology','tech','classroom','operations','infrastructure'],
+    governance: ['authorizer','charter','audit','regulation','accountability','renewal','board','governance','strategic','leadership'],
+    funding:    ['funding','budget','money','financial','grant','revenue','cost','fundraising','donation','tuition','sustainability','margin','reserves'],
+    equity:     ['equity','equitable','access','diverse','inclusion','iep','ell','disability','sped','underserved','multilingual'],
   };
 
   // ============================================================
-  // CHECK CONFIG — show setup screen if not configured
+  // CHECK CONFIG
   // ============================================================
   const CONFIG_OK = firebaseConfig.apiKey && !firebaseConfig.apiKey.startsWith('PASTE_');
 
@@ -890,7 +1513,7 @@
   }
 
   // ============================================================
-  // FIREBASE INIT — only runs if config is set
+  // FIREBASE
   // ============================================================
   let db, submissionsRef;
   let pushFn, setFn, removeFn, onValueFn, refFn;
@@ -900,13 +1523,11 @@
       const { initializeApp: initFb } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
       const { getDatabase, ref, onValue, push, set, remove } =
         await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js');
-
       const app = initFb(firebaseConfig);
       db = getDatabase(app);
       refFn = ref; pushFn = push; setFn = set; removeFn = remove; onValueFn = onValue;
-      submissionsRef = ref(db, `submissions/${CASE_ID}`);
+      submissionsRef = ref(db, `sessions/${SESSION_ID}`);
 
-      // Real-time listener — fires whenever any team submits anywhere
       onValue(submissionsRef, (snapshot) => {
         const data = snapshot.val() || {};
         const list = Object.entries(data).map(([key, sub]) => ({ ...sub, _key: key }));
@@ -921,15 +1542,11 @@
       });
     } catch (e) {
       console.error('Firebase init failed:', e);
-      document.getElementById('conn-text').textContent = 'Setup error — check config';
+      document.getElementById('conn-text').textContent = 'Setup error';
       document.getElementById('conn-indicator').classList.add('error');
-      toast('Could not connect to database — check config');
     }
   }
 
-  // ============================================================
-  // STORAGE OPS
-  // ============================================================
   async function pushSubmission(submission) {
     if (!submissionsRef) throw new Error('Database not initialized');
     const newRef = pushFn(submissionsRef);
@@ -992,6 +1609,155 @@
   renderOptionGroup('actions-container', ACTIONS);
 
   // ============================================================
+  // GROUP PICKER
+  // ============================================================
+  let chosenGroup = null;
+  document.querySelectorAll('.group-pick').forEach(el => {
+    el.addEventListener('click', () => {
+      document.querySelectorAll('.group-pick').forEach(g => g.classList.remove('selected'));
+      el.classList.add('selected');
+      chosenGroup = parseInt(el.dataset.group, 10);
+    });
+  });
+
+  // ============================================================
+  // POPULATE SCENARIO IN VIEW 2
+  // ============================================================
+  function loadScenario(groupNum) {
+    const sc = SCENARIOS[groupNum];
+    if (!sc) return;
+    document.getElementById('scenario-badge').textContent = sc.group;
+    document.getElementById('scenario-group-num').textContent = sc.group;
+    document.getElementById('scenario-area').textContent = sc.area;
+    document.getElementById('scenario-name').textContent = sc.name;
+    document.getElementById('case-id-label').textContent = `Group ${sc.group} · ${sc.area}`;
+    document.getElementById('case-title').textContent = sc.title;
+    const body = document.getElementById('case-body');
+    const paras = sc.paragraphs.map(p => `<p>${p}</p>`).join('');
+    const evidence = sc.evidence.map(e => `
+      <div class="item">
+        <div class="label">${e.label}</div>
+        <div class="val">${e.val}</div>
+      </div>
+    `).join('');
+
+    const trendHtml = sc.trend ? renderTrendChart(sc.trend) : '';
+
+    const voicesHtml = sc.voices && sc.voices.length ? `
+      <div class="evidence-block">
+        <div class="evidence-block-label">Voices from the school</div>
+        <div class="voices-list">
+          ${sc.voices.map(v => `
+            <div class="voice-card">
+              <p class="voice-quote">${escapeHtml(v.quote)}</p>
+              <div class="voice-role">— ${escapeHtml(v.role)}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    ` : '';
+
+    const timelineHtml = sc.timeline && sc.timeline.length ? `
+      <div class="evidence-block">
+        <div class="evidence-block-label">Recent context</div>
+        <div class="timeline-list">
+          ${sc.timeline.map(t => `
+            <div class="timeline-row">
+              <div class="timeline-when">${escapeHtml(t.when)}</div>
+              <div class="timeline-what">${escapeHtml(t.what)}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    ` : '';
+
+    const strengthsHtml = sc.strengths && sc.strengths.length ? `
+      <div class="evidence-block strengths-block">
+        <div class="evidence-block-label" style="color:var(--primary);">What's already working</div>
+        <ul class="strengths-list">
+          ${sc.strengths.map(s => `<li>${escapeHtml(s)}</li>`).join('')}
+        </ul>
+      </div>
+    ` : '';
+
+    body.innerHTML = `
+      ${paras}
+      <div class="evidence">${evidence}</div>
+      ${trendHtml}
+      ${voicesHtml}
+      ${timelineHtml}
+      ${strengthsHtml}
+      <div class="prompt-box">
+        <div class="kicker">Your group's task</div>
+        <p>${sc.prompt}</p>
+      </div>
+    `;
+  }
+
+  // Render a small inline SVG line chart for trend data
+  function renderTrendChart(trend) {
+    const w = 600, h = 140;
+    const pad = { top: 20, right: 16, bottom: 32, left: 36 };
+    const innerW = w - pad.left - pad.right;
+    const innerH = h - pad.top - pad.bottom;
+    const vals = trend.values;
+    const min = Math.min(...vals);
+    const max = Math.max(...vals);
+    const range = max - min || 1;
+    // Add a touch of headroom
+    const yMin = min - range * 0.15;
+    const yMax = max + range * 0.15;
+    const yRange = yMax - yMin || 1;
+
+    const xStep = innerW / (vals.length - 1);
+    const points = vals.map((v, i) => {
+      const x = pad.left + i * xStep;
+      const y = pad.top + innerH - ((v - yMin) / yRange) * innerH;
+      return [x, y, v];
+    });
+
+    const linePath = points.map((p, i) => (i === 0 ? `M${p[0]},${p[1]}` : `L${p[0]},${p[1]}`)).join(' ');
+    const areaPath = `${linePath} L${pad.left + innerW},${pad.top + innerH} L${pad.left},${pad.top + innerH} Z`;
+
+    const dots = points.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="3.5" fill="var(--primary)" stroke="white" stroke-width="1.5"/>`).join('');
+    const xLabels = trend.labels.map((l, i) => {
+      const x = pad.left + i * xStep;
+      return `<text x="${x}" y="${h - 10}" text-anchor="middle" font-size="10" fill="var(--muted)">${escapeHtml(l)}</text>`;
+    }).join('');
+    // Y-axis ticks
+    const yTicks = [yMin, (yMin + yMax) / 2, yMax].map(v => {
+      const y = pad.top + innerH - ((v - yMin) / yRange) * innerH;
+      const display = Math.round(v * 10) / 10;
+      return `
+        <line x1="${pad.left}" y1="${y}" x2="${pad.left + innerW}" y2="${y}" stroke="var(--rule)" stroke-dasharray="2,3"/>
+        <text x="${pad.left - 6}" y="${y + 3}" text-anchor="end" font-size="10" fill="var(--muted)">${display}${trend.unit === '%' ? '%' : ''}</text>
+      `;
+    }).join('');
+    // First and last value callouts
+    const firstP = points[0];
+    const lastP = points[points.length - 1];
+    const firstLabel = `<text x="${firstP[0]}" y="${firstP[1] - 8}" text-anchor="start" font-size="11" font-weight="600" fill="var(--ink)">${firstP[2]}${trend.unit === '%' ? '%' : ''}</text>`;
+    const lastLabel = `<text x="${lastP[0]}" y="${lastP[1] - 8}" text-anchor="end" font-size="11" font-weight="600" fill="var(--ink)">${lastP[2]}${trend.unit === '%' ? '%' : ''}</text>`;
+
+    return `
+      <div class="evidence-block">
+        <div class="evidence-block-label">${escapeHtml(trend.title)} <span class="evidence-unit">(${escapeHtml(trend.unit)})</span></div>
+        <div class="chart-wrap">
+          <svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="width:100%; height:auto; max-height:200px;">
+            ${yTicks}
+            <path d="${areaPath}" fill="var(--primary-soft)" opacity="0.6"/>
+            <path d="${linePath}" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            ${dots}
+            ${firstLabel}
+            ${lastLabel}
+            ${xLabels}
+          </svg>
+        </div>
+      </div>
+    `;
+  }
+
+  // ============================================================
   // ANALYSIS
   // ============================================================
   const ALL_OPTIONS = {};
@@ -1042,7 +1808,7 @@
   }
 
   // ============================================================
-  // VIEW MGMT
+  // VIEWS
   // ============================================================
   const views = {
     setup:   document.getElementById('view-setup'),
@@ -1061,17 +1827,23 @@
   // ============================================================
   let currentTeam = '';
   let currentMembers = '';
+  let currentGroupNum = null;
+  let activeTab = 'all'; // 'all' or 1..5
+  let cachedList = [];
 
   document.getElementById('filed-date').textContent =
-    new Date().toLocaleDateString('en-US', { month:'short', day:'2-digit', year:'numeric'}).toUpperCase();
+    new Date().toLocaleDateString('en-US', { month:'short', day:'2-digit', year:'numeric'});
 
   document.getElementById('start-btn').addEventListener('click', () => {
     if (!CONFIG_OK) { toast('Configure Firebase first'); return; }
     const name = document.getElementById('team-name').value.trim();
-    if (!name) { toast('Enter a team name first'); return; }
+    if (!name) { toast('Enter your group name'); return; }
+    if (!chosenGroup) { toast('Pick your group number (1–5)'); return; }
     currentTeam = name;
     currentMembers = document.getElementById('team-members').value.trim();
+    currentGroupNum = chosenGroup;
     document.getElementById('team-name-echo').textContent = currentTeam;
+    loadScenario(currentGroupNum);
     showView('case');
   });
 
@@ -1087,11 +1859,14 @@
     const actions = getChecked('actions-container');
     const notes = document.getElementById('notes').value.trim();
     if (causes.length === 0 && actions.length === 0 && !notes) {
-      toast('Pick at least a few items or write a note'); return;
+      toast('Pick a few items or share a note'); return;
     }
     const submission = {
-      team: currentTeam || 'Anonymous Team',
+      team: currentTeam || 'Unnamed Group',
       members: currentMembers || '',
+      groupNum: currentGroupNum,
+      scenarioName: SCENARIOS[currentGroupNum]?.name || '',
+      scenarioArea: SCENARIOS[currentGroupNum]?.area || '',
       causes, actions,
       notes: notes || '',
       notesThemes: analyzeNotes(notes),
@@ -1099,43 +1874,99 @@
     };
     const btn = document.getElementById('submit-btn');
     btn.disabled = true;
-    btn.textContent = 'Filing...';
+    btn.textContent = 'Sharing...';
     try {
       await pushSubmission(submission);
-      toast('Findings filed.');
+      toast('Shared with the Roundtable.');
       clearChecked('causes-container');
       clearChecked('actions-container');
       document.getElementById('notes').value = '';
       updateCounters();
+      activeTab = currentGroupNum;
       showView('room');
     } catch (e) {
       console.error(e);
       toast('Save failed — check connection');
     } finally {
       btn.disabled = false;
-      btn.textContent = 'Submit findings ▸';
+      btn.textContent = 'Share with the Roundtable →';
     }
   });
 
   document.getElementById('reset-btn').addEventListener('click', async () => {
-    if (!confirm('Reset all submissions for this case? This cannot be undone.')) return;
+    if (!confirm('Reset all responses for this session? This cannot be undone.')) return;
     try {
       await clearAllSubmissions();
-      toast('Case reset.');
+      toast('Session reset.');
     } catch (e) {
-      console.error(e);
       toast('Reset failed');
     }
   });
 
   // ============================================================
-  // RENDER WAR ROOM
+  // TABS
+  // ============================================================
+  function renderTabs(list) {
+    const counts = { all: list.length, 1:0, 2:0, 3:0, 4:0, 5:0 };
+    list.forEach(s => { if (s.groupNum) counts[s.groupNum] = (counts[s.groupNum]||0) + 1; });
+    const tabs = document.getElementById('scenario-tabs');
+    tabs.innerHTML = '';
+    const tabDef = [
+      { key: 'all', label: 'All groups' },
+      ...Object.values(SCENARIOS).map(sc => ({ key: sc.group, label: `Group ${sc.group} · ${sc.name}` })),
+    ];
+    tabDef.forEach(t => {
+      const btn = document.createElement('button');
+      btn.className = 'scenario-tab' + (activeTab === t.key ? ' active' : '');
+      const countLabel = t.key === 'all' ? `${counts[t.key]||0}` : `${counts[t.key]||0} ${counts[t.key]===1 ? 'voice' : 'voices'}`;
+      btn.innerHTML = `${t.label}<span class="count">${countLabel}</span>`;
+      btn.addEventListener('click', () => {
+        activeTab = t.key;
+        renderRoom(cachedList);
+      });
+      tabs.appendChild(btn);
+    });
+  }
+
+  // ============================================================
+  // RENDER ROOM
   // ============================================================
   function renderRoom(list) {
-    document.getElementById('stat-teams').textContent = list.length;
+    cachedList = list;
+    renderTabs(list);
+
+    const isGroupView = activeTab !== 'all';
+    const filtered = isGroupView ? list.filter(s => s.groupNum === activeTab) : list;
+
+    // Stat labels change based on view
+    const teamsStatLbl = document.querySelector('#stat-teams + .lbl');
+    if (teamsStatLbl) teamsStatLbl.textContent = isGroupView ? 'Voices in this group' : 'Groups sharing';
+
+    // Section title changes based on view
+    const respTitle = document.getElementById('responses-section-title');
+    const respSub = document.getElementById('responses-section-sub');
+    if (respTitle && respSub) {
+      if (isGroupView) {
+        const sc = SCENARIOS[activeTab];
+        respTitle.textContent = sc ? `Group ${sc.group}'s collective response` : `This group's response`;
+        respSub.textContent = 'Aggregated view, with each contributor visible below';
+      } else {
+        respTitle.textContent = 'Each group\'s response';
+        respSub.textContent = 'Selections and notes from every group sharing';
+      }
+    }
+    // Leaderboard + theme subtitles
+    const causesSub = document.getElementById('top-causes-sub');
+    const actionsSub = document.getElementById('top-actions-sub');
+    const themeSub = document.getElementById('theme-sub');
+    if (causesSub) causesSub.textContent = isGroupView ? 'What this group is flagging most' : 'What groups are pointing to as contributing';
+    if (actionsSub) actionsSub.textContent = isGroupView ? 'The actions this group is endorsing most' : 'The moves leaders are recommending';
+    if (themeSub) themeSub.textContent = isGroupView ? 'Themes across this group\'s responses' : 'Themes across all groups\' responses';
+
+    document.getElementById('stat-teams').textContent = filtered.length;
     let causesTotal = 0, actionsTotal = 0;
     const causeCount = {}, actionCount = {}, themeCount = {};
-    for (const s of list) {
+    for (const s of filtered) {
       (s.causes || []).forEach(id => { causeCount[id] = (causeCount[id]||0)+1; causesTotal++; });
       (s.actions || []).forEach(id => { actionCount[id] = (actionCount[id]||0)+1; actionsTotal++; });
       for (const t of combinedThemes(s)) themeCount[t] = (themeCount[t]||0)+1;
@@ -1150,12 +1981,12 @@
     renderLeaderList('top-causes', causeCount, 6);
     renderLeaderList('top-actions', actionCount, 6);
 
-    const totalTeams = Math.max(1, list.length);
+    const totalGroups = Math.max(1, filtered.length);
     const bars = document.getElementById('theme-bars');
     bars.innerHTML = '';
     for (const [t, def] of Object.entries(THEMES)) {
       const c = themeCount[t] || 0;
-      const pct = (c / totalTeams) * 100;
+      const pct = (c / totalGroups) * 100;
       const row = document.createElement('div');
       row.className = 'theme-row';
       row.innerHTML = `
@@ -1169,51 +2000,155 @@
     }
 
     const subs = document.getElementById('submissions-list');
-    if (!list.length) {
-      subs.innerHTML = '<div class="empty">No findings filed yet. Be the first detective on the scene.</div>';
+    if (!filtered.length) {
+      subs.innerHTML = '<div class="empty">No responses in this view yet.</div>';
       return;
     }
-    const sorted = [...list].sort((a,b) => (b.timestamp||0) - (a.timestamp||0));
-    subs.innerHTML = sorted.map(s => {
-      const themes = combinedThemes(s);
-      const primaryTheme = themes[0] || null;
-      const borderColor = primaryTheme ? THEMES[primaryTheme].color : 'var(--accent)';
-      const causePills = (s.causes || []).map(id => {
-        const opt = ALL_OPTIONS[id]; if (!opt) return '';
-        const c = THEMES[opt.theme].color;
-        return `<span class="pill" style="border-color:${c}; color:${c};">${opt.label}</span>`;
-      }).join('');
-      const actionPills = (s.actions || []).map(id => {
-        const opt = ALL_OPTIONS[id]; if (!opt) return '';
-        const c = THEMES[opt.theme].color;
-        return `<span class="pill" style="border-color:${c}; color:${c};">${opt.label}</span>`;
-      }).join('');
-      const time = s.timestamp ? new Date(s.timestamp).toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit'}) : '';
-      const notesHtml = s.notes
-        ? `<div class="sub-block"><div class="sub-block-label">Notes</div><p class="sub-notes">${highlightNotes(s.notes, s.notesThemes || {})}</p></div>`
-        : '';
-      return `
-        <div class="sub-card" style="border-left-color:${borderColor};">
-          <div class="sub-head">
-            <div>
-              <div class="sub-team">${escapeHtml(s.team)}</div>
-              ${s.members ? `<div style="font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace;">${escapeHtml(s.members)}</div>` : ''}
-            </div>
-            <div class="sub-time">${time}</div>
-          </div>
-          ${causePills ? `<div class="sub-block"><div class="sub-block-label">Suspected Causes</div><div class="sub-tags">${causePills}</div></div>` : ''}
-          ${actionPills ? `<div class="sub-block"><div class="sub-block-label">Recommended Actions</div><div class="sub-tags">${actionPills}</div></div>` : ''}
-          ${notesHtml}
-        </div>
-      `;
+
+    // ========== GROUP VIEW (single tab selected) ==========
+    if (isGroupView) {
+      subs.innerHTML = renderGroupAggregateView(filtered, activeTab) + renderIndividualToggle(filtered);
+      // Wire up the toggle
+      const toggleBtn = document.getElementById('toggle-individuals');
+      const indWrap = document.getElementById('individual-responses');
+      if (toggleBtn && indWrap) {
+        toggleBtn.addEventListener('click', () => {
+          const open = indWrap.style.display !== 'none';
+          indWrap.style.display = open ? 'none' : 'grid';
+          toggleBtn.textContent = open
+            ? `Show individual responses (${filtered.length})`
+            : `Hide individual responses`;
+        });
+      }
+      return;
+    }
+
+    // ========== ALL-GROUPS VIEW (default) — show individual cards ==========
+    const sorted = [...filtered].sort((a,b) => (b.timestamp||0) - (a.timestamp||0));
+    subs.innerHTML = sorted.map(s => renderIndividualCard(s)).join('');
+  }
+
+  function renderGroupAggregateView(filtered, groupNum) {
+    const sc = SCENARIOS[groupNum];
+    const scenarioLabel = sc ? `Group ${sc.group} · ${sc.name}` : `Group ${groupNum}`;
+
+    // Tally
+    const causeCount = {}, actionCount = {};
+    const allNotes = [];
+    for (const s of filtered) {
+      (s.causes || []).forEach(id => { causeCount[id] = (causeCount[id]||0)+1; });
+      (s.actions || []).forEach(id => { actionCount[id] = (actionCount[id]||0)+1; });
+      if (s.notes) allNotes.push(s);
+    }
+
+    const total = filtered.length;
+    const sortedCauses = Object.entries(causeCount).sort((a,b) => b[1]-a[1]);
+    const sortedActions = Object.entries(actionCount).sort((a,b) => b[1]-a[1]);
+
+    const causePills = sortedCauses.map(([id, c]) => {
+      const opt = ALL_OPTIONS[id]; if (!opt) return '';
+      const col = THEMES[opt.theme].color;
+      return `<span class="pill" style="border-color:${col}; color:${col};">${opt.label} <strong style="margin-left:4px; opacity:0.85;">${c}</strong></span>`;
     }).join('');
+
+    const actionPills = sortedActions.map(([id, c]) => {
+      const opt = ALL_OPTIONS[id]; if (!opt) return '';
+      const col = THEMES[opt.theme].color;
+      return `<span class="pill" style="border-color:${col}; color:${col};">${opt.label} <strong style="margin-left:4px; opacity:0.85;">${c}</strong></span>`;
+    }).join('');
+
+    const notesHtml = allNotes.length
+      ? allNotes.map(s => `
+          <div class="agg-note">
+            <div class="agg-note-author">${escapeHtml(s.team)}</div>
+            <p class="sub-notes" style="margin-top:6px;">${highlightNotes(s.notes, s.notesThemes || {})}</p>
+          </div>
+        `).join('')
+      : '<div class="empty" style="padding:14px 8px; text-align:left;">No notes shared in this group yet.</div>';
+
+    return `
+      <div class="group-aggregate-card">
+        <div class="agg-head">
+          <div>
+            <div class="agg-tag">Group view</div>
+            <div class="agg-title">${escapeHtml(scenarioLabel)}</div>
+          </div>
+          <div class="agg-meta">${total} ${total===1 ? 'voice' : 'voices'} contributed</div>
+        </div>
+
+        <div class="agg-section">
+          <div class="agg-section-label">What this group thinks is contributing</div>
+          ${causePills ? `<div class="sub-tags">${causePills}</div>` : '<div class="empty" style="padding:12px 8px; text-align:left;">No factors selected yet.</div>'}
+        </div>
+
+        <div class="agg-section">
+          <div class="agg-section-label">What this group would do</div>
+          ${actionPills ? `<div class="sub-tags">${actionPills}</div>` : '<div class="empty" style="padding:12px 8px; text-align:left;">No actions selected yet.</div>'}
+        </div>
+
+        <div class="agg-section">
+          <div class="agg-section-label">This group's thinking (notes)</div>
+          <div class="agg-notes-list">${notesHtml}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderIndividualToggle(filtered) {
+    const total = filtered.length;
+    return `
+      <div class="individual-toggle-wrap">
+        <button class="btn ghost" id="toggle-individuals" style="font-size:13px; padding:10px 16px;">Show individual responses (${total})</button>
+        <div class="submissions" id="individual-responses" style="display:none; margin-top:14px;">
+          ${[...filtered].sort((a,b) => (b.timestamp||0) - (a.timestamp||0)).map(s => renderIndividualCard(s, true)).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderIndividualCard(s, isInsideGroupView = false) {
+    const themes = combinedThemes(s);
+    const primaryTheme = themes[0] || null;
+    const borderColor = primaryTheme ? THEMES[primaryTheme].color : 'var(--primary)';
+    const causePills = (s.causes || []).map(id => {
+      const opt = ALL_OPTIONS[id]; if (!opt) return '';
+      const c = THEMES[opt.theme].color;
+      return `<span class="pill" style="border-color:${c}; color:${c};">${opt.label}</span>`;
+    }).join('');
+    const actionPills = (s.actions || []).map(id => {
+      const opt = ALL_OPTIONS[id]; if (!opt) return '';
+      const c = THEMES[opt.theme].color;
+      return `<span class="pill" style="border-color:${c}; color:${c};">${opt.label}</span>`;
+    }).join('');
+    const time = s.timestamp ? new Date(s.timestamp).toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit'}) : '';
+    const notesHtml = s.notes
+      ? `<div class="sub-block"><div class="sub-block-label">Their thinking</div><p class="sub-notes">${highlightNotes(s.notes, s.notesThemes || {})}</p></div>`
+      : '';
+    // Only show scenario tag in "All groups" view; redundant inside a group view
+    const scenarioTag = (!isInsideGroupView && s.scenarioName)
+      ? `<span class="sub-scenario-tag">Group ${s.groupNum} · ${escapeHtml(s.scenarioName)}</span>`
+      : '';
+    return `
+      <div class="sub-card" style="border-left-color:${borderColor};">
+        <div class="sub-head">
+          <div>
+            <span class="sub-team">${escapeHtml(s.team)}</span>${scenarioTag}
+            ${s.members ? `<div style="font-size:12px;color:var(--muted); margin-top:2px;">${escapeHtml(s.members)}</div>` : ''}
+          </div>
+          <div class="sub-time">${time}</div>
+        </div>
+        ${causePills ? `<div class="sub-block"><div class="sub-block-label">What they think is contributing</div><div class="sub-tags">${causePills}</div></div>` : ''}
+        ${actionPills ? `<div class="sub-block"><div class="sub-block-label">What they'd do</div><div class="sub-tags">${actionPills}</div></div>` : ''}
+        ${notesHtml}
+      </div>
+    `;
   }
 
   function renderLeaderList(elId, counts, topN) {
     const el = document.getElementById(elId);
     const entries = Object.entries(counts).sort((a,b) => b[1] - a[1]).slice(0, topN);
     if (!entries.length) {
-      el.innerHTML = '<div class="empty" style="padding:18px 8px;">No data yet.</div>';
+      el.innerHTML = '<div class="empty" style="padding:18px 8px;">No responses yet.</div>';
       return;
     }
     const max = Math.max(...entries.map(([,c]) => c));
