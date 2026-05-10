@@ -7,6 +7,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Firebase compat (loads via script tags — more reliable than ES module imports) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <style>
   :root {
     --bg: #f7f4ee;
@@ -21,10 +24,11 @@
     --primary-deep: #1b4332;
     --accent: #d97706;
     --accent-soft: #fde9c4;
-    --sky: #4a7ba6;
-    --sky-soft: #d6e6f3;
     --berry: #9d4e6c;
     --good: #2d6a4f;
+    --good-soft: #d8ebe1;
+    --bad: #b94a48;
+    --bad-soft: #fbe2e0;
     --neo: #1d4e89;
     --neo-soft: #dde8f5;
   }
@@ -37,26 +41,49 @@
     min-height: 100vh;
   }
   .wrap {
-    max-width: 1100px;
+    max-width: 900px;
     margin: 0 auto;
-    padding: 28px 24px 80px;
+    padding: 24px 22px 60px;
   }
 
   header.top {
     display: flex; align-items: flex-end; justify-content: space-between;
     border-bottom: 1px solid var(--rule);
-    padding-bottom: 18px; margin-bottom: 32px;
-    gap: 16px; flex-wrap: wrap;
+    padding-bottom: 16px; margin-bottom: 28px;
+    gap: 14px; flex-wrap: wrap;
+  }
+  .header-brand-row {
+    display: flex; align-items: center; gap: 12px;
+    flex-wrap: wrap;
   }
   .brand {
     font-family: 'Fraunces', serif;
     font-weight: 700;
-    font-size: clamp(22px, 3vw, 30px);
+    font-size: clamp(22px, 3vw, 28px);
     letter-spacing: -0.02em;
     line-height: 1;
     color: var(--ink);
   }
   .brand .em { color: var(--primary); }
+  .neo-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--neo);
+    color: white;
+    padding: 5px 11px 5px 9px;
+    border-radius: 6px;
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    box-shadow: 0 1px 2px rgba(29,78,137,0.2);
+  }
+  .neo-badge .neo-mark {
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+  }
   .sub-brand {
     font-size: 12px; color: var(--muted);
     margin-top: 6px;
@@ -66,7 +93,6 @@
     color: var(--muted);
     text-align: right;
   }
-  .meta strong { color: var(--ink); font-weight: 600; }
   .conn-status {
     display: inline-flex; align-items: center; gap: 6px;
     font-size: 11px;
@@ -76,16 +102,29 @@
     background: var(--muted);
   }
   .conn-status.connected .dot { background: var(--good); animation: pulse 1.6s infinite; }
-  .conn-status.error .dot { background: #b94a48; }
+  .conn-status.error .dot { background: var(--bad); }
   .conn-status.connected { color: var(--good); }
-  .conn-status.error { color: #b94a48; }
+  .conn-status.error { color: var(--bad); }
   @keyframes pulse {
     0% { box-shadow: 0 0 0 0 rgba(45,106,79,0.5); }
     70% { box-shadow: 0 0 0 8px rgba(45,106,79,0); }
     100% { box-shadow: 0 0 0 0 rgba(45,106,79,0); }
   }
 
-  .view { display: none; animation: fade .35s ease; }
+  /* Persistent score chip */
+  .score-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 4px 11px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 4px;
+  }
+  .score-chip strong { font-family: 'Fraunces', serif; font-size: 14px; }
+
+  .view { display: none; animation: fade .3s ease; }
   .view.active { display: block; }
   @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
@@ -93,61 +132,83 @@
     background: var(--surface);
     border: 1px solid var(--rule);
     border-radius: 12px;
-    padding: 32px;
+    padding: 28px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 8px 24px -16px rgba(0,0,0,0.08);
   }
-  .card + .card { margin-top: 18px; }
+  .card + .card { margin-top: 16px; }
 
   /* HERO */
   .hero {
-    display: grid; grid-template-columns: 1.15fr 1fr; gap: 0;
-    background: var(--surface);
+    background: linear-gradient(135deg, var(--primary-soft) 0%, var(--bg-2) 100%);
     border: 1px solid var(--rule);
     border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 12px 32px -20px rgba(0,0,0,0.12);
-  }
-  @media (max-width: 740px) { .hero { grid-template-columns: 1fr; } }
-  .hero-left {
-    background: linear-gradient(135deg, var(--primary-soft) 0%, var(--bg-2) 100%);
-    padding: 44px 36px;
+    padding: 36px 32px;
     position: relative;
+    overflow: hidden;
+    margin-bottom: 16px;
   }
-  .hero-left::after {
+  .hero::after {
     content: "";
     position: absolute;
-    bottom: -40px; right: -40px;
-    width: 200px; height: 200px;
+    bottom: -50px; right: -50px;
+    width: 220px; height: 220px;
     background: radial-gradient(circle, var(--accent-soft) 0%, transparent 70%);
-    opacity: 0.6;
+    opacity: 0.7;
     pointer-events: none;
   }
-  .hero-right { padding: 44px 36px; }
   .kicker {
     display: inline-block;
     font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
     color: var(--primary);
-    background: var(--primary-soft);
+    background: rgba(255,255,255,0.7);
     padding: 5px 11px;
     border-radius: 999px;
     font-weight: 600;
-    margin-bottom: 18px;
+    margin-bottom: 16px;
   }
   h1 {
     font-family: 'Fraunces', serif;
     font-weight: 700;
-    font-size: clamp(34px, 4.6vw, 48px);
+    font-size: clamp(30px, 4.4vw, 42px);
     line-height: 1.05;
     letter-spacing: -0.02em;
-    margin: 0 0 18px;
+    margin: 0 0 16px;
     color: var(--ink);
   }
   h1 em { font-style: italic; color: var(--primary); }
   .lede {
-    font-size: 16.5px; color: var(--ink-soft); line-height: 1.6;
-    margin-bottom: 0;
+    font-size: 16px; color: var(--ink-soft); line-height: 1.6;
+    margin: 0 0 18px;
+    max-width: 580px;
+  }
+  .neo-credit {
+    padding-top: 16px;
+    border-top: 1px dashed rgba(0,0,0,0.1);
+    display: flex; align-items: center; gap: 10px;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+  }
+  .neo-credit .label-text {
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .neo-credit .neo-name {
+    color: var(--neo);
+    font-weight: 600;
+  }
+  .neo-credit .neo-name em {
+    font-style: normal;
+    color: var(--ink-soft);
+    font-weight: 400;
   }
 
+  /* FORM */
   label.field-label {
     display: block;
     font-size: 12px; font-weight: 600;
@@ -166,68 +227,46 @@
     transition: border-color .15s ease;
   }
   input[type="text"]:focus { border-color: var(--primary); background: var(--surface); }
-  textarea {
-    width: 100%;
-    font-family: 'Inter', sans-serif;
-    font-size: 15px;
-    line-height: 1.55;
-    border: 1.5px solid var(--rule);
-    border-radius: 8px;
-    padding: 14px 16px;
-    background: var(--bg);
-    min-height: 120px;
-    color: var(--ink);
-    outline: none;
-    resize: vertical;
-    transition: border-color .15s ease;
-  }
-  textarea:focus { border-color: var(--primary); background: var(--surface); }
-  .field + .field { margin-top: 18px; }
+  .field + .field { margin-top: 16px; }
 
-  /* GROUP PICKER */
-  .group-picker {
+  /* PLAY MODE */
+  .play-mode-row {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 8px;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
     margin-top: 6px;
   }
-  @media (max-width: 460px) {
-    .group-picker { grid-template-columns: repeat(5, 1fr); gap: 6px; }
-  }
-  .group-pick {
+  .play-mode {
     cursor: pointer;
     text-align: center;
-    padding: 14px 4px;
+    padding: 14px 16px;
     background: var(--bg);
     border: 1.5px solid var(--rule);
-    border-radius: 8px;
-    font-family: 'Fraunces', serif;
-    font-weight: 700;
-    font-size: 22px;
-    color: var(--ink);
+    border-radius: 10px;
     transition: all .15s ease;
   }
-  .group-pick:hover {
+  .play-mode:hover {
     border-color: var(--primary);
     background: var(--primary-soft);
   }
-  .group-pick.selected {
+  .play-mode.selected {
     background: var(--primary);
     border-color: var(--primary);
     color: white;
     box-shadow: 0 4px 12px -4px rgba(45,106,79,0.4);
   }
-  .group-pick .label-tiny {
-    display: block;
-    font-family: 'Inter', sans-serif;
-    font-weight: 500;
-    font-size: 10px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    margin-top: 4px;
-    opacity: 0.7;
+  .play-mode .pm-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 17px;
+    margin-bottom: 2px;
+  }
+  .play-mode .pm-sub {
+    font-size: 12px;
+    opacity: 0.75;
   }
 
+  /* BUTTONS */
   .btn {
     appearance: none; cursor: pointer;
     background: var(--primary);
@@ -237,11 +276,10 @@
     padding: 13px 22px;
     font-family: 'Inter', sans-serif;
     font-size: 14px; font-weight: 600;
-    letter-spacing: 0.01em;
     transition: all .15s ease;
     box-shadow: 0 1px 2px rgba(0,0,0,0.05), 0 4px 12px -6px rgba(45,106,79,0.4);
   }
-  .btn:hover { background: var(--primary-deep); transform: translateY(-1px); box-shadow: 0 2px 4px rgba(0,0,0,0.06), 0 8px 20px -8px rgba(45,106,79,0.5); }
+  .btn:hover { background: var(--primary-deep); transform: translateY(-1px); }
   .btn:active { transform: none; }
   .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
   .btn.ghost {
@@ -250,688 +288,445 @@
     border: 1.5px solid var(--rule);
     box-shadow: none;
   }
-  .btn.ghost:hover { background: var(--bg-2); border-color: var(--ink-soft); transform: none; box-shadow: none; }
-  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 26px; }
-
-  .scenario-banner {
-    display: flex; align-items: center; gap: 14px;
-    background: var(--primary-soft);
-    border-radius: 10px;
-    padding: 14px 18px;
-    margin-bottom: 22px;
+  .btn.ghost:hover { background: var(--bg-2); border-color: var(--ink-soft); transform: none; }
+  .btn.big {
+    font-size: 15px;
+    padding: 15px 26px;
   }
-  .scenario-banner .badge {
-    flex-shrink: 0;
-    width: 42px; height: 42px;
-    background: var(--primary);
-    color: white;
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
+  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px; }
+
+  /* ROOM PICKER */
+  .picker-head {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .picker-head h2 {
     font-family: 'Fraunces', serif;
     font-weight: 700;
-    font-size: 18px;
-  }
-  .scenario-banner .text {
-    flex: 1; min-width: 0;
-  }
-  .scenario-banner .small {
-    font-size: 11px; color: var(--primary-deep);
-    text-transform: uppercase; letter-spacing: 0.08em;
-    font-weight: 600;
-  }
-  .scenario-banner .name {
-    font-family: 'Fraunces', serif;
-    font-weight: 600;
-    font-size: 16px;
-    color: var(--ink);
-    margin-top: 2px;
-  }
-
-  .case-head {
-    border-bottom: 1px solid var(--rule); padding-bottom: 18px; margin-bottom: 22px;
-  }
-  .case-id {
-    font-size: 12px; color: var(--muted);
-    margin-bottom: 6px;
-  }
-  .case-id strong { color: var(--primary); font-weight: 600; }
-  h2 {
-    font-family: 'Fraunces', serif;
-    font-weight: 700;
-    font-size: clamp(26px, 3.2vw, 34px);
-    line-height: 1.1;
+    font-size: clamp(26px, 3.4vw, 32px);
     letter-spacing: -0.02em;
+    margin: 6px 0 8px;
+  }
+  .picker-head p {
+    color: var(--muted);
+    font-size: 14.5px;
     margin: 0;
-    color: var(--ink);
+    max-width: 540px;
+    margin-left: auto; margin-right: auto;
   }
-  .case-body p {
-    font-size: 16px; line-height: 1.7; color: var(--ink-soft);
-    margin: 0 0 14px;
-  }
-  .evidence {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 10px;
-    margin: 22px 0 8px;
-  }
-  .evidence .item {
-    background: var(--bg);
-    border: 1px solid var(--rule);
-    border-radius: 8px;
-    padding: 14px 16px;
-  }
-  .evidence .label {
-    font-size: 11px; color: var(--muted);
-    margin-bottom: 4px;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    font-weight: 600;
-  }
-  .evidence .val {
-    font-family: 'Fraunces', serif; font-weight: 700;
-    font-size: 22px; line-height: 1.1;
-    color: var(--ink);
-  }
-  .prompt-box {
-    background: var(--accent-soft);
-    border-left: 3px solid var(--accent);
-    border-radius: 0 8px 8px 0;
-    padding: 16px 20px;
-    margin-top: 22px;
-  }
-  .prompt-box .kicker {
-    color: var(--accent); background: rgba(217,119,6,0.12);
-    margin-bottom: 8px;
-  }
-  .prompt-box p { margin: 0; font-size: 15.5px; line-height: 1.6; color: var(--ink-soft); }
-
-  /* Evidence sections — trend, voices, timeline, strengths */
-  .evidence-block {
-    margin-top: 22px;
-    padding-top: 18px;
-    border-top: 1px solid var(--rule);
-  }
-  .evidence-block-label {
-    font-size: 11px;
-    color: var(--muted);
-    margin-bottom: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    font-weight: 600;
-  }
-  .evidence-unit {
-    color: var(--muted);
-    font-size: 10px;
-    text-transform: none;
-    letter-spacing: 0;
-    font-weight: 400;
-    margin-left: 4px;
-  }
-  .chart-wrap {
-    background: var(--bg);
-    border: 1px solid var(--rule);
-    border-radius: 8px;
-    padding: 8px 10px;
-  }
-  .voices-list {
+  .rooms-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 10px;
-  }
-  .voice-card {
-    background: var(--bg);
-    border: 1px solid var(--rule);
-    border-left: 3px solid var(--berry);
-    border-radius: 6px;
-    padding: 12px 14px 11px;
-  }
-  .voice-quote {
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    font-size: 14.5px;
-    line-height: 1.5;
-    color: var(--ink);
-    margin: 0 0 8px;
-  }
-  .voice-role {
-    font-size: 11px;
-    color: var(--muted);
-    font-weight: 500;
-    letter-spacing: 0.02em;
-  }
-  .timeline-list {
-    display: flex; flex-direction: column;
-    gap: 8px;
-  }
-  .timeline-row {
-    display: grid;
-    grid-template-columns: 110px 1fr;
     gap: 14px;
-    align-items: baseline;
-    padding: 8px 0;
-    border-bottom: 1px dashed var(--rule);
   }
-  .timeline-row:last-child { border-bottom: none; }
-  @media (max-width: 540px) {
-    .timeline-row { grid-template-columns: 1fr; gap: 2px; }
-  }
-  .timeline-when {
-    font-size: 11px;
-    color: var(--accent);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    font-weight: 600;
-  }
-  .timeline-what {
-    font-size: 14.5px;
-    color: var(--ink-soft);
-    line-height: 1.5;
-  }
-  .strengths-block {
-    background: var(--primary-soft);
-    border-radius: 8px;
-    padding: 16px 20px 14px;
-    border-top: none;
-    margin-top: 22px;
-  }
-  .strengths-list {
-    margin: 0;
-    padding-left: 22px;
-    list-style: none;
-  }
-  .strengths-list li {
-    font-size: 14.5px;
-    line-height: 1.55;
-    color: var(--ink);
-    margin-bottom: 6px;
-    position: relative;
-  }
-  .strengths-list li::before {
-    content: "✓";
-    position: absolute;
-    left: -22px;
-    color: var(--primary);
-    font-weight: 700;
-  }
-  .strengths-list li:last-child { margin-bottom: 0; }
-
-  .findings-section { margin-top: 8px; }
-  .findings-section + .findings-section { margin-top: 28px; }
-  .findings-head {
-    display: flex; justify-content: space-between; align-items: baseline;
-    margin-bottom: 6px;
-  }
-  .findings-title {
-    font-family: 'Fraunces', serif; font-weight: 700;
-    font-size: 20px; letter-spacing: -0.01em;
-    margin: 0;
-    color: var(--ink);
-  }
-  .findings-counter {
-    font-size: 12px;
-    color: var(--muted);
-  }
-  .findings-counter strong { color: var(--primary); font-weight: 600; }
-  .findings-hint {
-    font-size: 13.5px; color: var(--muted);
-    margin: 0 0 14px;
-  }
-  .group-block + .group-block { margin-top: 18px; }
-  .group-label {
-    font-size: 11px; font-weight: 600;
-    color: var(--primary);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 8px;
-    padding-bottom: 6px;
-    border-bottom: 1px dashed var(--rule);
-  }
-  .options-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6px 12px;
-  }
-  @media (max-width: 640px) { .options-grid { grid-template-columns: 1fr; } }
-
-  .opt {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 9px 12px;
-    cursor: pointer;
+  .room-card {
+    background: var(--surface);
     border: 1.5px solid var(--rule);
-    border-radius: 8px;
-    transition: all .15s ease;
-    background: var(--bg);
-    user-select: none;
-  }
-  .opt:hover {
-    border-color: var(--primary);
-    background: var(--primary-soft);
-  }
-  .opt input { display: none; }
-  .opt .box {
-    flex-shrink: 0;
-    width: 18px; height: 18px;
-    border: 1.5px solid var(--ink-soft);
-    background: var(--surface);
-    border-radius: 4px;
-    margin-top: 1px;
-    position: relative;
-    transition: all .15s ease;
-  }
-  .opt input:checked + .box {
-    background: var(--primary);
-    border-color: var(--primary);
-  }
-  .opt input:checked + .box::after {
-    content: "";
-    position: absolute;
-    left: 4px; top: 0px;
-    width: 6px; height: 12px;
-    border: solid white;
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
-  }
-  .opt .text {
-    font-size: 14px;
-    line-height: 1.4;
-    color: var(--ink);
-  }
-  .opt.checked {
-    background: var(--primary-soft);
-    border-color: var(--primary);
-  }
-
-  .room-head {
-    display: flex; align-items: center; justify-content: space-between; gap: 16px;
-    flex-wrap: wrap;
-    margin-bottom: 18px;
-  }
-  .room-head h2 { margin: 0; }
-  .live-pill {
-    display: inline-flex; align-items: center; gap: 8px;
-    font-size: 12px;
-    color: var(--good);
-    font-weight: 500;
-    background: var(--primary-soft);
-    padding: 6px 12px;
-    border-radius: 999px;
-  }
-
-  .scenario-tabs {
-    display: flex; gap: 4px;
-    border-bottom: 1px solid var(--rule);
-    margin-bottom: 22px;
-    overflow-x: auto;
-    padding-bottom: 0;
-  }
-  .scenario-tab {
-    padding: 10px 16px;
+    border-radius: 14px;
+    padding: 22px 22px 20px;
     cursor: pointer;
-    border: none;
-    background: transparent;
-    font-family: 'Inter', sans-serif;
-    font-size: 13.5px;
-    color: var(--muted);
-    border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
-    white-space: nowrap;
-    transition: all .15s ease;
-    font-weight: 500;
+    transition: all .2s ease;
+    position: relative;
+    overflow: hidden;
+    text-align: left;
   }
-  .scenario-tab:hover { color: var(--ink); }
-  .scenario-tab.active {
-    color: var(--primary);
-    border-bottom-color: var(--primary);
-    font-weight: 600;
+  .room-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px -16px rgba(45,106,79,0.3);
   }
-  .scenario-tab .count {
-    display: inline-block;
-    margin-left: 6px;
-    background: var(--bg-2);
-    color: var(--ink-soft);
-    border-radius: 999px;
-    padding: 1px 7px;
-    font-size: 11px;
-    font-weight: 600;
+  .room-card.locked {
+    cursor: default;
+    opacity: 0.78;
   }
-  .scenario-tab.active .count {
+  .room-card.locked:hover {
+    border-color: var(--rule);
+    transform: none;
+    box-shadow: none;
+  }
+  .room-icon {
+    width: 44px; height: 44px;
+    border-radius: 10px;
     background: var(--primary-soft);
     color: var(--primary);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 14px;
+    font-size: 22px;
   }
-
-  .stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 10px;
-    margin-bottom: 24px;
-  }
-  .stat {
-    background: var(--surface);
-    border: 1px solid var(--rule);
-    border-radius: 10px;
-    padding: 16px 18px;
-  }
-  .stat .val {
-    font-family: 'Fraunces', serif; font-weight: 700;
-    font-size: 28px; line-height: 1; letter-spacing: -0.01em;
-    color: var(--ink);
-  }
-  .stat .lbl {
-    font-size: 11px;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin-top: 6px;
-    font-weight: 600;
-  }
-
-  .dash-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 18px;
-    margin-bottom: 24px;
-  }
-  @media (max-width: 820px) { .dash-grid { grid-template-columns: 1fr; } }
-
-  .panel {
-    background: var(--surface);
-    border: 1px solid var(--rule);
-    border-radius: 12px;
-    padding: 22px 24px;
-  }
-  .section-title {
+  .room-name {
     font-family: 'Fraunces', serif;
     font-weight: 700;
     font-size: 19px;
     letter-spacing: -0.01em;
-    margin: 0 0 4px;
     color: var(--ink);
-  }
-  .section-sub {
-    font-size: 13px;
-    color: var(--muted);
-    margin-bottom: 16px;
-  }
-
-  .leader-list { display: flex; flex-direction: column; gap: 8px; }
-  .leader-row {
-    display: grid;
-    grid-template-columns: 1fr 60px 26px;
-    gap: 10px; align-items: center;
-  }
-  .leader-label {
-    font-size: 13px; line-height: 1.3;
-    color: var(--ink);
-  }
-  .leader-bar-track {
-    background: var(--bg-2);
-    height: 8px;
-    border-radius: 999px;
-    overflow: hidden;
-  }
-  .leader-bar-fill {
-    height: 100%;
-    border-radius: 999px;
-    transition: width .6s cubic-bezier(.2,.8,.2,1);
-  }
-  .leader-count {
-    font-family: 'Fraunces', serif; font-weight: 700; font-size: 14px;
-    text-align: right;
-    color: var(--ink);
-  }
-
-  .theme-bars { display: flex; flex-direction: column; gap: 10px; }
-  .theme-row {
-    display: grid;
-    grid-template-columns: 110px 1fr 32px;
-    gap: 10px; align-items: center;
-  }
-  .theme-name {
-    font-size: 12px;
-    color: var(--ink);
-    font-weight: 500;
-  }
-  .theme-bar-track {
-    background: var(--bg-2);
-    height: 14px;
-    border-radius: 999px;
-    overflow: hidden;
-  }
-  .theme-bar-fill { height: 100%; border-radius: 999px; transition: width .6s cubic-bezier(.2,.8,.2,1); }
-  .theme-count {
-    font-family: 'Fraunces', serif; font-weight: 700; font-size: 14px;
-    text-align: right;
-    color: var(--ink);
-  }
-
-  .submissions { display: grid; gap: 12px; }
-  .group-aggregate-card {
-    background: linear-gradient(135deg, var(--surface) 0%, var(--primary-soft) 200%);
-    border: 1.5px solid var(--primary);
-    border-radius: 14px;
-    padding: 24px 28px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.03), 0 12px 28px -16px rgba(45,106,79,0.25);
     margin-bottom: 4px;
   }
-  .agg-head {
-    display: flex; justify-content: space-between; align-items: flex-start;
-    gap: 12px; flex-wrap: wrap;
-    margin-bottom: 18px;
-    padding-bottom: 14px;
-    border-bottom: 1px solid var(--rule);
+  .room-desc {
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.4;
+    margin-bottom: 12px;
   }
-  .agg-tag {
-    display: inline-block;
-    font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase;
+  .room-meta {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-top: 12px;
+    border-top: 1px dashed var(--rule);
+    font-size: 12px;
+  }
+  .room-status {
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .room-status.done {
     color: var(--primary);
-    background: var(--primary-soft);
-    padding: 4px 10px;
-    border-radius: 999px;
     font-weight: 600;
-    margin-bottom: 6px;
   }
-  .agg-title {
+  .room-status.coming {
+    color: var(--muted);
+    font-style: italic;
+  }
+  .room-score {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    color: var(--accent);
+    font-size: 14px;
+  }
+  .room-card .badge-corner {
+    position: absolute;
+    top: 12px; right: 12px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 999px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .room-card .badge-corner.done {
+    background: var(--good-soft);
+    color: var(--good);
+  }
+  .room-card .badge-corner.coming {
+    background: var(--bg-2);
+    color: var(--muted);
+  }
+
+  /* QUESTION VIEW */
+  .question-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 14px;
+    gap: 12px; flex-wrap: wrap;
+  }
+  .question-room {
+    font-size: 11px;
+    color: var(--primary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .question-counter {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .question-counter strong { color: var(--ink); }
+  .question-progress {
+    height: 6px;
+    background: var(--bg-2);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 22px;
+  }
+  .question-progress-fill {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 999px;
+    transition: width .4s cubic-bezier(.2,.8,.2,1);
+  }
+  .question-text {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: clamp(20px, 2.6vw, 24px);
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    margin: 0 0 20px;
+  }
+  .question-evidence {
+    background: var(--bg);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 12px 16px;
+    margin-bottom: 22px;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+  .question-evidence strong { color: var(--accent); font-weight: 600; }
+
+  .answers {
+    display: flex; flex-direction: column;
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+  .answer {
+    display: flex; align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1.5px solid var(--rule);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all .15s ease;
+    user-select: none;
+    text-align: left;
+    width: 100%;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    line-height: 1.45;
+    color: var(--ink);
+  }
+  .answer:hover:not(.locked):not(.disabled) {
+    border-color: var(--primary);
+    background: var(--primary-soft);
+  }
+  .answer.selected {
+    background: var(--primary-soft);
+    border-color: var(--primary);
+  }
+  .answer .letter {
+    flex-shrink: 0;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 1.5px solid var(--ink-soft);
+    color: var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 14px;
+    transition: all .15s ease;
+  }
+  .answer.selected .letter {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+  }
+  .answer .text {
+    flex: 1;
+    padding-top: 3px;
+  }
+  /* After lock-in: correct */
+  .answer.correct {
+    background: var(--good-soft);
+    border-color: var(--good);
+    cursor: default;
+  }
+  .answer.correct .letter {
+    background: var(--good);
+    border-color: var(--good);
+    color: white;
+  }
+  .answer.correct::after {
+    content: "✓";
+    font-size: 18px;
+    color: var(--good);
+    font-weight: 700;
+    margin-left: auto;
+    align-self: center;
+  }
+  /* After lock-in: incorrect (the user's wrong choice) */
+  .answer.incorrect {
+    background: var(--bad-soft);
+    border-color: var(--bad);
+    cursor: default;
+  }
+  .answer.incorrect .letter {
+    background: var(--bad);
+    border-color: var(--bad);
+    color: white;
+  }
+  .answer.incorrect::after {
+    content: "✗";
+    font-size: 18px;
+    color: var(--bad);
+    font-weight: 700;
+    margin-left: auto;
+    align-self: center;
+  }
+  .answer.disabled {
+    opacity: 0.55;
+    cursor: default;
+  }
+
+  .feedback {
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 20px;
+    display: none;
+  }
+  .feedback.show { display: block; animation: fade .25s ease; }
+  .feedback.correct {
+    background: var(--good-soft);
+    border-left: 3px solid var(--good);
+  }
+  .feedback.incorrect {
+    background: var(--bad-soft);
+    border-left: 3px solid var(--bad);
+  }
+  .feedback-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 17px;
+    margin: 0 0 6px;
+  }
+  .feedback.correct .feedback-title { color: var(--good); }
+  .feedback.incorrect .feedback-title { color: var(--bad); }
+  .feedback-body {
+    font-size: 14px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  /* ROOM COMPLETE */
+  .complete-card {
+    background: var(--surface);
+    border: 1.5px solid var(--primary);
+    border-radius: 14px;
+    padding: 36px 32px;
+    text-align: center;
+    background: linear-gradient(180deg, var(--primary-soft) 0%, var(--surface) 60%);
+  }
+  .complete-icon {
+    width: 72px; height: 72px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 30px;
+  }
+  .complete-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 26px;
+    letter-spacing: -0.01em;
+    margin: 0 0 8px;
+  }
+  .complete-sub {
+    color: var(--muted);
+    font-size: 14.5px;
+    margin: 0 0 22px;
+  }
+  .complete-score {
+    background: var(--bg);
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    padding: 18px 24px;
+    display: inline-block;
+    margin-bottom: 22px;
+  }
+  .complete-score .num {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 38px;
+    line-height: 1;
+    color: var(--primary);
+  }
+  .complete-score .of {
+    color: var(--muted);
+    font-size: 18px;
+  }
+  .complete-score .lbl {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    margin-top: 4px;
+  }
+
+  /* LEADERBOARD */
+  .leaderboard-head {
+    text-align: center;
+    margin-bottom: 22px;
+  }
+  .leaderboard-list {
+    display: flex; flex-direction: column;
+    gap: 10px;
+  }
+  .lb-row {
+    display: grid;
+    grid-template-columns: 50px 1fr 80px;
+    gap: 12px;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 14px 18px;
+  }
+  .lb-row.you {
+    border-color: var(--primary);
+    background: var(--primary-soft);
+  }
+  .lb-row.gold { border-color: #d4a017; background: linear-gradient(135deg, #fff8e1 0%, var(--surface) 50%); }
+  .lb-row.silver { border-color: #94a3b8; background: linear-gradient(135deg, #f1f5f9 0%, var(--surface) 50%); }
+  .lb-row.bronze { border-color: #c97039; background: linear-gradient(135deg, #fef2e6 0%, var(--surface) 50%); }
+  .lb-rank {
     font-family: 'Fraunces', serif;
     font-weight: 700;
     font-size: 22px;
     color: var(--ink);
-    line-height: 1.1;
-    letter-spacing: -0.01em;
-  }
-  .agg-meta {
-    font-size: 13px; color: var(--ink-soft);
-    background: var(--bg);
-    padding: 6px 12px;
-    border-radius: 999px;
-    border: 1px solid var(--rule);
-    font-weight: 500;
-  }
-  .agg-section {
-    margin-top: 16px;
-  }
-  .agg-section-label {
-    font-size: 11px;
-    color: var(--muted);
-    margin-bottom: 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    font-weight: 600;
-  }
-  .agg-notes-list {
-    display: grid; gap: 10px;
-  }
-  .agg-note {
-    background: var(--bg);
-    border-radius: 8px;
-    padding: 10px 14px;
-    border: 1px solid var(--rule);
-  }
-  .agg-note-author {
-    font-family: 'Fraunces', serif;
-    font-weight: 600;
-    font-size: 14px;
-    color: var(--ink);
-  }
-  .individual-toggle-wrap {
-    margin-top: 18px;
-    padding-top: 18px;
-    border-top: 1px dashed var(--rule);
     text-align: center;
   }
-  .individual-toggle-wrap .submissions {
-    text-align: left;
-  }
-  .sub-card {
-    background: var(--surface);
-    border: 1px solid var(--rule);
-    border-left: 4px solid var(--primary);
-    border-radius: 10px;
-    padding: 18px 22px;
-  }
-  .sub-head {
-    display: flex; justify-content: space-between; align-items: baseline;
-    gap: 12px; flex-wrap: wrap;
-    margin-bottom: 10px;
-  }
-  .sub-team {
-    font-family: 'Fraunces', serif; font-weight: 700;
-    font-size: 18px; letter-spacing: -0.01em;
+  .lb-rank.medal { font-size: 26px; }
+  .lb-name {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 16px;
     color: var(--ink);
   }
-  .sub-scenario-tag {
+  .lb-name .you-tag {
     display: inline-block;
-    font-size: 11px;
-    color: var(--primary);
-    background: var(--primary-soft);
-    padding: 3px 9px;
-    border-radius: 999px;
-    margin-left: 8px;
+    background: var(--primary);
+    color: white;
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
     font-weight: 600;
-    vertical-align: middle;
-  }
-  .sub-time {
-    font-size: 11px;
-    color: var(--muted);
-  }
-  .sub-block { margin-bottom: 10px; }
-  .sub-block-label {
-    font-size: 11px;
-    color: var(--muted);
-    margin-bottom: 6px;
+    padding: 2px 7px;
+    border-radius: 999px;
+    margin-left: 6px;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    font-weight: 600;
   }
-  .sub-tags { display: flex; flex-wrap: wrap; gap: 5px; }
-  .pill {
-    font-size: 12px;
-    padding: 3px 10px;
-    border-radius: 999px;
-    background: var(--bg);
-    border: 1px solid var(--rule);
-    color: var(--ink-soft);
-    line-height: 1.4;
-  }
-  .sub-notes {
-    font-size: 14px; line-height: 1.55; color: var(--ink-soft);
-    margin: 0;
-    background: var(--bg);
-    border-radius: 6px;
-    padding: 10px 14px;
-  }
-  mark {
-    background: var(--accent-soft);
-    color: var(--ink);
-    padding: 0 3px;
-    border-radius: 3px;
-    font-weight: 500;
-  }
-
-  .empty {
-    text-align: center; padding: 30px 20px;
+  .lb-mode {
+    font-size: 11px;
     color: var(--muted);
-    font-style: italic;
-    font-size: 14.5px;
+    margin-top: 2px;
   }
-
-  .footer-nav {
-    margin-top: 30px;
-    display: flex; justify-content: space-between; align-items: center;
-    font-size: 13px;
-    color: var(--muted);
-    border-top: 1px solid var(--rule);
-    padding-top: 18px;
-    flex-wrap: wrap; gap: 12px;
+  .lb-score {
+    text-align: right;
   }
-  .footer-nav a { color: var(--primary); cursor: pointer; font-weight: 500; }
-  .footer-nav a:hover { text-decoration: underline; }
-
-  .toast {
-    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-    background: var(--ink);
-    color: white;
-    padding: 12px 22px;
-    border-radius: 999px;
-    font-size: 13px; font-weight: 500;
-    z-index: 100;
-    opacity: 0; pointer-events: none;
-    transition: opacity .25s ease, transform .25s ease;
-    box-shadow: 0 8px 24px -8px rgba(0,0,0,0.4);
-  }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(-4px); }
-
-  /* NEO branding */
-  .neo-badge {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: var(--neo);
-    color: white;
-    padding: 5px 11px 5px 9px;
-    border-radius: 6px;
+  .lb-score .pts {
     font-family: 'Fraunces', serif;
     font-weight: 700;
-    font-size: 13px;
-    letter-spacing: 0.04em;
+    font-size: 22px;
+    color: var(--accent);
     line-height: 1;
-    text-decoration: none;
-    box-shadow: 0 1px 2px rgba(29,78,137,0.2);
   }
-  .neo-badge .neo-mark {
-    display: inline-block;
-    width: 6px; height: 6px;
-    background: var(--accent);
-    border-radius: 50%;
-  }
-  .header-brand-row {
-    display: flex; align-items: center; gap: 12px;
-    flex-wrap: wrap;
-  }
-  .neo-credit {
-    margin-top: 18px;
-    padding-top: 16px;
-    border-top: 1px dashed var(--rule);
-    display: flex; align-items: center; gap: 10px;
-    font-size: 12.5px;
-    color: var(--ink-soft);
-    flex-wrap: wrap;
-  }
-  .neo-credit .label-text {
+  .lb-score .rooms-completed {
+    font-size: 10px;
     color: var(--muted);
-    font-size: 11px;
-    letter-spacing: 0.06em;
     text-transform: uppercase;
-    font-weight: 600;
+    letter-spacing: 0.06em;
+    margin-top: 4px;
   }
-  .neo-credit .neo-name {
-    color: var(--neo);
-    font-weight: 600;
-  }
-  .neo-credit .neo-name em {
-    font-style: normal;
-    color: var(--ink-soft);
-    font-weight: 400;
-  }
+
+  /* FOOTER */
   .footer-neo {
     margin-top: 36px;
     padding-top: 20px;
@@ -953,32 +748,40 @@
     font-weight: 400;
   }
 
-  .setup-screen {
-    background: var(--surface);
-    border: 2px solid var(--accent);
-    border-radius: 12px;
-    padding: 36px;
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--ink);
+    color: white;
+    padding: 12px 22px;
+    border-radius: 999px;
+    font-size: 13px; font-weight: 500;
+    z-index: 100;
+    opacity: 0; pointer-events: none;
+    transition: opacity .25s ease, transform .25s ease;
+    box-shadow: 0 8px 24px -8px rgba(0,0,0,0.4);
   }
-  .setup-screen h2 { margin-top: 0; }
-  .setup-screen ol { padding-left: 22px; line-height: 1.7; font-size: 15px; }
-  .setup-screen ol li { margin-bottom: 10px; }
-  .setup-screen code {
-    background: var(--bg-2);
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+
+  /* Nav button row */
+  .nav-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 24px;
+    flex-wrap: wrap;
+    gap: 10px;
   }
-  .setup-screen pre {
-    background: #1f2937;
-    color: #f3f4f6;
-    padding: 16px 18px;
-    border-radius: 8px;
-    overflow-x: auto;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    line-height: 1.5;
+  .nav-row .left-side, .nav-row .right-side {
+    display: flex; gap: 10px; flex-wrap: wrap;
   }
+  .text-link {
+    background: none; border: none; cursor: pointer;
+    color: var(--primary); font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    font-size: 13.5px;
+    padding: 4px 6px;
+  }
+  .text-link:hover { text-decoration: underline; }
+  .text-link.muted { color: var(--muted); }
 </style>
 </head>
 <body>
@@ -990,190 +793,151 @@
         <div class="brand">The <span class="em">Roundtable</span></div>
         <span class="neo-badge"><span class="neo-mark"></span>NEO</span>
       </div>
-      <div class="sub-brand">A leadership session for charter school changemakers</div>
+      <div class="sub-brand">A leadership challenge for charter school changemakers</div>
     </div>
     <div class="meta">
       <div id="conn-indicator" class="conn-status"><span class="dot"></span><span id="conn-text">Connecting...</span></div>
-      <div style="margin-top:4px;">Session: <strong id="filed-date">—</strong></div>
+      <div id="player-info" style="margin-top:4px; display:none;">
+        Playing as: <strong id="player-name-display">—</strong>
+        <div class="score-chip" style="margin-top:4px;">
+          <span>Total score</span>
+          <strong id="score-display">0</strong>
+        </div>
+      </div>
     </div>
   </header>
 
-  <!-- VIEW 0: Setup (only shown if Firebase not configured) -->
-  <section class="view" id="view-setup">
-    <div class="setup-screen">
-      <div class="kicker">One-time setup needed</div>
-      <h2>Connect a database first.</h2>
-      <p>This app needs a free Firebase database to share submissions across devices.</p>
-      <ol>
-        <li>Go to <a href="https://console.firebase.google.com" target="_blank"><code>console.firebase.google.com</code></a> and sign in.</li>
-        <li>Create a project, add a Realtime Database in test mode, and register a web app.</li>
-        <li>Paste your <code>firebaseConfig</code> values into the script block at the bottom of this HTML.</li>
-      </ol>
-    </div>
-  </section>
-
   <!-- VIEW 1: Welcome -->
-  <section class="view" id="view-welcome">
+  <section class="view active" id="view-welcome">
     <div class="hero">
-      <div class="hero-left">
-        <div class="kicker">Welcome to the session</div>
-        <h1>Five schools. Five challenges. <em>One room of leaders.</em></h1>
-        <p class="lede">
-          You and your group are joining other charter school leaders today to think through
-          a real-world scenario — and to learn from how others approach theirs.
-          Pick your group number, dig into your scenario, and share what you'd do.
-        </p>
-        <div class="neo-credit">
-          <span class="label-text">Presented by</span>
-          <span class="neo-name">NEO <em>· Novation Education Opportunities</em></span>
-        </div>
+      <div class="kicker">Welcome to the Roundtable</div>
+      <h1>Visit each station. Examine the evidence. <em>Crack the questions.</em></h1>
+      <p class="lede">
+        Five stations. Real artifacts at each table. Test your charter school leadership instincts —
+        and rack up points as you go. Play solo or with your school's team.
+      </p>
+      <div class="neo-credit">
+        <span class="label-text">Presented by</span>
+        <span class="neo-name">NEO <em>· Novation Education Opportunities</em></span>
       </div>
-      <div class="hero-right">
-        <div style="font-size:13px; font-weight:600; color:var(--ink); margin-bottom:14px;">Step 1 — Get started</div>
-        <div class="field">
-          <label class="field-label" for="team-name">Your group's name</label>
-          <input type="text" id="team-name" placeholder="e.g. The Lakeview Leaders" autocomplete="off" maxlength="60" />
-        </div>
-        <div class="field">
-          <label class="field-label" for="team-members">Members (optional)</label>
-          <input type="text" id="team-members" placeholder="Names, separated by commas" autocomplete="off" maxlength="200" />
-        </div>
-        <div class="field">
-          <label class="field-label">Pick your group number</label>
-          <div class="group-picker" id="group-picker">
-            <div class="group-pick" data-group="1">1<span class="label-tiny">Group</span></div>
-            <div class="group-pick" data-group="2">2<span class="label-tiny">Group</span></div>
-            <div class="group-pick" data-group="3">3<span class="label-tiny">Group</span></div>
-            <div class="group-pick" data-group="4">4<span class="label-tiny">Group</span></div>
-            <div class="group-pick" data-group="5">5<span class="label-tiny">Group</span></div>
+    </div>
+
+    <div class="card">
+      <div style="font-size:13px; font-weight:600; color:var(--ink); margin-bottom:14px;">Get started</div>
+      <div class="field">
+        <label class="field-label" for="player-name">Your name (or your team's name)</label>
+        <input type="text" id="player-name" placeholder="e.g. Jordan, or 'Lakeview Leaders'" autocomplete="off" maxlength="60" />
+      </div>
+      <div class="field">
+        <label class="field-label">Playing</label>
+        <div class="play-mode-row">
+          <div class="play-mode selected" data-mode="solo">
+            <div class="pm-title">Solo</div>
+            <div class="pm-sub">Just me</div>
+          </div>
+          <div class="play-mode" data-mode="group">
+            <div class="pm-title">As a group</div>
+            <div class="pm-sub">With my school</div>
           </div>
         </div>
-        <div class="btn-row">
-          <button class="btn" id="start-btn">Open my scenario →</button>
-          <button class="btn ghost" id="view-room-btn">The Roundtable →</button>
-        </div>
       </div>
-    </div>
-    <div class="footer-nav" style="border-top:none; padding-top:24px;">
-      <span>Multi-device · live shared · five scenarios</span>
-      <span>v0.4</span>
-    </div>
-  </section>
-
-  <!-- VIEW 2: Scenario + Submission -->
-  <section class="view" id="view-case">
-
-    <div class="card">
-      <div class="scenario-banner">
-        <div class="badge" id="scenario-badge">—</div>
-        <div class="text">
-          <div class="small">Group <span id="scenario-group-num">—</span> · <span id="scenario-area">—</span></div>
-          <div class="name" id="scenario-name">—</div>
-        </div>
-      </div>
-
-      <div class="case-head">
-        <div class="case-id">Scenario · <strong id="case-id-label">—</strong></div>
-        <h2 id="case-title">—</h2>
-      </div>
-
-      <div class="case-body" id="case-body">
-        <!-- Filled in by JS -->
-      </div>
-    </div>
-
-    <div class="card">
-      <div style="font-size:13px; font-weight:600; color:var(--ink); margin-bottom:6px;">Step 2 — Share what you'd do</div>
-      <div style="font-family:'Fraunces',serif; font-size:18px; margin-bottom:6px;">
-        Group <span id="team-name-echo" style="color:var(--primary); font-weight:700;">—</span>
-      </div>
-      <div style="font-size:13.5px; color:var(--muted); margin-bottom:24px;">
-        Pick the items that match your group's thinking. You can choose as many as you want — and use the notes section to add anything that's not in the lists.
-      </div>
-
-      <div class="findings-section">
-        <div class="findings-head">
-          <h3 class="findings-title">What we think is contributing</h3>
-          <div class="findings-counter"><strong id="count-causes">0</strong> selected</div>
-        </div>
-        <p class="findings-hint">The factors your group believes are at the root of this challenge.</p>
-        <div id="causes-container"></div>
-      </div>
-
-      <div class="findings-section">
-        <div class="findings-head">
-          <h3 class="findings-title">What we'd do about it</h3>
-          <div class="findings-counter"><strong id="count-actions">0</strong> selected</div>
-        </div>
-        <p class="findings-hint">The moves your group would recommend over the next 90 days.</p>
-        <div id="actions-container"></div>
-      </div>
-
-      <div class="findings-section">
-        <div class="findings-head">
-          <h3 class="findings-title">Our group's thinking</h3>
-          <div class="findings-counter">Optional</div>
-        </div>
-        <p class="findings-hint">Add reasoning, a top priority, ideas not in the lists, or what you'd want to know more about.</p>
-        <textarea id="notes" placeholder="What's your group's perspective?"></textarea>
-      </div>
-
       <div class="btn-row">
-        <button class="btn" id="submit-btn">Share with the Roundtable →</button>
-        <button class="btn ghost" id="back-btn">← Back</button>
+        <button class="btn big" id="start-btn">Pick a station →</button>
       </div>
     </div>
   </section>
 
-  <!-- VIEW 3: The Roundtable -->
-  <section class="view" id="view-room">
-    <div class="room-head">
-      <div>
-        <div class="case-id">Live session</div>
-        <h2>The Roundtable</h2>
-      </div>
-      <div class="live-pill"><span class="conn-status connected"><span class="dot"></span></span>Live · auto-updating</div>
+  <!-- VIEW 2: Room Picker -->
+  <section class="view" id="view-rooms">
+    <div class="picker-head">
+      <div class="kicker">Choose a station</div>
+      <h2>Where will you start?</h2>
+      <p>Visit any station in any order. Each one has artifacts on the table to examine — and questions to answer.</p>
     </div>
-
-    <div class="scenario-tabs" id="scenario-tabs"></div>
-
-    <div class="stats">
-      <div class="stat"><div class="val" id="stat-teams">0</div><div class="lbl">Groups sharing</div></div>
-      <div class="stat"><div class="val" id="stat-causes-total">0</div><div class="lbl">Factors flagged</div></div>
-      <div class="stat"><div class="val" id="stat-actions-total">0</div><div class="lbl">Actions endorsed</div></div>
-      <div class="stat"><div class="val" id="stat-consensus">—</div><div class="lbl">Top theme</div></div>
-    </div>
-
-    <div class="dash-grid">
-      <div class="panel">
-        <h3 class="section-title">Most-flagged factors</h3>
-        <div class="section-sub" id="top-causes-sub">What groups are pointing to as contributing</div>
-        <div class="leader-list" id="top-causes"></div>
-      </div>
-      <div class="panel">
-        <h3 class="section-title">Most-endorsed actions</h3>
-        <div class="section-sub" id="top-actions-sub">The moves leaders are recommending</div>
-        <div class="leader-list" id="top-actions"></div>
+    <div class="rooms-grid" id="rooms-grid"></div>
+    <div class="nav-row">
+      <div class="left-side"></div>
+      <div class="right-side">
+        <button class="text-link" id="show-leaderboard-btn">View leaderboard →</button>
       </div>
     </div>
+  </section>
 
-    <div class="panel" style="margin-bottom:18px;">
-      <h3 class="section-title">Where the thinking is converging</h3>
-      <div class="section-sub" id="theme-sub">Themes across all groups' responses</div>
-      <div class="theme-bars" id="theme-bars"></div>
-    </div>
+  <!-- VIEW 3: Question Screen -->
+  <section class="view" id="view-question">
+    <div class="card">
+      <div class="question-head">
+        <div class="question-room" id="q-room-name">—</div>
+        <div class="question-counter">Question <strong id="q-current">1</strong> of <strong id="q-total">5</strong></div>
+      </div>
+      <div class="question-progress">
+        <div class="question-progress-fill" id="q-progress-fill" style="width:0%"></div>
+      </div>
 
-    <div class="panel">
-      <h3 class="section-title" id="responses-section-title">Each group's response</h3>
-      <div class="section-sub" id="responses-section-sub">Selections and notes from every group sharing</div>
-      <div class="submissions" id="submissions-list">
-        <div class="empty">No responses yet. Be the first to share with the Roundtable.</div>
+      <div id="q-evidence" class="question-evidence" style="display:none;"></div>
+
+      <p class="question-text" id="q-text">—</p>
+
+      <div class="answers" id="q-answers"></div>
+
+      <div class="feedback" id="q-feedback">
+        <div class="feedback-title" id="q-feedback-title">—</div>
+        <p class="feedback-body" id="q-feedback-body">—</p>
+      </div>
+
+      <div class="nav-row">
+        <div class="left-side">
+          <button class="text-link muted" id="back-to-rooms-btn">← Back to stations</button>
+        </div>
+        <div class="right-side">
+          <button class="btn" id="lock-in-btn" disabled>Lock in answer</button>
+          <button class="btn" id="next-q-btn" style="display:none;">Next question →</button>
+        </div>
       </div>
     </div>
+  </section>
 
-    <div class="footer-nav">
-      <a id="add-another">← Add another response</a>
-      <a id="reset-btn" style="color:var(--muted);">Reset session (facilitator)</a>
+  <!-- VIEW 4: Room Complete -->
+  <section class="view" id="view-complete">
+    <div class="complete-card">
+      <div class="complete-icon">✓</div>
+      <h2 class="complete-title" id="complete-title">Station complete!</h2>
+      <p class="complete-sub" id="complete-sub">Nice work in the <strong id="complete-room-name">—</strong>.</p>
+      <div class="complete-score">
+        <div><span class="num" id="complete-correct">0</span><span class="of">/<span id="complete-total">5</span></span></div>
+        <div class="lbl">Correct at this station</div>
+      </div>
+      <div class="btn-row" style="justify-content:center;">
+        <button class="btn big" id="continue-btn">Pick another station →</button>
+        <button class="btn ghost" id="view-lb-btn">See leaderboard</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIEW 5: Coming Soon -->
+  <section class="view" id="view-coming-soon">
+    <div class="complete-card">
+      <div class="complete-icon" style="background:var(--accent);">⏳</div>
+      <h2 class="complete-title">Coming soon</h2>
+      <p class="complete-sub">Questions for the <strong id="coming-room-name">—</strong> are still being prepared. Check back during the session.</p>
+      <div class="btn-row" style="justify-content:center;">
+        <button class="btn big" id="back-from-coming-btn">← Back to stations</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIEW 6: Leaderboard -->
+  <section class="view" id="view-leaderboard">
+    <div class="leaderboard-head">
+      <div class="kicker">Leaderboard</div>
+      <h2 style="font-family:'Fraunces',serif; font-weight:700; font-size:clamp(26px,3.4vw,32px); letter-spacing:-0.02em; margin:6px 0 8px;">Top scores so far</h2>
+      <p style="color:var(--muted); font-size:14px; margin:0;">Updates live as players answer questions across stations.</p>
+    </div>
+    <div class="leaderboard-list" id="leaderboard-list">
+      <div style="text-align:center; padding:30px 20px; color:var(--muted); font-style:italic;">No scores yet. Be the first to play.</div>
+    </div>
+    <div class="nav-row" style="justify-content:center;">
+      <button class="btn ghost" id="back-from-lb-btn">← Back to stations</button>
     </div>
   </section>
 
@@ -1186,7 +950,7 @@
 
 <div class="toast" id="toast">Saved.</div>
 
-<script type="module">
+<script>
   // ============================================================
   // 🔥 FIREBASE CONFIG
   // ============================================================
@@ -1200,338 +964,155 @@
     appId: "1:901262767504:web:2106e6872896d4b426af15"
   };
 
-  // ============================================================
-  // SESSION ID — change this to start a fresh session
-  // ============================================================
-  const SESSION_ID = 'roundtable-2026-01';
+  const SESSION_ID = 'roundtable-2026-event-01';
 
   // ============================================================
-  // SCENARIOS — NEO can edit any of these. One per group (1-5).
-  // Each scenario has:
-  //   - paragraphs: 2-3 paragraph framing
-  //   - evidence: 4 quick-stat cards
-  //   - trend: a small line/bar chart of one metric over time
-  //   - voices: 2-3 short anonymous quotes from school stakeholders
-  //   - timeline: 3-4 recent events
-  //   - strengths: 2-3 things the school already has going for it
-  //   - prompt: the discussion question
+  // ROOM CONTENT — NEO adds questions here.
+  //
+  // Each question:
+  //   - text: the question
+  //   - evidence: optional reference to the physical exhibit (e.g. "Exhibit A")
+  //   - options: array of answer strings (any number — 3, 4, 5, etc.)
+  //   - correct: index of correct answer (0 = A, 1 = B, etc.)
+  //   - explanation: shown after lock-in (optional but recommended)
   // ============================================================
-  const SCENARIOS = {
-    1: {
-      group: 1,
-      area: 'Staff Culture & Retention',
-      name: 'Maple Grove Charter',
-      title: 'Building a school where great teachers want to stay.',
-      paragraphs: [
-        'Maple Grove Charter is a K–8 school entering its eighth year. The school has a passionate teaching staff and strong academic results, but turnover has been creeping up — three of the school\'s most experienced teachers left last spring, and exit conversations pointed to burnout, lack of growth pathways, and feeling unheard in school decisions.',
-        'The leadership team genuinely values their educators and wants to build a culture where teachers thrive long-term. They have some flexibility in the budget and the board\'s full support to invest in staff. The question is where to focus first — and how to make sure changes feel meaningful, not performative.',
+  const ROOMS = {
+    board: {
+      id: 'board',
+      name: 'Board Room',
+      icon: '⚖️',
+      description: 'Governance, compliance, board operations.',
+      questions: [
+        {
+          evidence: 'Exhibit A',
+          text: 'What governance risk does Exhibit A primarily help prevent?',
+          options: [
+            'Board member turnover issues',
+            'Board member elections and board composition issues',
+            'Board meeting notification issues',
+            'Board meeting attendance issues',
+          ],
+          correct: 1,
+          explanation: 'Exhibit A primarily addresses board member elections and board composition issues.',
+        },
+        {
+          evidence: 'Exhibit B',
+          text: 'Why is Exhibit B evidence of a strong system?',
+          options: [
+            'It looks professional',
+            'It schedules required votes and duties before deadlines occur',
+            'It reduces meeting time',
+            'It replaces policies',
+          ],
+          correct: 1,
+          explanation: 'A strong system schedules required votes and duties before deadlines occur — proactive rather than reactive governance.',
+        },
+        {
+          evidence: 'Exhibit C',
+          text: 'What statutory requirement does Exhibit C support?',
+          options: [
+            'Notification of candidate names, biographies and statements',
+            'Notification of date of election',
+            'Notification of election policy and procedures',
+            'All of the above',
+          ],
+          correct: 3,
+          explanation: 'Exhibit C supports all three — candidate information, election dates, and policies/procedures together meet the full statutory requirement.',
+        },
+        {
+          evidence: 'Exhibit D',
+          text: 'Why is Exhibit D important evidence in addition to individual certificates?',
+          options: [
+            'It demonstrates ongoing monitoring of board compliance',
+            'It demonstrates completion of a continuous improvement plan',
+            'It demonstrates progress toward contract renewal',
+            'It demonstrates evidence of teacher licensure',
+          ],
+          correct: 0,
+          explanation: 'Beyond individual certificates, this exhibit shows ongoing monitoring of board compliance over time.',
+        },
+        {
+          evidence: 'Exhibit E',
+          text: 'Which best practice items does Exhibit E include?',
+          options: [
+            'Check for conflicts of interest with any agenda item prior to approving the agenda',
+            'Approval of monthly financials to include a review of procurement for contracted services',
+            'Policy review to include compliance with current law',
+            'Board training',
+            'All of the above',
+          ],
+          correct: 4,
+          explanation: 'Exhibit E includes all four — a comprehensive set of board best practices.',
+        },
       ],
-      evidence: [
-        { label: 'Teacher retention', val: '74%' },
-        { label: 'Avg tenure', val: '2.8 yrs' },
-        { label: 'Staff survey morale', val: '6.2 / 10' },
-        { label: 'Open positions', val: '4' },
-      ],
-      trend: {
-        title: 'Teacher retention over time',
-        unit: '%',
-        labels: ['2020', '2021', '2022', '2023', '2024', '2025'],
-        values: [92, 89, 85, 81, 78, 74],
-      },
-      voices: [
-        { role: '8th-grade teacher, 5 years', quote: 'I love this school and the kids. But I\'m planning the same units I planned three years ago, and there\'s no clear path to grow without leaving the classroom.' },
-        { role: 'Newer teacher, 2 years', quote: 'Onboarding was overwhelming. I had a mentor on paper, but in practice we both ran out of time.' },
-        { role: 'Department lead', quote: 'When decisions get made about scheduling or initiatives, teachers find out at the all-staff meeting. That\'s the part that wears on people.' },
-      ],
-      timeline: [
-        { when: 'Last May', what: 'Three veteran teachers (10+ years) gave notice within two weeks of each other.' },
-        { when: 'Last August', what: 'Two open positions remained unfilled at start of school year; classes covered by long-term subs.' },
-        { when: 'Last October', what: 'Anonymous staff climate survey showed morale dropped from 7.4 to 6.2.' },
-        { when: 'This January', what: 'Board approved a 4% budget reserve to invest in staff initiatives.' },
-      ],
-      strengths: [
-        'Strong academic outcomes and a recognized school culture among families.',
-        'Engaged, mission-aligned core staff and a supportive board.',
-        '$180K of flexible budget reserve available for staff investment.',
-      ],
-      prompt: 'As leaders, what do you think is contributing to retention challenges, and what would you prioritize over the next 90 days to build a school culture where great teachers stay and grow?',
     },
-    2: {
-      group: 2,
-      area: 'Enrollment & Visibility',
-      name: 'Riverside Discovery Academy',
-      title: 'Growing the school families are looking for.',
-      paragraphs: [
-        'Riverside Discovery Academy is a strong K–6 charter with a project-based learning model. Current families love the school — parent satisfaction sits at 91% — but enrollment has plateaued for two years. The waitlist that once stretched into the hundreds has shrunk, and several families have shared they nearly chose a different school because they hadn\'t heard much about Riverside.',
-        'The leadership team believes Riverside\'s story is one worth telling. They want to grow back to capacity over the next year, while keeping the close-knit community that makes the school special. They\'re curious about how to balance visibility with intentionality.',
-      ],
-      evidence: [
-        { label: 'Current enrollment', val: '305 / 380' },
-        { label: 'Waitlist (last yr)', val: '12' },
-        { label: 'Parent satisfaction', val: '91%' },
-        { label: 'New competitors nearby', val: '2' },
-      ],
-      trend: {
-        title: 'Enrollment over time',
-        unit: 'students',
-        labels: ['2020', '2021', '2022', '2023', '2024', '2025'],
-        values: [380, 380, 365, 340, 320, 305],
-      },
-      voices: [
-        { role: 'Current parent, 3 years at school', quote: 'We tell every neighbor about Riverside. But we\'re basically doing the marketing — the school doesn\'t do much of it.' },
-        { role: 'Prospective parent who chose elsewhere', quote: 'I heard great things about Riverside from a friend, but the website made it hard to figure out what made it different.' },
-        { role: 'Kindergarten teacher', quote: 'The kids who come in already know they want to be here. We just don\'t have as many of them showing up as we used to.' },
-      ],
-      timeline: [
-        { when: '2 years ago', what: 'New charter school opened 4 miles away with a STEM-focused model.' },
-        { when: 'Last spring', what: 'Open house attendance dropped from 80 families to 32.' },
-        { when: 'Last summer', what: 'A district magnet school launched a project-based program for K–5.' },
-        { when: 'This fall', what: 'New family inquiries down 28% compared to two years ago.' },
-      ],
-      strengths: [
-        '91% parent satisfaction — among the highest in the city.',
-        'Strong, distinctive project-based learning model that families remember.',
-        'Active parent community willing to refer and recruit when asked.',
-      ],
-      prompt: 'What do you think is shaping enrollment trends here, and what concrete moves would your group recommend to grow Riverside back to full capacity in a way that protects what families love?',
+    finance: {
+      id: 'finance',
+      name: 'Finance Committee Meeting Room',
+      icon: '💰',
+      description: 'Budget, audits, financial sustainability.',
+      questions: [], // empty = coming soon
     },
-    3: {
-      group: 3,
-      area: 'Academic Growth & Instruction',
-      name: 'Northstar Prep',
-      title: 'Lifting every student\'s academic experience.',
-      paragraphs: [
-        'Northstar Prep serves grades 6–12 and has built a reputation for college readiness. Graduation and college acceptance rates remain strong, but recent benchmark data shows that growth in math and literacy has slowed in the middle grades, and the gap between top-performing and struggling students has widened over the past two years.',
-        'The leadership team wants to deepen the academic program for every student — not just the highest performers. They have engaged teachers and recent investment in curriculum materials, but they\'re thinking carefully about how to focus the next 90 days for the biggest impact.',
-      ],
-      evidence: [
-        { label: 'Math growth (mid-grade)', val: '+0.8%' },
-        { label: 'Reading growth', val: '+1.2%' },
-        { label: 'Performance gap', val: '+14%' },
-        { label: 'Avg class size', val: '24' },
-      ],
-      trend: {
-        title: 'Performance gap (top vs. struggling students)',
-        unit: '% gap',
-        labels: ['2020', '2021', '2022', '2023', '2024', '2025'],
-        values: [22, 24, 27, 30, 34, 36],
-      },
-      voices: [
-        { role: '7th-grade math teacher', quote: 'I have students reading three grades below level sitting next to students two grades above. I don\'t have the systems to serve both well at once.' },
-        { role: 'High school senior', quote: 'I felt prepared by senior year, but middle school I kind of coasted. Some friends never caught back up.' },
-        { role: 'Instructional coach', quote: 'Our teachers are working hard. The challenge is we don\'t have a consistent way to identify and respond to where each student is.' },
-      ],
-      timeline: [
-        { when: '3 years ago', what: 'New literacy curriculum adopted in grades 6–8; rollout was uneven across teachers.' },
-        { when: 'Last year', what: 'First diagnostic data revealed widening performance gap between students in middle grades.' },
-        { when: 'Last fall', what: 'Two new instructional coaches hired; coaching model still being defined.' },
-        { when: 'This spring', what: 'Board flagged middle-grade growth as the school\'s top academic priority.' },
-      ],
-      strengths: [
-        'Strong college acceptance and graduation outcomes — 96% college acceptance.',
-        'Engaged, mission-aligned teaching staff with low turnover.',
-        'Recent investment in curriculum and two new coaching positions.',
-      ],
-      prompt: 'What factors does your group think are slowing academic growth, and what would you recommend to lift the experience for every learner — especially in the middle grades?',
+    classroom: {
+      id: 'classroom',
+      name: 'Classroom',
+      icon: '📚',
+      description: 'Instruction, curriculum, student experience.',
+      questions: [],
     },
-    4: {
-      group: 4,
-      area: 'Family & Community Engagement',
-      name: 'Cedar Heights Community School',
-      title: 'Strengthening the partnership between school and families.',
-      paragraphs: [
-        'Cedar Heights serves a beautifully diverse K–8 community. The school has long-standing strengths in serving multilingual learners and students with IEPs. Recently, though, family engagement at school events has dropped, fewer parents are attending board meetings, and a recent survey showed that some families feel uncertain about how decisions get made at the school.',
-        'The leadership team sees this as an opportunity to deepen real partnership with families — not just attendance numbers, but trust, transparency, and shared ownership. They believe Cedar Heights\' diversity is a strength worth building on.',
-      ],
-      evidence: [
-        { label: 'Family event attendance', val: '38%' },
-        { label: 'Multilingual families', val: '47%' },
-        { label: 'Survey: "I feel heard"', val: '62%' },
-        { label: 'Board meeting attendees', val: '8 avg' },
-      ],
-      trend: {
-        title: 'Family event attendance over time',
-        unit: '%',
-        labels: ['2020', '2021', '2022', '2023', '2024', '2025'],
-        values: [68, 64, 58, 52, 44, 38],
-      },
-      voices: [
-        { role: 'Spanish-speaking parent', quote: 'The communication often comes only in English. By the time I get it translated, the moment to weigh in has passed.' },
-        { role: 'Long-time parent volunteer', quote: 'I used to know everyone here. Now I see new faces I\'ve never met. We need to rebuild those connections.' },
-        { role: 'Family liaison staff member', quote: 'Families ask great questions when we go to them. The events we host at school just aren\'t reaching everyone.' },
-      ],
-      timeline: [
-        { when: '2 years ago', what: 'Long-time family liaison retired; replacement role was vacant for 7 months.' },
-        { when: 'Last year', what: 'School moved to a new family communication platform that not all families adopted.' },
-        { when: 'Last spring', what: 'Annual family climate survey showed 38% of families "not sure how decisions get made."' },
-        { when: 'This fall', what: 'New family liaison hired; building monthly listening rotations with cultural communities.' },
-      ],
-      strengths: [
-        'Cedar Heights\' diversity is a defining strength — 47% multilingual families, deep cultural richness.',
-        'Strong record serving students with IEPs and English Language Learners.',
-        'New family liaison position is now filled with a bilingual hire.',
-      ],
-      prompt: 'What does your group think is at the heart of the engagement challenge, and what would you recommend to build deeper partnership with all of Cedar Heights\' families over the next 90 days?',
+    lunchroom: {
+      id: 'lunchroom',
+      name: 'Lunchroom',
+      icon: '🍎',
+      description: 'School culture, climate, daily life.',
+      questions: [],
     },
-    5: {
-      group: 5,
-      area: 'Financial Sustainability',
-      name: 'Summit Pathways Charter',
-      title: 'Building a financially strong school for the long term.',
-      paragraphs: [
-        'Summit Pathways is a thriving K–12 charter with full enrollment, a strong waitlist, and a respected academic program. The challenge is on the financial side: rising facility costs, growing program ambitions, and a still-developing fundraising muscle have left the school running tighter margins than leadership wants for a school of Summit\'s size.',
-        'The board and leadership team want to put Summit on a stronger financial footing — not by cutting what makes the school special, but by building sustainable revenue, smart partnerships, and disciplined planning. They have a year to set the trajectory.',
-      ],
-      evidence: [
-        { label: 'Operating margin', val: '2.1%' },
-        { label: 'Reserves (months)', val: '1.4' },
-        { label: 'Annual fundraising', val: '$48K' },
-        { label: 'Facility costs (% budget)', val: '23%' },
-      ],
-      trend: {
-        title: 'Operating margin over time',
-        unit: '%',
-        labels: ['2020', '2021', '2022', '2023', '2024', '2025'],
-        values: [6.4, 5.8, 4.9, 3.7, 2.8, 2.1],
-      },
-      voices: [
-        { role: 'Board treasurer', quote: 'We have a great school and a tight budget. One unexpected expense and we\'re making decisions we don\'t want to make.' },
-        { role: 'Director of Operations', quote: 'Facility costs have outpaced our per-pupil revenue every year for four years. That math doesn\'t work long-term.' },
-        { role: 'Development volunteer', quote: 'Our families would absolutely give if we asked. We just haven\'t built the muscle to ask consistently.' },
-      ],
-      timeline: [
-        { when: '4 years ago', what: 'Lease renegotiation increased annual facility costs by 18%.' },
-        { when: '2 years ago', what: 'School expanded high school program; per-pupil costs grew faster than revenue.' },
-        { when: 'Last year', what: 'First director of development hired part-time; annual fund raised $48K.' },
-        { when: 'This spring', what: 'Board passed resolution to grow reserves to 3 months by 2027.' },
-      ],
-      strengths: [
-        'Full enrollment and a 60-family waitlist — strong demand signals.',
-        'Engaged board and parent community willing to support development efforts.',
-        'Respected academic program and stable leadership team.',
-      ],
-      prompt: 'What does your group see as the key drivers of Summit\'s tight margins, and what would you recommend to build a stronger financial foundation while protecting the school\'s academic mission?',
+    office: {
+      id: 'office',
+      name: 'Main Office',
+      icon: '🏛️',
+      description: 'Operations, family-facing systems, communication.',
+      questions: [],
     },
   };
 
-  // ============================================================
-  // THEMES, OPTIONS, KEYWORDS — broad enough to fit all 5 scenarios
-  // ============================================================
-  const THEMES = {
-    staffing:    { label: 'Staffing',    color: '#2d6a4f' },
-    academics:   { label: 'Academics',   color: '#4a7ba6' },
-    community:   { label: 'Community',   color: '#9d4e6c' },
-    enrollment:  { label: 'Enrollment',  color: '#d97706' },
-    operations:  { label: 'Operations',  color: '#5b6f8a' },
-    governance:  { label: 'Governance',  color: '#6b7280' },
-    funding:     { label: 'Funding',     color: '#a8321e' },
-    equity:      { label: 'Equity',      color: '#c45a00' },
-  };
-
-  const CAUSES = [
-    { group: 'Staff Culture', items: [
-      { id: 'c-pay',       label: 'Compensation below regional benchmarks',     theme: 'staffing' },
-      { id: 'c-burnout',   label: 'Educator burnout from workload',             theme: 'staffing' },
-      { id: 'c-growth',    label: 'Limited career growth pathways',             theme: 'staffing' },
-    ]},
-    { group: 'Academics', items: [
-      { id: 'c-drift',     label: 'Drift from founding instructional vision',   theme: 'academics' },
-      { id: 'c-quality',   label: 'Inconsistent instructional quality',         theme: 'academics' },
-      { id: 'c-mtss',      label: 'Underdeveloped intervention systems',        theme: 'academics' },
-      { id: 'c-services',  label: 'Specialized services under-resourced',       theme: 'equity' },
-    ]},
-    { group: 'Community & Families', items: [
-      { id: 'c-marketing', label: 'Limited family-facing storytelling',         theme: 'enrollment' },
-      { id: 'c-trust',     label: 'Communication gaps with current families',   theme: 'community' },
-      { id: 'c-competition', label: 'Stronger options nearby drawing families', theme: 'enrollment' },
-      { id: 'c-demo',      label: 'Shifting demographics in service area',      theme: 'enrollment' },
-    ]},
-    { group: 'Operations & Resources', items: [
-      { id: 'c-facility',  label: 'Aging facility or learning environment',     theme: 'operations' },
-      { id: 'c-funding',   label: 'Tight budget limits flexibility',            theme: 'funding' },
-    ]},
-    { group: 'Governance & Leadership', items: [
-      { id: 'c-board',     label: 'Board governance gaps',                      theme: 'governance' },
-      { id: 'c-leadership', label: 'Leadership transitions or stretch',         theme: 'governance' },
-    ]},
-  ];
-
-  const ACTIONS = [
-    { group: 'Staff Culture', items: [
-      { id: 'a-comp',       label: 'Compensation review and adjustment',         theme: 'staffing' },
-      { id: 'a-stay',       label: 'Stay interviews and retention plan',         theme: 'staffing' },
-      { id: 'a-coach',      label: 'Add instructional coach or academic dean',   theme: 'staffing' },
-      { id: 'a-wellness',   label: 'Staff wellness and workload review',         theme: 'staffing' },
-    ]},
-    { group: 'Academics', items: [
-      { id: 'a-audit',      label: 'Curriculum audit and alignment review',      theme: 'academics' },
-      { id: 'a-tier',       label: 'Strengthen tiered intervention systems',     theme: 'academics' },
-      { id: 'a-diagnostic', label: 'Diagnostic data and targeted support',       theme: 'academics' },
-      { id: 'a-sped',       label: 'Strengthen specialized program staffing',    theme: 'equity' },
-    ]},
-    { group: 'Community & Families', items: [
-      { id: 'a-listen',     label: 'Launch family listening sessions',           theme: 'community' },
-      { id: 'a-marketing',  label: 'Targeted enrollment outreach',               theme: 'enrollment' },
-      { id: 'a-referral',   label: 'Family referral and open house program',     theme: 'enrollment' },
-      { id: 'a-mission',    label: 'Re-tell the school\'s story to community',   theme: 'community' },
-    ]},
-    { group: 'Operations & Resources', items: [
-      { id: 'a-techplan',   label: 'Technology and infrastructure plan',         theme: 'operations' },
-      { id: 'a-facility',   label: 'Facility improvement roadmap',               theme: 'operations' },
-      { id: 'a-fundraise',  label: 'Build fundraising and partnerships',         theme: 'funding' },
-    ]},
-    { group: 'Governance & Strategy', items: [
-      { id: 'a-bdtraining', label: 'Board development and training',             theme: 'governance' },
-      { id: 'a-strat',      label: 'Strategic plan refresh with staff input',    theme: 'governance' },
-      { id: 'a-survey',     label: 'Family and student feedback loop',           theme: 'community' },
-    ]},
-  ];
-
-  const THEME_KEYWORDS = {
-    staffing:   ['teacher','teachers','staff','staffing','hire','retention','retain','salary','pay','wage','burnout','training','recruit','turnover','mentor','coach','growth','wellness'],
-    academics:  ['curriculum','academic','instruction','learning','assessment','rigor','literacy','math','reading','project-based','pbl','stem','tutoring','intervention'],
-    community:  ['parent','parents','community','family','families','engagement','partnership','volunteer','communication','trust','listening','transparency'],
-    enrollment: ['enrollment','enroll','marketing','outreach','waitlist','capacity','attract','referral','open house','visibility'],
-    operations: ['facility','facilities','building','space','lease','transportation','technology','tech','classroom','operations','infrastructure'],
-    governance: ['authorizer','charter','audit','regulation','accountability','renewal','board','governance','strategic','leadership'],
-    funding:    ['funding','budget','money','financial','grant','revenue','cost','fundraising','donation','tuition','sustainability','margin','reserves'],
-    equity:     ['equity','equitable','access','diverse','inclusion','iep','ell','disability','sped','underserved','multilingual'],
-  };
+  // Display order
+  const ROOM_ORDER = ['board', 'finance', 'classroom', 'lunchroom', 'office'];
 
   // ============================================================
-  // CHECK CONFIG
+  // FIREBASE INIT (uses compat SDK loaded via script tags in <head>)
   // ============================================================
-  const CONFIG_OK = firebaseConfig.apiKey && !firebaseConfig.apiKey.startsWith('PASTE_');
+  let db, playersRef;
+  let pushFn, setFn, removeFn, onValueFn, refFn, updateFn;
+  let CONFIG_OK = firebaseConfig.apiKey && !firebaseConfig.apiKey.startsWith('PASTE_');
 
-  if (!CONFIG_OK) {
-    document.getElementById('view-setup').classList.add('active');
-    document.getElementById('conn-text').textContent = 'Not configured';
-    document.getElementById('conn-indicator').classList.add('error');
-  } else {
-    document.getElementById('view-welcome').classList.add('active');
-    initializeApp();
-  }
-
-  // ============================================================
-  // FIREBASE
-  // ============================================================
-  let db, submissionsRef;
-  let pushFn, setFn, removeFn, onValueFn, refFn;
-
-  async function initializeApp() {
+  function initializeApp() {
     try {
-      const { initializeApp: initFb } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
-      const { getDatabase, ref, onValue, push, set, remove } =
-        await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js');
-      const app = initFb(firebaseConfig);
-      db = getDatabase(app);
-      refFn = ref; pushFn = push; setFn = set; removeFn = remove; onValueFn = onValue;
-      submissionsRef = ref(db, `sessions/${SESSION_ID}`);
+      if (typeof firebase === 'undefined') {
+        throw new Error('Firebase SDK did not load. Check your network connection or browser extensions blocking gstatic.com.');
+      }
+      firebase.initializeApp(firebaseConfig);
+      db = firebase.database();
 
-      onValue(submissionsRef, (snapshot) => {
+      // Wrap compat API in the same call-shape the rest of the app expects
+      refFn = (database, path) => database.ref(path);
+      pushFn = (refObj) => refObj.push();
+      setFn = (refObj, value) => refObj.set(value);
+      removeFn = (refObj) => refObj.remove();
+      updateFn = (refObj, value) => refObj.update(value);
+      onValueFn = (refObj, success, error) => {
+        refObj.on('value',
+          (snapshot) => success(snapshot),
+          (err) => error && error(err)
+        );
+      };
+
+      playersRef = db.ref(`sessions/${SESSION_ID}/players`);
+
+      onValueFn(playersRef, (snapshot) => {
         const data = snapshot.val() || {};
-        const list = Object.entries(data).map(([key, sub]) => ({ ...sub, _key: key }));
-        renderRoom(list);
+        const list = Object.entries(data).map(([key, p]) => ({ ...p, _key: key }));
+        renderLeaderboard(list);
         document.getElementById('conn-text').textContent = 'Connected';
         document.getElementById('conn-indicator').classList.remove('error');
         document.getElementById('conn-indicator').classList.add('connected');
@@ -1547,274 +1128,38 @@
     }
   }
 
-  async function pushSubmission(submission) {
-    if (!submissionsRef) throw new Error('Database not initialized');
-    const newRef = pushFn(submissionsRef);
-    await setFn(newRef, submission);
-  }
-  async function clearAllSubmissions() {
-    if (!submissionsRef) return;
-    await removeFn(submissionsRef);
+  if (CONFIG_OK) initializeApp();
+  else {
+    document.getElementById('conn-text').textContent = 'Not configured';
+    document.getElementById('conn-indicator').classList.add('error');
   }
 
   // ============================================================
-  // FORM RENDERING
+  // STATE
   // ============================================================
-  function renderOptionGroup(containerId, groups) {
-    const container = document.getElementById(containerId);
-    container.innerHTML = '';
-    groups.forEach(grp => {
-      const block = document.createElement('div');
-      block.className = 'group-block';
-      block.innerHTML = `<div class="group-label">${grp.group}</div>`;
-      const grid = document.createElement('div');
-      grid.className = 'options-grid';
-      grp.items.forEach(it => {
-        const lbl = document.createElement('label');
-        lbl.className = 'opt';
-        lbl.dataset.id = it.id;
-        lbl.innerHTML = `
-          <input type="checkbox" value="${it.id}">
-          <span class="box"></span>
-          <span class="text">${it.label}</span>
-        `;
-        const cb = lbl.querySelector('input');
-        cb.addEventListener('change', () => {
-          lbl.classList.toggle('checked', cb.checked);
-          updateCounters();
-        });
-        grid.appendChild(lbl);
-      });
-      block.appendChild(grid);
-      container.appendChild(block);
-    });
-  }
-
-  function getChecked(containerId) {
-    return Array.from(document.querySelectorAll(`#${containerId} input[type=checkbox]:checked`))
-      .map(cb => cb.value);
-  }
-  function clearChecked(containerId) {
-    document.querySelectorAll(`#${containerId} input[type=checkbox]:checked`).forEach(cb => {
-      cb.checked = false;
-      cb.closest('.opt').classList.remove('checked');
-    });
-  }
-  function updateCounters() {
-    document.getElementById('count-causes').textContent = getChecked('causes-container').length;
-    document.getElementById('count-actions').textContent = getChecked('actions-container').length;
-  }
-
-  renderOptionGroup('causes-container', CAUSES);
-  renderOptionGroup('actions-container', ACTIONS);
+  let player = {
+    key: null,
+    name: '',
+    mode: 'solo',
+    totalScore: 0,
+    roomsCompleted: {}, // roomId -> { correct, total, locked: true }
+  };
+  let currentRoom = null;
+  let currentQIndex = 0;
+  let currentSelection = null;
+  let currentLocked = false;
+  let cachedLeaderboard = [];
 
   // ============================================================
-  // GROUP PICKER
-  // ============================================================
-  let chosenGroup = null;
-  document.querySelectorAll('.group-pick').forEach(el => {
-    el.addEventListener('click', () => {
-      document.querySelectorAll('.group-pick').forEach(g => g.classList.remove('selected'));
-      el.classList.add('selected');
-      chosenGroup = parseInt(el.dataset.group, 10);
-    });
-  });
-
-  // ============================================================
-  // POPULATE SCENARIO IN VIEW 2
-  // ============================================================
-  function loadScenario(groupNum) {
-    const sc = SCENARIOS[groupNum];
-    if (!sc) return;
-    document.getElementById('scenario-badge').textContent = sc.group;
-    document.getElementById('scenario-group-num').textContent = sc.group;
-    document.getElementById('scenario-area').textContent = sc.area;
-    document.getElementById('scenario-name').textContent = sc.name;
-    document.getElementById('case-id-label').textContent = `Group ${sc.group} · ${sc.area}`;
-    document.getElementById('case-title').textContent = sc.title;
-    const body = document.getElementById('case-body');
-    const paras = sc.paragraphs.map(p => `<p>${p}</p>`).join('');
-    const evidence = sc.evidence.map(e => `
-      <div class="item">
-        <div class="label">${e.label}</div>
-        <div class="val">${e.val}</div>
-      </div>
-    `).join('');
-
-    const trendHtml = sc.trend ? renderTrendChart(sc.trend) : '';
-
-    const voicesHtml = sc.voices && sc.voices.length ? `
-      <div class="evidence-block">
-        <div class="evidence-block-label">Voices from the school</div>
-        <div class="voices-list">
-          ${sc.voices.map(v => `
-            <div class="voice-card">
-              <p class="voice-quote">${escapeHtml(v.quote)}</p>
-              <div class="voice-role">— ${escapeHtml(v.role)}</div>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-    ` : '';
-
-    const timelineHtml = sc.timeline && sc.timeline.length ? `
-      <div class="evidence-block">
-        <div class="evidence-block-label">Recent context</div>
-        <div class="timeline-list">
-          ${sc.timeline.map(t => `
-            <div class="timeline-row">
-              <div class="timeline-when">${escapeHtml(t.when)}</div>
-              <div class="timeline-what">${escapeHtml(t.what)}</div>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-    ` : '';
-
-    const strengthsHtml = sc.strengths && sc.strengths.length ? `
-      <div class="evidence-block strengths-block">
-        <div class="evidence-block-label" style="color:var(--primary);">What's already working</div>
-        <ul class="strengths-list">
-          ${sc.strengths.map(s => `<li>${escapeHtml(s)}</li>`).join('')}
-        </ul>
-      </div>
-    ` : '';
-
-    body.innerHTML = `
-      ${paras}
-      <div class="evidence">${evidence}</div>
-      ${trendHtml}
-      ${voicesHtml}
-      ${timelineHtml}
-      ${strengthsHtml}
-      <div class="prompt-box">
-        <div class="kicker">Your group's task</div>
-        <p>${sc.prompt}</p>
-      </div>
-    `;
-  }
-
-  // Render a small inline SVG line chart for trend data
-  function renderTrendChart(trend) {
-    const w = 600, h = 140;
-    const pad = { top: 20, right: 16, bottom: 32, left: 36 };
-    const innerW = w - pad.left - pad.right;
-    const innerH = h - pad.top - pad.bottom;
-    const vals = trend.values;
-    const min = Math.min(...vals);
-    const max = Math.max(...vals);
-    const range = max - min || 1;
-    // Add a touch of headroom
-    const yMin = min - range * 0.15;
-    const yMax = max + range * 0.15;
-    const yRange = yMax - yMin || 1;
-
-    const xStep = innerW / (vals.length - 1);
-    const points = vals.map((v, i) => {
-      const x = pad.left + i * xStep;
-      const y = pad.top + innerH - ((v - yMin) / yRange) * innerH;
-      return [x, y, v];
-    });
-
-    const linePath = points.map((p, i) => (i === 0 ? `M${p[0]},${p[1]}` : `L${p[0]},${p[1]}`)).join(' ');
-    const areaPath = `${linePath} L${pad.left + innerW},${pad.top + innerH} L${pad.left},${pad.top + innerH} Z`;
-
-    const dots = points.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="3.5" fill="var(--primary)" stroke="white" stroke-width="1.5"/>`).join('');
-    const xLabels = trend.labels.map((l, i) => {
-      const x = pad.left + i * xStep;
-      return `<text x="${x}" y="${h - 10}" text-anchor="middle" font-size="10" fill="var(--muted)">${escapeHtml(l)}</text>`;
-    }).join('');
-    // Y-axis ticks
-    const yTicks = [yMin, (yMin + yMax) / 2, yMax].map(v => {
-      const y = pad.top + innerH - ((v - yMin) / yRange) * innerH;
-      const display = Math.round(v * 10) / 10;
-      return `
-        <line x1="${pad.left}" y1="${y}" x2="${pad.left + innerW}" y2="${y}" stroke="var(--rule)" stroke-dasharray="2,3"/>
-        <text x="${pad.left - 6}" y="${y + 3}" text-anchor="end" font-size="10" fill="var(--muted)">${display}${trend.unit === '%' ? '%' : ''}</text>
-      `;
-    }).join('');
-    // First and last value callouts
-    const firstP = points[0];
-    const lastP = points[points.length - 1];
-    const firstLabel = `<text x="${firstP[0]}" y="${firstP[1] - 8}" text-anchor="start" font-size="11" font-weight="600" fill="var(--ink)">${firstP[2]}${trend.unit === '%' ? '%' : ''}</text>`;
-    const lastLabel = `<text x="${lastP[0]}" y="${lastP[1] - 8}" text-anchor="end" font-size="11" font-weight="600" fill="var(--ink)">${lastP[2]}${trend.unit === '%' ? '%' : ''}</text>`;
-
-    return `
-      <div class="evidence-block">
-        <div class="evidence-block-label">${escapeHtml(trend.title)} <span class="evidence-unit">(${escapeHtml(trend.unit)})</span></div>
-        <div class="chart-wrap">
-          <svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="width:100%; height:auto; max-height:200px;">
-            ${yTicks}
-            <path d="${areaPath}" fill="var(--primary-soft)" opacity="0.6"/>
-            <path d="${linePath}" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-            ${dots}
-            ${firstLabel}
-            ${lastLabel}
-            ${xLabels}
-          </svg>
-        </div>
-      </div>
-    `;
-  }
-
-  // ============================================================
-  // ANALYSIS
-  // ============================================================
-  const ALL_OPTIONS = {};
-  [...CAUSES, ...ACTIONS].forEach(g => g.items.forEach(it => ALL_OPTIONS[it.id] = it));
-
-  function analyzeNotes(text) {
-    const lower = (text || '').toLowerCase();
-    const matched = {};
-    for (const [theme, kws] of Object.entries(THEME_KEYWORDS)) {
-      for (const kw of kws) {
-        const re = new RegExp(`(^|[^a-z])${kw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}([^a-z]|$)`, 'g');
-        if (re.test(lower)) {
-          if (!matched[theme]) matched[theme] = [];
-          if (!matched[theme].includes(kw)) matched[theme].push(kw);
-        }
-      }
-    }
-    return matched;
-  }
-
-  function highlightNotes(text, themesMatched) {
-    const allKw = [];
-    for (const [theme, kws] of Object.entries(themesMatched || {})) {
-      kws.forEach(k => allKw.push({ kw: k, color: THEMES[theme].color }));
-    }
-    if (!allKw.length) return escapeHtml(text);
-    allKw.sort((a,b) => b.kw.length - a.kw.length);
-    let safe = escapeHtml(text);
-    for (const { kw, color } of allKw) {
-      const re = new RegExp(`(^|[^a-zA-Z])(${kw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})([^a-zA-Z]|$)`, 'gi');
-      safe = safe.replace(re, (m, p1, p2, p3) => `${p1}<mark style="background:${color}33;">${p2}</mark>${p3}`);
-    }
-    return safe;
-  }
-
-  function escapeHtml(s) {
-    return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  }
-
-  function combinedThemes(submission) {
-    const themeSet = new Set();
-    [...(submission.causes||[]), ...(submission.actions||[])].forEach(id => {
-      const opt = ALL_OPTIONS[id];
-      if (opt) themeSet.add(opt.theme);
-    });
-    Object.keys(submission.notesThemes || {}).forEach(t => themeSet.add(t));
-    return Array.from(themeSet);
-  }
-
-  // ============================================================
-  // VIEWS
+  // VIEW MGMT
   // ============================================================
   const views = {
-    setup:   document.getElementById('view-setup'),
     welcome: document.getElementById('view-welcome'),
-    case:    document.getElementById('view-case'),
-    room:    document.getElementById('view-room'),
+    rooms: document.getElementById('view-rooms'),
+    question: document.getElementById('view-question'),
+    complete: document.getElementById('view-complete'),
+    coming: document.getElementById('view-coming-soon'),
+    leaderboard: document.getElementById('view-leaderboard'),
   };
   function showView(name) {
     Object.values(views).forEach(v => v.classList.remove('active'));
@@ -1823,352 +1168,327 @@
   }
 
   // ============================================================
-  // STATE & EVENTS
+  // WELCOME — pick mode, enter name
   // ============================================================
-  let currentTeam = '';
-  let currentMembers = '';
-  let currentGroupNum = null;
-  let activeTab = 'all'; // 'all' or 1..5
-  let cachedList = [];
-
-  document.getElementById('filed-date').textContent =
-    new Date().toLocaleDateString('en-US', { month:'short', day:'2-digit', year:'numeric'});
-
-  document.getElementById('start-btn').addEventListener('click', () => {
-    if (!CONFIG_OK) { toast('Configure Firebase first'); return; }
-    const name = document.getElementById('team-name').value.trim();
-    if (!name) { toast('Enter your group name'); return; }
-    if (!chosenGroup) { toast('Pick your group number (1–5)'); return; }
-    currentTeam = name;
-    currentMembers = document.getElementById('team-members').value.trim();
-    currentGroupNum = chosenGroup;
-    document.getElementById('team-name-echo').textContent = currentTeam;
-    loadScenario(currentGroupNum);
-    showView('case');
+  document.querySelectorAll('.play-mode').forEach(el => {
+    el.addEventListener('click', () => {
+      document.querySelectorAll('.play-mode').forEach(p => p.classList.remove('selected'));
+      el.classList.add('selected');
+      player.mode = el.dataset.mode;
+    });
   });
 
-  document.getElementById('view-room-btn').addEventListener('click', () => {
-    if (!CONFIG_OK) { toast('Configure Firebase first'); return; }
-    showView('room');
-  });
-  document.getElementById('back-btn').addEventListener('click', () => showView('welcome'));
-  document.getElementById('add-another').addEventListener('click', () => showView('welcome'));
+  document.getElementById('start-btn').addEventListener('click', async () => {
+    const name = document.getElementById('player-name').value.trim();
+    if (!name) { toast('Enter your name or team name first'); return; }
+    if (!CONFIG_OK) { toast('Database not connected'); return; }
 
-  document.getElementById('submit-btn').addEventListener('click', async () => {
-    const causes = getChecked('causes-container');
-    const actions = getChecked('actions-container');
-    const notes = document.getElementById('notes').value.trim();
-    if (causes.length === 0 && actions.length === 0 && !notes) {
-      toast('Pick a few items or share a note'); return;
-    }
-    const submission = {
-      team: currentTeam || 'Unnamed Group',
-      members: currentMembers || '',
-      groupNum: currentGroupNum,
-      scenarioName: SCENARIOS[currentGroupNum]?.name || '',
-      scenarioArea: SCENARIOS[currentGroupNum]?.area || '',
-      causes, actions,
-      notes: notes || '',
-      notesThemes: analyzeNotes(notes),
-      timestamp: Date.now(),
-    };
-    const btn = document.getElementById('submit-btn');
-    btn.disabled = true;
-    btn.textContent = 'Sharing...';
+    player.name = name;
+    document.getElementById('player-name-display').textContent = name;
+    document.getElementById('player-info').style.display = 'block';
+
     try {
-      await pushSubmission(submission);
-      toast('Shared with the Roundtable.');
-      clearChecked('causes-container');
-      clearChecked('actions-container');
-      document.getElementById('notes').value = '';
-      updateCounters();
-      activeTab = currentGroupNum;
-      showView('room');
+      const newRef = pushFn(playersRef);
+      player.key = newRef.key;
+      await setFn(newRef, {
+        name: player.name,
+        mode: player.mode,
+        totalScore: 0,
+        roomsCompleted: {},
+        startedAt: Date.now(),
+        lastActive: Date.now(),
+      });
+      renderRoomsGrid();
+      showView('rooms');
     } catch (e) {
       console.error(e);
-      toast('Save failed — check connection');
-    } finally {
-      btn.disabled = false;
-      btn.textContent = 'Share with the Roundtable →';
-    }
-  });
-
-  document.getElementById('reset-btn').addEventListener('click', async () => {
-    if (!confirm('Reset all responses for this session? This cannot be undone.')) return;
-    try {
-      await clearAllSubmissions();
-      toast('Session reset.');
-    } catch (e) {
-      toast('Reset failed');
+      toast('Could not start session — check connection');
     }
   });
 
   // ============================================================
-  // TABS
+  // ROOMS PICKER
   // ============================================================
-  function renderTabs(list) {
-    const counts = { all: list.length, 1:0, 2:0, 3:0, 4:0, 5:0 };
-    list.forEach(s => { if (s.groupNum) counts[s.groupNum] = (counts[s.groupNum]||0) + 1; });
-    const tabs = document.getElementById('scenario-tabs');
-    tabs.innerHTML = '';
-    const tabDef = [
-      { key: 'all', label: 'All groups' },
-      ...Object.values(SCENARIOS).map(sc => ({ key: sc.group, label: `Group ${sc.group} · ${sc.name}` })),
-    ];
-    tabDef.forEach(t => {
-      const btn = document.createElement('button');
-      btn.className = 'scenario-tab' + (activeTab === t.key ? ' active' : '');
-      const countLabel = t.key === 'all' ? `${counts[t.key]||0}` : `${counts[t.key]||0} ${counts[t.key]===1 ? 'voice' : 'voices'}`;
-      btn.innerHTML = `${t.label}<span class="count">${countLabel}</span>`;
-      btn.addEventListener('click', () => {
-        activeTab = t.key;
-        renderRoom(cachedList);
-      });
-      tabs.appendChild(btn);
+  function renderRoomsGrid() {
+    const grid = document.getElementById('rooms-grid');
+    grid.innerHTML = '';
+    ROOM_ORDER.forEach(roomId => {
+      const room = ROOMS[roomId];
+      const completion = player.roomsCompleted[roomId];
+      const isComingSoon = !room.questions || room.questions.length === 0;
+      const isDone = !!completion;
+
+      const card = document.createElement('div');
+      card.className = 'room-card' + (isDone || isComingSoon ? ' locked' : '');
+      card.dataset.room = roomId;
+
+      let badgeHtml = '';
+      let statusHtml = '';
+      let scoreHtml = '';
+
+      if (isComingSoon) {
+        badgeHtml = '<div class="badge-corner coming">Coming soon</div>';
+        statusHtml = '<div class="room-status coming">Content in progress</div>';
+      } else if (isDone) {
+        badgeHtml = '<div class="badge-corner done">Completed</div>';
+        statusHtml = '<div class="room-status done">Done · locked in</div>';
+        scoreHtml = `<div class="room-score">${completion.correct}/${completion.total} ★</div>`;
+      } else {
+        statusHtml = `<div class="room-status">${room.questions.length} questions</div>`;
+      }
+
+      card.innerHTML = `
+        ${badgeHtml}
+        <div class="room-icon">${room.icon}</div>
+        <div class="room-name">${room.name}</div>
+        <div class="room-desc">${room.description}</div>
+        <div class="room-meta">
+          ${statusHtml}
+          ${scoreHtml}
+        </div>
+      `;
+
+      if (!isComingSoon && !isDone) {
+        card.addEventListener('click', () => enterRoom(roomId));
+      } else if (isComingSoon) {
+        card.addEventListener('click', () => {
+          document.getElementById('coming-room-name').textContent = room.name;
+          showView('coming');
+        });
+      } else if (isDone) {
+        card.addEventListener('click', () => toast(`${room.name} is already complete`));
+      }
+
+      grid.appendChild(card);
     });
   }
 
+  document.getElementById('show-leaderboard-btn').addEventListener('click', () => {
+    renderLeaderboard(cachedLeaderboard);
+    showView('leaderboard');
+  });
+
+  document.getElementById('back-from-lb-btn').addEventListener('click', () => {
+    renderRoomsGrid();
+    showView('rooms');
+  });
+
+  document.getElementById('back-from-coming-btn').addEventListener('click', () => {
+    showView('rooms');
+  });
+
   // ============================================================
-  // RENDER ROOM
+  // ENTER ROOM
   // ============================================================
-  function renderRoom(list) {
-    cachedList = list;
-    renderTabs(list);
+  function enterRoom(roomId) {
+    currentRoom = ROOMS[roomId];
+    currentQIndex = 0;
+    loadQuestion();
+    showView('question');
+  }
 
-    const isGroupView = activeTab !== 'all';
-    const filtered = isGroupView ? list.filter(s => s.groupNum === activeTab) : list;
+  function loadQuestion() {
+    const q = currentRoom.questions[currentQIndex];
+    if (!q) return;
+    currentSelection = null;
+    currentLocked = false;
 
-    // Stat labels change based on view
-    const teamsStatLbl = document.querySelector('#stat-teams + .lbl');
-    if (teamsStatLbl) teamsStatLbl.textContent = isGroupView ? 'Voices in this group' : 'Groups sharing';
+    document.getElementById('q-room-name').textContent = currentRoom.name;
+    document.getElementById('q-current').textContent = currentQIndex + 1;
+    document.getElementById('q-total').textContent = currentRoom.questions.length;
+    document.getElementById('q-progress-fill').style.width =
+      `${((currentQIndex) / currentRoom.questions.length) * 100}%`;
+    document.getElementById('q-text').textContent = q.text;
 
-    // Section title changes based on view
-    const respTitle = document.getElementById('responses-section-title');
-    const respSub = document.getElementById('responses-section-sub');
-    if (respTitle && respSub) {
-      if (isGroupView) {
-        const sc = SCENARIOS[activeTab];
-        respTitle.textContent = sc ? `Group ${sc.group}'s collective response` : `This group's response`;
-        respSub.textContent = 'Aggregated view, with each contributor visible below';
-      } else {
-        respTitle.textContent = 'Each group\'s response';
-        respSub.textContent = 'Selections and notes from every group sharing';
-      }
+    const ev = document.getElementById('q-evidence');
+    if (q.evidence) {
+      ev.style.display = 'block';
+      ev.innerHTML = `<strong>${escapeHtml(q.evidence)}:</strong> Examine the artifact at the ${escapeHtml(currentRoom.name)} station, then answer below.`;
+    } else {
+      ev.style.display = 'none';
     }
-    // Leaderboard + theme subtitles
-    const causesSub = document.getElementById('top-causes-sub');
-    const actionsSub = document.getElementById('top-actions-sub');
-    const themeSub = document.getElementById('theme-sub');
-    if (causesSub) causesSub.textContent = isGroupView ? 'What this group is flagging most' : 'What groups are pointing to as contributing';
-    if (actionsSub) actionsSub.textContent = isGroupView ? 'The actions this group is endorsing most' : 'The moves leaders are recommending';
-    if (themeSub) themeSub.textContent = isGroupView ? 'Themes across this group\'s responses' : 'Themes across all groups\' responses';
 
-    document.getElementById('stat-teams').textContent = filtered.length;
-    let causesTotal = 0, actionsTotal = 0;
-    const causeCount = {}, actionCount = {}, themeCount = {};
-    for (const s of filtered) {
-      (s.causes || []).forEach(id => { causeCount[id] = (causeCount[id]||0)+1; causesTotal++; });
-      (s.actions || []).forEach(id => { actionCount[id] = (actionCount[id]||0)+1; actionsTotal++; });
-      for (const t of combinedThemes(s)) themeCount[t] = (themeCount[t]||0)+1;
-    }
-    document.getElementById('stat-causes-total').textContent = causesTotal;
-    document.getElementById('stat-actions-total').textContent = actionsTotal;
-
-    let topTheme = null, topN = 0;
-    for (const [t, c] of Object.entries(themeCount)) if (c > topN) { topN = c; topTheme = t; }
-    document.getElementById('stat-consensus').textContent = topTheme ? THEMES[topTheme].label : '—';
-
-    renderLeaderList('top-causes', causeCount, 6);
-    renderLeaderList('top-actions', actionCount, 6);
-
-    const totalGroups = Math.max(1, filtered.length);
-    const bars = document.getElementById('theme-bars');
-    bars.innerHTML = '';
-    for (const [t, def] of Object.entries(THEMES)) {
-      const c = themeCount[t] || 0;
-      const pct = (c / totalGroups) * 100;
-      const row = document.createElement('div');
-      row.className = 'theme-row';
-      row.innerHTML = `
-        <div class="theme-name">${def.label}</div>
-        <div class="theme-bar-track">
-          <div class="theme-bar-fill" style="width:${pct}%; background:${def.color};"></div>
-        </div>
-        <div class="theme-count">${c}</div>
+    const answersEl = document.getElementById('q-answers');
+    answersEl.innerHTML = '';
+    q.options.forEach((opt, i) => {
+      const letter = String.fromCharCode(65 + i); // A, B, C, ...
+      const btn = document.createElement('button');
+      btn.className = 'answer';
+      btn.dataset.index = i;
+      btn.innerHTML = `
+        <span class="letter">${letter}</span>
+        <span class="text">${escapeHtml(opt)}</span>
       `;
-      bars.appendChild(row);
-    }
+      btn.addEventListener('click', () => selectAnswer(i));
+      answersEl.appendChild(btn);
+    });
 
-    const subs = document.getElementById('submissions-list');
-    if (!filtered.length) {
-      subs.innerHTML = '<div class="empty">No responses in this view yet.</div>';
-      return;
-    }
+    document.getElementById('q-feedback').classList.remove('show', 'correct', 'incorrect');
+    document.getElementById('lock-in-btn').disabled = true;
+    document.getElementById('lock-in-btn').style.display = '';
+    document.getElementById('next-q-btn').style.display = 'none';
+  }
 
-    // ========== GROUP VIEW (single tab selected) ==========
-    if (isGroupView) {
-      subs.innerHTML = renderGroupAggregateView(filtered, activeTab) + renderIndividualToggle(filtered);
-      // Wire up the toggle
-      const toggleBtn = document.getElementById('toggle-individuals');
-      const indWrap = document.getElementById('individual-responses');
-      if (toggleBtn && indWrap) {
-        toggleBtn.addEventListener('click', () => {
-          const open = indWrap.style.display !== 'none';
-          indWrap.style.display = open ? 'none' : 'grid';
-          toggleBtn.textContent = open
-            ? `Show individual responses (${filtered.length})`
-            : `Hide individual responses`;
+  function selectAnswer(i) {
+    if (currentLocked) return;
+    currentSelection = i;
+    document.querySelectorAll('#q-answers .answer').forEach((el, idx) => {
+      el.classList.toggle('selected', idx === i);
+    });
+    document.getElementById('lock-in-btn').disabled = false;
+  }
+
+  document.getElementById('lock-in-btn').addEventListener('click', () => {
+    if (currentSelection === null || currentLocked) return;
+    currentLocked = true;
+    const q = currentRoom.questions[currentQIndex];
+    const correct = currentSelection === q.correct;
+
+    document.querySelectorAll('#q-answers .answer').forEach((el, idx) => {
+      el.classList.remove('selected');
+      if (idx === q.correct) {
+        el.classList.add('correct');
+      } else if (idx === currentSelection) {
+        el.classList.add('incorrect');
+      } else {
+        el.classList.add('disabled');
+      }
+    });
+
+    const fb = document.getElementById('q-feedback');
+    fb.classList.add('show', correct ? 'correct' : 'incorrect');
+    document.getElementById('q-feedback-title').textContent = correct ? '✓ Correct' : '✗ Not quite';
+    document.getElementById('q-feedback-body').textContent = q.explanation || (correct ? 'Nice work.' : `The correct answer is: ${q.options[q.correct]}`);
+
+    // Track for end-of-room score
+    if (!currentRoom._sessionAnswers) currentRoom._sessionAnswers = [];
+    currentRoom._sessionAnswers.push({ qIndex: currentQIndex, selected: currentSelection, correct });
+
+    document.getElementById('lock-in-btn').style.display = 'none';
+    document.getElementById('next-q-btn').style.display = '';
+    if (currentQIndex === currentRoom.questions.length - 1) {
+      document.getElementById('next-q-btn').textContent = 'See your score →';
+    } else {
+      document.getElementById('next-q-btn').textContent = 'Next question →';
+    }
+  });
+
+  document.getElementById('next-q-btn').addEventListener('click', () => {
+    if (currentQIndex < currentRoom.questions.length - 1) {
+      currentQIndex++;
+      loadQuestion();
+    } else {
+      finishRoom();
+    }
+  });
+
+  document.getElementById('back-to-rooms-btn').addEventListener('click', () => {
+    if (confirm('Leave this station without finishing? Your progress here will be lost.')) {
+      currentRoom._sessionAnswers = null;
+      renderRoomsGrid();
+      showView('rooms');
+    }
+  });
+
+  // ============================================================
+  // FINISH ROOM
+  // ============================================================
+  async function finishRoom() {
+    const answers = currentRoom._sessionAnswers || [];
+    const correct = answers.filter(a => a.correct).length;
+    const total = currentRoom.questions.length;
+
+    // Update local state
+    player.roomsCompleted[currentRoom.id] = { correct, total, locked: true };
+    player.totalScore = Object.values(player.roomsCompleted).reduce((sum, r) => sum + (r.correct || 0), 0);
+    document.getElementById('score-display').textContent = player.totalScore;
+
+    // Update Firebase
+    try {
+      if (player.key && CONFIG_OK) {
+        await updateFn(refFn(db, `sessions/${SESSION_ID}/players/${player.key}`), {
+          totalScore: player.totalScore,
+          roomsCompleted: player.roomsCompleted,
+          lastActive: Date.now(),
         });
       }
+    } catch (e) {
+      console.error('Failed to save score', e);
+      toast('Score saved locally — connection issue');
+    }
+
+    // Show completion screen
+    document.getElementById('complete-room-name').textContent = currentRoom.name;
+    document.getElementById('complete-correct').textContent = correct;
+    document.getElementById('complete-total').textContent = total;
+    document.getElementById('complete-sub').innerHTML = `Nice work in the <strong>${escapeHtml(currentRoom.name)}</strong>.`;
+
+    // Reset for next time
+    currentRoom._sessionAnswers = null;
+    currentRoom = null;
+    showView('complete');
+  }
+
+  document.getElementById('continue-btn').addEventListener('click', () => {
+    renderRoomsGrid();
+    showView('rooms');
+  });
+
+  document.getElementById('view-lb-btn').addEventListener('click', () => {
+    renderLeaderboard(cachedLeaderboard);
+    showView('leaderboard');
+  });
+
+  // ============================================================
+  // LEADERBOARD
+  // ============================================================
+  function renderLeaderboard(list) {
+    cachedLeaderboard = list;
+    const el = document.getElementById('leaderboard-list');
+    if (!list.length) {
+      el.innerHTML = '<div style="text-align:center; padding:30px 20px; color:var(--muted); font-style:italic;">No scores yet. Be the first to play.</div>';
       return;
     }
+    const sorted = [...list].sort((a, b) => {
+      if (b.totalScore !== a.totalScore) return (b.totalScore||0) - (a.totalScore||0);
+      // Tiebreak: rooms completed, then earliest finish
+      const aRooms = Object.keys(a.roomsCompleted || {}).length;
+      const bRooms = Object.keys(b.roomsCompleted || {}).length;
+      if (bRooms !== aRooms) return bRooms - aRooms;
+      return (a.lastActive||0) - (b.lastActive||0);
+    });
 
-    // ========== ALL-GROUPS VIEW (default) — show individual cards ==========
-    const sorted = [...filtered].sort((a,b) => (b.timestamp||0) - (a.timestamp||0));
-    subs.innerHTML = sorted.map(s => renderIndividualCard(s)).join('');
-  }
-
-  function renderGroupAggregateView(filtered, groupNum) {
-    const sc = SCENARIOS[groupNum];
-    const scenarioLabel = sc ? `Group ${sc.group} · ${sc.name}` : `Group ${groupNum}`;
-
-    // Tally
-    const causeCount = {}, actionCount = {};
-    const allNotes = [];
-    for (const s of filtered) {
-      (s.causes || []).forEach(id => { causeCount[id] = (causeCount[id]||0)+1; });
-      (s.actions || []).forEach(id => { actionCount[id] = (actionCount[id]||0)+1; });
-      if (s.notes) allNotes.push(s);
-    }
-
-    const total = filtered.length;
-    const sortedCauses = Object.entries(causeCount).sort((a,b) => b[1]-a[1]);
-    const sortedActions = Object.entries(actionCount).sort((a,b) => b[1]-a[1]);
-
-    const causePills = sortedCauses.map(([id, c]) => {
-      const opt = ALL_OPTIONS[id]; if (!opt) return '';
-      const col = THEMES[opt.theme].color;
-      return `<span class="pill" style="border-color:${col}; color:${col};">${opt.label} <strong style="margin-left:4px; opacity:0.85;">${c}</strong></span>`;
-    }).join('');
-
-    const actionPills = sortedActions.map(([id, c]) => {
-      const opt = ALL_OPTIONS[id]; if (!opt) return '';
-      const col = THEMES[opt.theme].color;
-      return `<span class="pill" style="border-color:${col}; color:${col};">${opt.label} <strong style="margin-left:4px; opacity:0.85;">${c}</strong></span>`;
-    }).join('');
-
-    const notesHtml = allNotes.length
-      ? allNotes.map(s => `
-          <div class="agg-note">
-            <div class="agg-note-author">${escapeHtml(s.team)}</div>
-            <p class="sub-notes" style="margin-top:6px;">${highlightNotes(s.notes, s.notesThemes || {})}</p>
-          </div>
-        `).join('')
-      : '<div class="empty" style="padding:14px 8px; text-align:left;">No notes shared in this group yet.</div>';
-
-    return `
-      <div class="group-aggregate-card">
-        <div class="agg-head">
-          <div>
-            <div class="agg-tag">Group view</div>
-            <div class="agg-title">${escapeHtml(scenarioLabel)}</div>
-          </div>
-          <div class="agg-meta">${total} ${total===1 ? 'voice' : 'voices'} contributed</div>
-        </div>
-
-        <div class="agg-section">
-          <div class="agg-section-label">What this group thinks is contributing</div>
-          ${causePills ? `<div class="sub-tags">${causePills}</div>` : '<div class="empty" style="padding:12px 8px; text-align:left;">No factors selected yet.</div>'}
-        </div>
-
-        <div class="agg-section">
-          <div class="agg-section-label">What this group would do</div>
-          ${actionPills ? `<div class="sub-tags">${actionPills}</div>` : '<div class="empty" style="padding:12px 8px; text-align:left;">No actions selected yet.</div>'}
-        </div>
-
-        <div class="agg-section">
-          <div class="agg-section-label">This group's thinking (notes)</div>
-          <div class="agg-notes-list">${notesHtml}</div>
-        </div>
-      </div>
-    `;
-  }
-
-  function renderIndividualToggle(filtered) {
-    const total = filtered.length;
-    return `
-      <div class="individual-toggle-wrap">
-        <button class="btn ghost" id="toggle-individuals" style="font-size:13px; padding:10px 16px;">Show individual responses (${total})</button>
-        <div class="submissions" id="individual-responses" style="display:none; margin-top:14px;">
-          ${[...filtered].sort((a,b) => (b.timestamp||0) - (a.timestamp||0)).map(s => renderIndividualCard(s, true)).join('')}
-        </div>
-      </div>
-    `;
-  }
-
-  function renderIndividualCard(s, isInsideGroupView = false) {
-    const themes = combinedThemes(s);
-    const primaryTheme = themes[0] || null;
-    const borderColor = primaryTheme ? THEMES[primaryTheme].color : 'var(--primary)';
-    const causePills = (s.causes || []).map(id => {
-      const opt = ALL_OPTIONS[id]; if (!opt) return '';
-      const c = THEMES[opt.theme].color;
-      return `<span class="pill" style="border-color:${c}; color:${c};">${opt.label}</span>`;
-    }).join('');
-    const actionPills = (s.actions || []).map(id => {
-      const opt = ALL_OPTIONS[id]; if (!opt) return '';
-      const c = THEMES[opt.theme].color;
-      return `<span class="pill" style="border-color:${c}; color:${c};">${opt.label}</span>`;
-    }).join('');
-    const time = s.timestamp ? new Date(s.timestamp).toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit'}) : '';
-    const notesHtml = s.notes
-      ? `<div class="sub-block"><div class="sub-block-label">Their thinking</div><p class="sub-notes">${highlightNotes(s.notes, s.notesThemes || {})}</p></div>`
-      : '';
-    // Only show scenario tag in "All groups" view; redundant inside a group view
-    const scenarioTag = (!isInsideGroupView && s.scenarioName)
-      ? `<span class="sub-scenario-tag">Group ${s.groupNum} · ${escapeHtml(s.scenarioName)}</span>`
-      : '';
-    return `
-      <div class="sub-card" style="border-left-color:${borderColor};">
-        <div class="sub-head">
-          <div>
-            <span class="sub-team">${escapeHtml(s.team)}</span>${scenarioTag}
-            ${s.members ? `<div style="font-size:12px;color:var(--muted); margin-top:2px;">${escapeHtml(s.members)}</div>` : ''}
-          </div>
-          <div class="sub-time">${time}</div>
-        </div>
-        ${causePills ? `<div class="sub-block"><div class="sub-block-label">What they think is contributing</div><div class="sub-tags">${causePills}</div></div>` : ''}
-        ${actionPills ? `<div class="sub-block"><div class="sub-block-label">What they'd do</div><div class="sub-tags">${actionPills}</div></div>` : ''}
-        ${notesHtml}
-      </div>
-    `;
-  }
-
-  function renderLeaderList(elId, counts, topN) {
-    const el = document.getElementById(elId);
-    const entries = Object.entries(counts).sort((a,b) => b[1] - a[1]).slice(0, topN);
-    if (!entries.length) {
-      el.innerHTML = '<div class="empty" style="padding:18px 8px;">No responses yet.</div>';
-      return;
-    }
-    const max = Math.max(...entries.map(([,c]) => c));
-    el.innerHTML = entries.map(([id, c]) => {
-      const opt = ALL_OPTIONS[id]; if (!opt) return '';
-      const color = THEMES[opt.theme].color;
-      const pct = (c / max) * 100;
+    el.innerHTML = sorted.map((p, idx) => {
+      const rank = idx + 1;
+      const isYou = p._key === player.key;
+      const rooms = Object.keys(p.roomsCompleted || {}).length;
+      const medalCls = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : '';
+      const rankDisplay = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
+      const rankCls = rank <= 3 ? 'medal' : '';
+      const modeLabel = p.mode === 'group' ? 'Group' : 'Solo';
       return `
-        <div class="leader-row">
-          <div class="leader-label">${opt.label}</div>
-          <div class="leader-bar-track"><div class="leader-bar-fill" style="width:${pct}%; background:${color};"></div></div>
-          <div class="leader-count">${c}</div>
+        <div class="lb-row ${medalCls} ${isYou ? 'you' : ''}">
+          <div class="lb-rank ${rankCls}">${rankDisplay}</div>
+          <div>
+            <div class="lb-name">${escapeHtml(p.name || 'Anonymous')}${isYou ? '<span class="you-tag">You</span>' : ''}</div>
+            <div class="lb-mode">${modeLabel} · ${rooms} ${rooms === 1 ? 'station' : 'stations'} complete</div>
+          </div>
+          <div class="lb-score">
+            <div class="pts">${p.totalScore||0}</div>
+            <div class="rooms-completed">points</div>
+          </div>
         </div>
       `;
     }).join('');
   }
 
   // ============================================================
-  // TOAST
+  // UTILITIES
   // ============================================================
+  function escapeHtml(s) {
+    return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
   let toastTimer = null;
   function toast(msg) {
     const t = document.getElementById('toast');
