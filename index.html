@@ -763,6 +763,143 @@
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(-4px); }
 
+  /* Facilitator gear — intentionally blends with background */
+  .fac-gear {
+    position: fixed;
+    bottom: 14px; left: 14px;
+    width: 28px; height: 28px;
+    border: none;
+    background: transparent;
+    color: var(--bg-2);
+    cursor: pointer;
+    padding: 0;
+    opacity: 0.5;
+    transition: opacity .2s ease, color .2s ease, transform .2s ease;
+    z-index: 90;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .fac-gear:hover {
+    opacity: 1;
+    color: var(--ink-soft);
+    transform: rotate(30deg);
+  }
+  .fac-gear:focus { outline: none; }
+  .fac-gear:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+
+  /* Facilitator overlay & panel */
+  .fac-overlay {
+    position: fixed; inset: 0;
+    background: rgba(31,41,55,0.4);
+    backdrop-filter: blur(2px);
+    display: none;
+    align-items: center; justify-content: center;
+    z-index: 200;
+    padding: 20px;
+    animation: fade .2s ease;
+  }
+  .fac-overlay.show { display: flex; }
+  .fac-panel {
+    background: var(--surface);
+    border-radius: 14px;
+    width: 100%; max-width: 460px;
+    box-shadow: 0 12px 40px -8px rgba(0,0,0,0.3);
+    border: 1px solid var(--rule);
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .fac-head {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    padding: 22px 24px 18px;
+    border-bottom: 1px solid var(--rule);
+    gap: 14px;
+  }
+  .fac-kicker {
+    font-size: 10px;
+    color: var(--bad);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .fac-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 20px;
+    color: var(--ink);
+    line-height: 1.1;
+  }
+  .fac-close {
+    background: none; border: none; cursor: pointer;
+    font-size: 28px;
+    line-height: 1;
+    color: var(--muted);
+    padding: 0;
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    transition: all .15s ease;
+  }
+  .fac-close:hover { background: var(--bg-2); color: var(--ink); }
+  .fac-body { padding: 18px 24px 22px; }
+  .fac-section {
+    padding: 14px 16px;
+    background: var(--bg);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    margin-bottom: 12px;
+  }
+  .fac-section.fac-danger {
+    background: var(--bad-soft);
+    border-color: var(--bad);
+  }
+  .fac-section-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .fac-danger .fac-section-title { color: var(--bad); }
+  .fac-section-desc {
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    margin: 0 0 12px;
+  }
+  .fac-btn {
+    width: 100%;
+    font-size: 13px;
+    padding: 11px 16px;
+  }
+  .fac-btn-danger {
+    background: var(--bad);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05), 0 4px 12px -6px rgba(185,74,72,0.5);
+  }
+  .fac-btn-danger:hover { background: #93302e; }
+  .fac-meta {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--rule);
+    font-size: 12px;
+    color: var(--muted);
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .fac-meta-label {
+    font-weight: 500;
+  }
+  .fac-meta code {
+    background: var(--bg-2);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-soft);
+  }
+
   /* Nav button row */
   .nav-row {
     display: flex; justify-content: space-between; align-items: center;
@@ -949,6 +1086,43 @@
 </div>
 
 <div class="toast" id="toast">Saved.</div>
+
+<!-- Facilitator gear (intentionally subtle — same color as background) -->
+<button id="fac-gear" class="fac-gear" aria-label="Settings" title="">
+  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="3"/>
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+  </svg>
+</button>
+
+<!-- Facilitator panel -->
+<div id="fac-overlay" class="fac-overlay">
+  <div class="fac-panel" role="dialog" aria-modal="true" aria-labelledby="fac-title">
+    <div class="fac-head">
+      <div>
+        <div class="fac-kicker">Private</div>
+        <div class="fac-title" id="fac-title">Facilitator options</div>
+      </div>
+      <button class="fac-close" id="fac-close" aria-label="Close">×</button>
+    </div>
+    <div class="fac-body">
+      <div class="fac-section">
+        <div class="fac-section-title">Reset my own session</div>
+        <p class="fac-section-desc">Clear just this device — keeps everyone else's progress. Use this if you want to play again as a different person.</p>
+        <button class="btn ghost fac-btn" id="fac-reset-mine">Reset this device</button>
+      </div>
+      <div class="fac-section fac-danger">
+        <div class="fac-section-title">Restart everything</div>
+        <p class="fac-section-desc">Wipes <strong>all players, scores, and leaderboard data</strong> for everyone. Use this between sessions. Cannot be undone.</p>
+        <button class="btn fac-btn fac-btn-danger" id="fac-reset-all">Restart everything</button>
+      </div>
+      <div class="fac-meta">
+        <div><span class="fac-meta-label">Session ID:</span> <code id="fac-session-id">—</code></div>
+        <div><span class="fac-meta-label">Players in session:</span> <strong id="fac-player-count">0</strong></div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
   // ============================================================
@@ -1481,6 +1655,92 @@
       `;
     }).join('');
   }
+
+  // ============================================================
+  // FACILITATOR GEAR
+  // ============================================================
+  const facGear = document.getElementById('fac-gear');
+  const facOverlay = document.getElementById('fac-overlay');
+  const facClose = document.getElementById('fac-close');
+  const facResetMine = document.getElementById('fac-reset-mine');
+  const facResetAll = document.getElementById('fac-reset-all');
+  document.getElementById('fac-session-id').textContent = SESSION_ID;
+
+  function openFacPanel() {
+    document.getElementById('fac-player-count').textContent = cachedLeaderboard.length;
+    facOverlay.classList.add('show');
+  }
+  function closeFacPanel() {
+    facOverlay.classList.remove('show');
+  }
+
+  facGear.addEventListener('click', openFacPanel);
+  facClose.addEventListener('click', closeFacPanel);
+  facOverlay.addEventListener('click', (e) => {
+    if (e.target === facOverlay) closeFacPanel();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && facOverlay.classList.contains('show')) closeFacPanel();
+  });
+
+  // Reset just my own session
+  facResetMine.addEventListener('click', async () => {
+    const confirmed = confirm('Reset just THIS device? Your local progress will be cleared, but everyone else\'s scores stay.');
+    if (!confirmed) return;
+    try {
+      // Remove this player from Firebase if we have a key
+      if (player.key && CONFIG_OK && db) {
+        await db.ref(`sessions/${SESSION_ID}/players/${player.key}`).remove();
+      }
+    } catch (e) {
+      console.error('Failed to remove player record', e);
+    }
+    // Wipe local state and start over
+    player = { key: null, name: '', mode: 'solo', totalScore: 0, roomsCompleted: {} };
+    currentRoom = null;
+    currentQIndex = 0;
+    currentSelection = null;
+    currentLocked = false;
+    // Reset any room session answers
+    Object.values(ROOMS).forEach(r => { r._sessionAnswers = null; });
+    document.getElementById('player-name').value = '';
+    document.getElementById('player-info').style.display = 'none';
+    document.querySelectorAll('.play-mode').forEach(p => p.classList.remove('selected'));
+    document.querySelector('.play-mode[data-mode="solo"]').classList.add('selected');
+    closeFacPanel();
+    showView('welcome');
+    toast('This device has been reset.');
+  });
+
+  // Reset EVERYTHING — wipe all Firebase data
+  facResetAll.addEventListener('click', async () => {
+    const confirmed = confirm('Wipe ALL players and scores for this session? This affects everyone and cannot be undone.');
+    if (!confirmed) return;
+    const doubleConfirm = confirm('Are you sure? Type-confirm: this is a hard reset of the entire leaderboard.');
+    if (!doubleConfirm) return;
+    try {
+      if (CONFIG_OK && db) {
+        await db.ref(`sessions/${SESSION_ID}`).remove();
+      }
+      // Also reset this device's local state
+      player = { key: null, name: '', mode: 'solo', totalScore: 0, roomsCompleted: {} };
+      currentRoom = null;
+      currentQIndex = 0;
+      currentSelection = null;
+      currentLocked = false;
+      Object.values(ROOMS).forEach(r => { r._sessionAnswers = null; });
+      document.getElementById('player-name').value = '';
+      document.getElementById('player-info').style.display = 'none';
+      document.querySelectorAll('.play-mode').forEach(p => p.classList.remove('selected'));
+      document.querySelector('.play-mode[data-mode="solo"]').classList.add('selected');
+      closeFacPanel();
+      showView('welcome');
+      toast('Everything has been reset.');
+    } catch (e) {
+      console.error('Failed to wipe session', e);
+      toast('Reset failed — check connection');
+    }
+  });
 
   // ============================================================
   // UTILITIES
