@@ -1655,6 +1655,9 @@
     Object.values(views).forEach(v => v.classList.remove('active'));
     views[name].classList.add('active');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Prevent ghost/double-tap clicks from carrying over into the new view's buttons
+    document.body.style.pointerEvents = 'none';
+    setTimeout(() => { document.body.style.pointerEvents = ''; }, 450);
   }
 
   // ============================================================
