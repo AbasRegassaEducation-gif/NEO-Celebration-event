@@ -1864,6 +1864,13 @@
   });
 
   document.getElementById('next-q-btn').addEventListener('click', () => {
+    if (!currentRoom) {
+      // Safety net: if state somehow got reset, go back to rooms
+      console.warn('next-q-btn clicked but currentRoom is null — returning to rooms');
+      renderRoomsGrid();
+      showView('rooms');
+      return;
+    }
     if (currentQIndex < currentRoom.questions.length - 1) {
       currentQIndex++;
       loadQuestion();
@@ -1887,36 +1894,39 @@
     const answers = currentRoom._sessionAnswers || [];
     const correct = answers.filter(a => a.correct).length;
     const total = currentRoom.questions.length;
+    const completedRoomName = currentRoom.name;
+    const completedRoomId = currentRoom.id;
 
     // Update local state
-    player.roomsCompleted[currentRoom.id] = { correct, total, locked: true };
+    player.roomsCompleted[completedRoomId] = { correct, total, locked: true };
     player.totalScore = Object.values(player.roomsCompleted).reduce((sum, r) => sum + (r.correct || 0), 0);
     document.getElementById('score-display').textContent = player.totalScore;
 
-    // Update Firebase
-    try {
-      if (player.key && CONFIG_OK) {
-        await updateFn(refFn(db, `sessions/${SESSION_ID}/players/${player.key}`), {
-          totalScore: player.totalScore,
-          roomsCompleted: player.roomsCompleted,
-          lastActive: Date.now(),
-        });
-      }
-    } catch (e) {
-      console.error('Failed to save score', e);
-      toast('Score saved locally — connection issue');
-    }
-
-    // Show completion screen
-    document.getElementById('complete-room-name').textContent = currentRoom.name;
+    // Show completion screen IMMEDIATELY (don't wait for Firebase)
+    document.getElementById('complete-room-name').textContent = completedRoomName;
     document.getElementById('complete-correct').textContent = correct;
     document.getElementById('complete-total').textContent = total;
-    document.getElementById('complete-sub').innerHTML = `Nice work in the <strong>${escapeHtml(currentRoom.name)}</strong>.`;
+    document.getElementById('complete-sub').innerHTML = `Nice work in the <strong>${escapeHtml(completedRoomName)}</strong>.`;
 
-    // Reset for next time
+    // Reset state for next time
     currentRoom._sessionAnswers = null;
     currentRoom = null;
     showView('complete');
+
+    // Save to Firebase in the background — don't block the UI on it
+    if (player.key && CONFIG_OK && db) {
+      try {
+        db.ref(`sessions/${SESSION_ID}/players/${player.key}`).update({
+          totalScore: player.totalScore,
+          roomsCompleted: player.roomsCompleted,
+          lastActive: Date.now(),
+        }).catch(e => {
+          console.error('Background score save failed:', e);
+        });
+      } catch (e) {
+        console.error('Could not initiate background save:', e);
+      }
+    }
   }
 
   document.getElementById('continue-btn').addEventListener('click', () => {
