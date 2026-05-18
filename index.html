@@ -657,17 +657,17 @@
   }
   .leaderboard-list {
     display: flex; flex-direction: column;
-    gap: 10px;
+    gap: 12px;
   }
   .lb-row {
     display: grid;
-    grid-template-columns: 50px 1fr 80px;
-    gap: 12px;
+    grid-template-columns: 64px 1fr 100px;
+    gap: 14px;
     align-items: center;
     background: var(--surface);
     border: 1px solid var(--rule);
-    border-radius: 10px;
-    padding: 14px 18px;
+    border-radius: 12px;
+    padding: 18px 22px;
   }
   .lb-row.you {
     border-color: var(--primary);
@@ -679,34 +679,36 @@
   .lb-rank {
     font-family: 'Fraunces', serif;
     font-weight: 700;
-    font-size: 22px;
+    font-size: 28px;
     color: var(--ink);
     text-align: center;
   }
-  .lb-rank.medal { font-size: 26px; }
+  .lb-rank.medal { font-size: 34px; }
   .lb-name {
     font-family: 'Fraunces', serif;
     font-weight: 600;
-    font-size: 16px;
+    font-size: 20px;
     color: var(--ink);
+    line-height: 1.2;
   }
   .lb-name .you-tag {
     display: inline-block;
     background: var(--primary);
     color: white;
     font-family: 'Inter', sans-serif;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 600;
-    padding: 2px 7px;
+    padding: 3px 9px;
     border-radius: 999px;
-    margin-left: 6px;
+    margin-left: 8px;
     text-transform: uppercase;
     letter-spacing: 0.06em;
+    vertical-align: middle;
   }
   .lb-mode {
-    font-size: 11px;
+    font-size: 13px;
     color: var(--muted);
-    margin-top: 2px;
+    margin-top: 4px;
   }
   .lb-score {
     text-align: right;
@@ -714,16 +716,17 @@
   .lb-score .pts {
     font-family: 'Fraunces', serif;
     font-weight: 700;
-    font-size: 22px;
+    font-size: 30px;
     color: var(--accent);
     line-height: 1;
   }
   .lb-score .rooms-completed {
-    font-size: 10px;
+    font-size: 11px;
     color: var(--muted);
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    margin-top: 4px;
+    margin-top: 6px;
+    font-weight: 500;
   }
 
   /* FOOTER */
@@ -762,6 +765,96 @@
     box-shadow: 0 8px 24px -8px rgba(0,0,0,0.4);
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+
+  /* Score reveal modal — shown after completing each room */
+  .score-overlay {
+    position: fixed; inset: 0;
+    background: rgba(31,41,55,0.55);
+    backdrop-filter: blur(3px);
+    display: none;
+    align-items: center; justify-content: center;
+    z-index: 300;
+    padding: 20px;
+    animation: fade .25s ease;
+  }
+  .score-overlay.show { display: flex; }
+  .score-modal {
+    background: var(--surface);
+    border-radius: 16px;
+    width: 100%; max-width: 440px;
+    padding: 36px 32px 30px;
+    text-align: center;
+    box-shadow: 0 16px 48px -10px rgba(0,0,0,0.4);
+    border: 2px solid var(--primary);
+    background: linear-gradient(180deg, var(--primary-soft) 0%, var(--surface) 50%);
+    animation: pop .3s ease;
+  }
+  @keyframes pop {
+    from { transform: scale(0.94); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  .score-emoji {
+    font-size: 48px;
+    line-height: 1;
+    margin-bottom: 14px;
+  }
+  .score-room-label {
+    font-size: 11px;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .score-headline {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 26px;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    margin-bottom: 22px;
+    line-height: 1.15;
+  }
+  .score-num-block {
+    background: var(--bg);
+    border: 1px solid var(--rule);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 18px;
+  }
+  .score-num {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 48px;
+    line-height: 1;
+    color: var(--primary);
+  }
+  .score-of {
+    color: var(--muted);
+    font-size: 28px;
+  }
+  .score-num-lbl {
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    margin-top: 8px;
+  }
+  .score-running {
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin-bottom: 24px;
+  }
+  .score-running strong {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    color: var(--accent);
+  }
+  #score-continue-btn {
+    width: 100%;
+    max-width: 240px;
+  }
 
   /* Facilitator gear — intentionally blends with background */
   .fac-gear {
@@ -990,6 +1083,7 @@
       <div class="kicker">Choose a station</div>
       <h2>Where will you start?</h2>
       <p>Visit any station in any order. Each one has artifacts on the table to examine — and questions to answer.</p>
+      <button class="btn" id="show-leaderboard-top-btn" style="margin-top: 16px;">View leaderboard →</button>
     </div>
     <div class="rooms-grid" id="rooms-grid"></div>
     <div class="nav-row">
@@ -1086,6 +1180,23 @@
 </div>
 
 <div class="toast" id="toast">Saved.</div>
+
+<!-- Score Reveal Modal (shown after completing each room) -->
+<div id="score-overlay" class="score-overlay">
+  <div class="score-modal">
+    <div class="score-emoji" id="score-emoji">🎉</div>
+    <div class="score-room-label" id="score-room-label">—</div>
+    <div class="score-headline" id="score-headline">Nice work!</div>
+    <div class="score-num-block">
+      <div class="score-num"><span id="score-correct">0</span><span class="score-of">/<span id="score-total-q">0</span></span></div>
+      <div class="score-num-lbl">Correct at this station</div>
+    </div>
+    <div class="score-running">
+      Total score so far: <strong id="score-running-val">0</strong>
+    </div>
+    <button class="btn big" id="score-continue-btn">Continue →</button>
+  </div>
+</div>
 
 <!-- Facilitator gear (intentionally subtle — same color as background) -->
 <button id="fac-gear" class="fac-gear" aria-label="Settings" title="">
@@ -1761,6 +1872,11 @@
     showView('leaderboard');
   });
 
+  document.getElementById('show-leaderboard-top-btn').addEventListener('click', () => {
+    renderLeaderboard(cachedLeaderboard);
+    showView('leaderboard');
+  });
+
   document.getElementById('back-from-lb-btn').addEventListener('click', () => {
     renderRoomsGrid();
     showView('rooms');
@@ -1900,6 +2016,7 @@
     const correct = answers.filter(a => a.correct).length;
     const total = currentRoom.questions.length;
     const completedRoomId = currentRoom.id;
+    const completedRoomName = currentRoom.name;
 
     // Update local state
     player.roomsCompleted[completedRoomId] = { correct, total, locked: true };
@@ -1910,12 +2027,33 @@
     currentRoom._sessionAnswers = null;
     currentRoom = null;
 
-    // Go straight back to the rooms picker — the room is now marked done with its score
+    // Go back to the rooms picker FIRST, then show the score modal on top
     renderRoomsGrid();
     showView('rooms');
-    toast(`+${correct} ${correct === 1 ? 'point' : 'points'} — total ${player.totalScore}`);
 
-    // Save to Firebase in the background — don't block the UI on it
+    // Pick an emoji based on performance
+    const pct = total > 0 ? correct / total : 0;
+    let emoji = '✨';
+    let headline = 'Nice work!';
+    if (pct === 1) { emoji = '🌟'; headline = 'Perfect score!'; }
+    else if (pct >= 0.75) { emoji = '🎉'; headline = 'Great work!'; }
+    else if (pct >= 0.5) { emoji = '👍'; headline = 'Nice work!'; }
+    else { emoji = '💡'; headline = 'Good effort!'; }
+
+    // Fill in modal content
+    document.getElementById('score-emoji').textContent = emoji;
+    document.getElementById('score-room-label').textContent = completedRoomName;
+    document.getElementById('score-headline').textContent = headline;
+    document.getElementById('score-correct').textContent = correct;
+    document.getElementById('score-total-q').textContent = total;
+    document.getElementById('score-running-val').textContent = player.totalScore;
+
+    // Show modal — delayed slightly so any ghost-tap from "See your score" lands harmlessly
+    setTimeout(() => {
+      document.getElementById('score-overlay').classList.add('show');
+    }, 500);
+
+    // Save to Firebase in the background
     if (player.key && CONFIG_OK && db) {
       try {
         db.ref(`sessions/${SESSION_ID}/players/${player.key}`).update({
@@ -1930,6 +2068,11 @@
       }
     }
   }
+
+  // Score modal continue button
+  document.getElementById('score-continue-btn').addEventListener('click', () => {
+    document.getElementById('score-overlay').classList.remove('show');
+  });
 
   document.getElementById('continue-btn').addEventListener('click', () => {
     renderRoomsGrid();
