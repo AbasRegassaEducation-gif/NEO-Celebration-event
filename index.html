@@ -1524,16 +1524,16 @@
       description: 'Instruction, student progress, classroom systems.',
       questions: [
         {
-          evidence: 'Exhibit A: Student Progress Monitoring Tool Aligned to State Standards, LIEP, TSES Manual, and Testing Calendar',
+          evidence: 'Exhibit A: Progress Monitoring',
           text: 'Based on inspection of Exhibit A, there is evidence that the school is…',
           options: [
-            'providing instruction in a scope and sequence that is aligned with the MN Academic Standards and empowering students to monitor their individual progress toward standards',
-            'monitoring implementation of the Language Instruction and Educational Plan (LIEP) and Total Special Education System (TSES) manual',
-            'monitoring progress with required assessments and in compliance with testing security requirements',
-            'All of the above',
+            'monitoring progress toward class goals and empowering students to monitor their own progress toward their goals',
+            'violating Minnesota Data Practices',
+            'clearly aligning goals to Minnesota state standards',
+            'all of the above',
           ],
-          correct: 3,
-          explanation: 'A progress monitoring tool aligned to standards, LIEP, TSES, and testing calendar supports all three — instructional alignment, program monitoring, and assessment compliance.',
+          correct: 0,
+          explanation: 'A progress monitoring tool used in the classroom shows the school is monitoring progress toward class goals and empowering students to track their own learning.',
         },
         {
           evidence: 'Exhibit B: Behavior Expectations, Routine, Groupings',
@@ -1548,7 +1548,7 @@
           explanation: 'Documented behavior expectations, routines, and groupings demonstrate MTSS, clear expectations, and structured instruction — all of the above.',
         },
         {
-          evidence: 'Exhibit C: Emergency Flip Chart (Missing Lockdown)',
+          evidence: 'Exhibit C: Emergency Procedures',
           text: 'Based on inspection of Exhibit C, there is evidence that the school is…',
           options: [
             'ready in case of any emergency',
@@ -1910,12 +1910,7 @@
     document.getElementById('q-text').textContent = q.text;
 
     const ev = document.getElementById('q-evidence');
-    if (q.evidence) {
-      ev.style.display = 'block';
-      ev.innerHTML = `<strong>${escapeHtml(q.evidence)}:</strong> Examine the artifact at the ${escapeHtml(currentRoom.name)} station, then answer below.`;
-    } else {
-      ev.style.display = 'none';
-    }
+    ev.style.display = 'none';
 
     const answersEl = document.getElementById('q-answers');
     answersEl.innerHTML = '';
