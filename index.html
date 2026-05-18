@@ -1899,7 +1899,6 @@
     const answers = currentRoom._sessionAnswers || [];
     const correct = answers.filter(a => a.correct).length;
     const total = currentRoom.questions.length;
-    const completedRoomName = currentRoom.name;
     const completedRoomId = currentRoom.id;
 
     // Update local state
@@ -1907,16 +1906,14 @@
     player.totalScore = Object.values(player.roomsCompleted).reduce((sum, r) => sum + (r.correct || 0), 0);
     document.getElementById('score-display').textContent = player.totalScore;
 
-    // Show completion screen IMMEDIATELY (don't wait for Firebase)
-    document.getElementById('complete-room-name').textContent = completedRoomName;
-    document.getElementById('complete-correct').textContent = correct;
-    document.getElementById('complete-total').textContent = total;
-    document.getElementById('complete-sub').innerHTML = `Nice work in the <strong>${escapeHtml(completedRoomName)}</strong>.`;
-
-    // Reset state for next time
+    // Reset state
     currentRoom._sessionAnswers = null;
     currentRoom = null;
-    showView('complete');
+
+    // Go straight back to the rooms picker — the room is now marked done with its score
+    renderRoomsGrid();
+    showView('rooms');
+    toast(`+${correct} ${correct === 1 ? 'point' : 'points'} — total ${player.totalScore}`);
 
     // Save to Firebase in the background — don't block the UI on it
     if (player.key && CONFIG_OK && db) {
