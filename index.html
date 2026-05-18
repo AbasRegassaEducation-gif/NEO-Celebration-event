@@ -1863,14 +1863,16 @@
     }
   });
 
+  let processingClick = false;
   document.getElementById('next-q-btn').addEventListener('click', () => {
-    if (!currentRoom) {
-      // Safety net: if state somehow got reset, go back to rooms
-      console.warn('next-q-btn clicked but currentRoom is null — returning to rooms');
-      renderRoomsGrid();
-      showView('rooms');
-      return;
-    }
+    // Prevent double-fire from ghost clicks / double taps
+    if (processingClick) return;
+    processingClick = true;
+    setTimeout(() => { processingClick = false; }, 500);
+
+    // If we've already finished and left the room, just ignore
+    if (!currentRoom) return;
+
     if (currentQIndex < currentRoom.questions.length - 1) {
       currentQIndex++;
       loadQuestion();
