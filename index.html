@@ -1224,7 +1224,7 @@
       </div>
       <div class="fac-section fac-danger">
         <div class="fac-section-title">Restart everything</div>
-        <p class="fac-section-desc">Wipes <strong>all players, scores, and leaderboard data</strong> for everyone. Use this between sessions. Cannot be undone.</p>
+        <p class="fac-section-desc">Wipes <strong>all players, scores, and leaderboard data</strong> for everyone. Requires a passcode. Use this between sessions. Cannot be undone.</p>
         <button class="btn fac-btn fac-btn-danger" id="fac-reset-all">Restart everything</button>
       </div>
       <div class="fac-meta">
@@ -2179,11 +2179,19 @@
   });
 
   // Reset EVERYTHING — wipe all Firebase data
+  // 🔒 FACILITATOR PASSCODE — change this 4-digit code to whatever you want.
+  // Anyone who finds the gear must enter this to wipe the leaderboard.
+  const FACILITATOR_PASSCODE = '1111';
+
   facResetAll.addEventListener('click', async () => {
-    const confirmed = confirm('Wipe ALL players and scores for this session? This affects everyone and cannot be undone.');
+    const entered = prompt('Enter the 4-digit facilitator passcode to restart everything:');
+    if (entered === null) return; // user cancelled
+    if (entered.trim() !== FACILITATOR_PASSCODE) {
+      toast('Incorrect passcode');
+      return;
+    }
+    const confirmed = confirm('Passcode accepted. Wipe ALL players and scores for this session? This cannot be undone.');
     if (!confirmed) return;
-    const doubleConfirm = confirm('Are you sure? Type-confirm: this is a hard reset of the entire leaderboard.');
-    if (!doubleConfirm) return;
     try {
       if (CONFIG_OK && db) {
         await db.ref(`sessions/${SESSION_ID}`).remove();
