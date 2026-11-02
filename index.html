@@ -3,11 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>The Roundtable · NEO</title>
+<title>Mystery Academy · The Roundtable · NEO</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<!-- Firebase compat (loads via script tags — more reliable than ES module imports) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <style>
@@ -33,985 +32,213 @@
     --neo-soft: #dde8f5;
   }
   * { box-sizing: border-box; }
-  html, body {
-    margin: 0; padding: 0;
-    background: var(--bg);
-    color: var(--ink);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    min-height: 100vh;
-  }
-  .wrap {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 24px 22px 60px;
-  }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); font-family: 'Inter', sans-serif; min-height: 100vh; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 24px 22px 60px; }
 
-  header.top {
-    display: flex; align-items: flex-end; justify-content: space-between;
-    border-bottom: 1px solid var(--rule);
-    padding-bottom: 16px; margin-bottom: 28px;
-    gap: 14px; flex-wrap: wrap;
-  }
-  .header-brand-row {
-    display: flex; align-items: center; gap: 12px;
-    flex-wrap: wrap;
-  }
-  .brand {
-    font-family: 'Fraunces', serif;
-    font-weight: 700;
-    font-size: clamp(22px, 3vw, 28px);
-    letter-spacing: -0.02em;
-    line-height: 1;
-    color: var(--ink);
-  }
+  header.top { display: flex; align-items: flex-end; justify-content: space-between; border-bottom: 1px solid var(--rule); padding-bottom: 16px; margin-bottom: 28px; gap: 14px; flex-wrap: wrap; }
+  .header-brand-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .brand { font-family: 'Fraunces', serif; font-weight: 700; font-size: clamp(22px, 3vw, 28px); letter-spacing: -0.02em; line-height: 1; color: var(--ink); }
   .brand .em { color: var(--primary); }
-  .neo-badge {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: var(--neo);
-    color: white;
-    padding: 5px 11px 5px 9px;
-    border-radius: 6px;
-    font-family: 'Fraunces', serif;
-    font-weight: 700;
-    font-size: 13px;
-    letter-spacing: 0.04em;
-    line-height: 1;
-    box-shadow: 0 1px 2px rgba(29,78,137,0.2);
-  }
-  .neo-badge .neo-mark {
-    display: inline-block;
-    width: 6px; height: 6px;
-    background: var(--accent);
-    border-radius: 50%;
-  }
-  .sub-brand {
-    font-size: 12px; color: var(--muted);
-    margin-top: 6px;
-  }
-  .meta {
-    font-size: 12px;
-    color: var(--muted);
-    text-align: right;
-  }
-  .conn-status {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-size: 11px;
-  }
-  .conn-status .dot {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: var(--muted);
-  }
+  .neo-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--neo); color: white; padding: 5px 11px 5px 9px; border-radius: 6px; font-family: 'Fraunces', serif; font-weight: 700; font-size: 13px; letter-spacing: 0.04em; line-height: 1; box-shadow: 0 1px 2px rgba(29,78,137,0.2); }
+  .neo-badge .neo-mark { display: inline-block; width: 6px; height: 6px; background: var(--accent); border-radius: 50%; }
+  .sub-brand { font-size: 12px; color: var(--muted); margin-top: 6px; }
+  .meta { font-size: 12px; color: var(--muted); text-align: right; }
+  .conn-status { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; }
+  .conn-status .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
   .conn-status.connected .dot { background: var(--good); animation: pulse 1.6s infinite; }
   .conn-status.error .dot { background: var(--bad); }
   .conn-status.connected { color: var(--good); }
   .conn-status.error { color: var(--bad); }
-  @keyframes pulse {
-    0% { box-shadow: 0 0 0 0 rgba(45,106,79,0.5); }
-    70% { box-shadow: 0 0 0 8px rgba(45,106,79,0); }
-    100% { box-shadow: 0 0 0 0 rgba(45,106,79,0); }
-  }
-
-  /* Persistent score chip */
-  .score-chip {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: var(--accent-soft);
-    color: var(--accent);
-    padding: 4px 11px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 600;
-    margin-top: 4px;
-  }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(45,106,79,0.5); } 70% { box-shadow: 0 0 0 8px rgba(45,106,79,0); } 100% { box-shadow: 0 0 0 0 rgba(45,106,79,0); } }
+  .score-chip { display: inline-flex; align-items: center; gap: 6px; background: var(--accent-soft); color: var(--accent); padding: 4px 11px; border-radius: 999px; font-size: 12px; font-weight: 600; margin-top: 4px; }
   .score-chip strong { font-family: 'Fraunces', serif; font-size: 14px; }
+  .group-chip { display: inline-flex; align-items: center; gap: 6px; background: var(--neo-soft); color: var(--neo); padding: 4px 11px; border-radius: 999px; font-size: 11px; font-weight: 600; margin-top: 4px; }
 
   .view { display: none; animation: fade .3s ease; }
   .view.active { display: block; }
   @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--rule);
-    border-radius: 12px;
-    padding: 28px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 8px 24px -16px rgba(0,0,0,0.08);
-  }
+  .card { background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; padding: 28px; box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 8px 24px -16px rgba(0,0,0,0.08); }
   .card + .card { margin-top: 16px; }
 
-  /* HERO */
-  .hero {
-    background: linear-gradient(135deg, var(--primary-soft) 0%, var(--bg-2) 100%);
-    border: 1px solid var(--rule);
-    border-radius: 16px;
-    padding: 36px 32px;
-    position: relative;
-    overflow: hidden;
-    margin-bottom: 16px;
-  }
-  .hero::after {
-    content: "";
-    position: absolute;
-    bottom: -50px; right: -50px;
-    width: 220px; height: 220px;
-    background: radial-gradient(circle, var(--accent-soft) 0%, transparent 70%);
-    opacity: 0.7;
-    pointer-events: none;
-  }
-  .kicker {
-    display: inline-block;
-    font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
-    color: var(--primary);
-    background: rgba(255,255,255,0.7);
-    padding: 5px 11px;
-    border-radius: 999px;
-    font-weight: 600;
-    margin-bottom: 16px;
-  }
-  h1 {
-    font-family: 'Fraunces', serif;
-    font-weight: 700;
-    font-size: clamp(30px, 4.4vw, 42px);
-    line-height: 1.05;
-    letter-spacing: -0.02em;
-    margin: 0 0 16px;
-    color: var(--ink);
-  }
+  .hero { background: linear-gradient(135deg, var(--primary-soft) 0%, var(--bg-2) 100%); border: 1px solid var(--rule); border-radius: 16px; padding: 36px 32px; position: relative; overflow: hidden; margin-bottom: 16px; }
+  .hero::after { content: ""; position: absolute; bottom: -50px; right: -50px; width: 220px; height: 220px; background: radial-gradient(circle, var(--accent-soft) 0%, transparent 70%); opacity: 0.7; pointer-events: none; }
+  .kicker { display: inline-block; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--primary); background: rgba(255,255,255,0.7); padding: 5px 11px; border-radius: 999px; font-weight: 600; margin-bottom: 16px; }
+  h1 { font-family: 'Fraunces', serif; font-weight: 700; font-size: clamp(28px, 4vw, 38px); line-height: 1.05; letter-spacing: -0.02em; margin: 0 0 16px; color: var(--ink); }
   h1 em { font-style: italic; color: var(--primary); }
-  .lede {
-    font-size: 16px; color: var(--ink-soft); line-height: 1.6;
-    margin: 0 0 18px;
-    max-width: 580px;
-  }
-  .neo-credit {
-    padding-top: 16px;
-    border-top: 1px dashed rgba(0,0,0,0.1);
-    display: flex; align-items: center; gap: 10px;
-    font-size: 12.5px;
-    color: var(--ink-soft);
-    flex-wrap: wrap;
-    position: relative;
-    z-index: 1;
-  }
-  .neo-credit .label-text {
-    color: var(--muted);
-    font-size: 11px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    font-weight: 600;
-  }
-  .neo-credit .neo-name {
-    color: var(--neo);
-    font-weight: 600;
-  }
-  .neo-credit .neo-name em {
-    font-style: normal;
-    color: var(--ink-soft);
-    font-weight: 400;
-  }
+  .lede { font-size: 16px; color: var(--ink-soft); line-height: 1.6; margin: 0 0 18px; max-width: 580px; }
+  .neo-credit { padding-top: 16px; border-top: 1px dashed rgba(0,0,0,0.1); display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: var(--ink-soft); flex-wrap: wrap; position: relative; z-index: 1; }
+  .neo-credit .label-text { color: var(--muted); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600; }
+  .neo-credit .neo-name { color: var(--neo); font-weight: 600; }
+  .neo-credit .neo-name em { font-style: normal; color: var(--ink-soft); font-weight: 400; }
 
-  /* FORM */
-  label.field-label {
-    display: block;
-    font-size: 12px; font-weight: 600;
-    color: var(--ink); margin-bottom: 8px;
-  }
-  input[type="text"] {
-    width: 100%;
-    background: var(--bg);
-    border: 1.5px solid var(--rule);
-    border-radius: 8px;
-    padding: 12px 14px;
-    font-family: 'Inter', sans-serif;
-    font-size: 15px;
-    color: var(--ink);
-    outline: none;
-    transition: border-color .15s ease;
-  }
-  input[type="text"]:focus { border-color: var(--primary); background: var(--surface); }
+  label.field-label { display: block; font-size: 12px; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
+  input[type="text"], input[type="number"] { width: 100%; background: var(--bg); border: 1.5px solid var(--rule); border-radius: 8px; padding: 12px 14px; font-family: 'Inter', sans-serif; font-size: 15px; color: var(--ink); outline: none; transition: border-color .15s ease; }
+  input[type="text"]:focus, input[type="number"]:focus { border-color: var(--primary); background: var(--surface); }
   .field + .field { margin-top: 16px; }
 
-  /* PLAY MODE */
-  .play-mode-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-top: 6px;
-  }
-  .play-mode {
-    cursor: pointer;
-    text-align: center;
-    padding: 14px 16px;
-    background: var(--bg);
-    border: 1.5px solid var(--rule);
-    border-radius: 10px;
-    transition: all .15s ease;
-  }
-  .play-mode:hover {
-    border-color: var(--primary);
-    background: var(--primary-soft);
-  }
-  .play-mode.selected {
-    background: var(--primary);
-    border-color: var(--primary);
-    color: white;
-    box-shadow: 0 4px 12px -4px rgba(45,106,79,0.4);
-  }
-  .play-mode .pm-title {
-    font-family: 'Fraunces', serif;
-    font-weight: 700;
-    font-size: 17px;
-    margin-bottom: 2px;
-  }
-  .play-mode .pm-sub {
-    font-size: 12px;
-    opacity: 0.75;
-  }
+  .play-mode-stack { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
+  .play-mode { cursor: pointer; padding: 16px 18px; background: var(--bg); border: 1.5px solid var(--rule); border-radius: 10px; transition: all .15s ease; display: flex; align-items: flex-start; gap: 14px; }
+  .play-mode:hover { border-color: var(--primary); background: var(--primary-soft); }
+  .play-mode.selected { background: var(--primary-soft); border-color: var(--primary); }
+  .play-mode .pm-icon { font-size: 22px; line-height: 1; flex-shrink: 0; }
+  .play-mode .pm-body { flex: 1; }
+  .play-mode .pm-title { font-family: 'Fraunces', serif; font-weight: 700; font-size: 16px; color: var(--ink); line-height: 1.1; }
+  .play-mode .pm-sub { font-size: 13px; color: var(--ink-soft); margin-top: 3px; line-height: 1.4; }
 
-  /* BUTTONS */
-  .btn {
-    appearance: none; cursor: pointer;
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 13px 22px;
-    font-family: 'Inter', sans-serif;
-    font-size: 14px; font-weight: 600;
-    transition: all .15s ease;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05), 0 4px 12px -6px rgba(45,106,79,0.4);
-  }
+  .btn { appearance: none; cursor: pointer; background: var(--primary); color: white; border: none; border-radius: 8px; padding: 13px 22px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; transition: all .15s ease; box-shadow: 0 1px 2px rgba(0,0,0,0.05), 0 4px 12px -6px rgba(45,106,79,0.4); }
   .btn:hover { background: var(--primary-deep); transform: translateY(-1px); }
   .btn:active { transform: none; }
   .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
-  .btn.ghost {
-    background: transparent;
-    color: var(--ink);
-    border: 1.5px solid var(--rule);
-    box-shadow: none;
-  }
+  .btn.ghost { background: transparent; color: var(--ink); border: 1.5px solid var(--rule); box-shadow: none; }
   .btn.ghost:hover { background: var(--bg-2); border-color: var(--ink-soft); transform: none; }
-  .btn.big {
-    font-size: 15px;
-    padding: 15px 26px;
-  }
+  .btn.big { font-size: 15px; padding: 15px 26px; }
   .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px; }
 
-  /* ROOM PICKER */
-  .picker-head {
-    text-align: center;
-    margin-bottom: 24px;
-  }
-  .picker-head h2 {
-    font-family: 'Fraunces', serif;
-    font-weight: 700;
-    font-size: clamp(26px, 3.4vw, 32px);
-    letter-spacing: -0.02em;
-    margin: 6px 0 8px;
-  }
-  .picker-head p {
-    color: var(--muted);
-    font-size: 14.5px;
-    margin: 0;
-    max-width: 540px;
-    margin-left: auto; margin-right: auto;
-  }
-  .rooms-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 14px;
-  }
-  .room-card {
-    background: var(--surface);
-    border: 1.5px solid var(--rule);
-    border-radius: 14px;
-    padding: 22px 22px 20px;
-    cursor: pointer;
-    transition: all .2s ease;
-    position: relative;
-    overflow: hidden;
-    text-align: left;
-  }
-  .room-card:hover {
-    border-color: var(--primary);
-    transform: translateY(-2px);
-    box-shadow: 0 12px 28px -16px rgba(45,106,79,0.3);
-  }
-  .room-card.locked {
-    cursor: default;
-    opacity: 0.78;
-  }
-  .room-card.locked:hover {
-    border-color: var(--rule);
-    transform: none;
-    box-shadow: none;
-  }
-  .room-icon {
-    width: 44px; height: 44px;
-    border-radius: 10px;
-    background: var(--primary-soft);
-    color: var(--primary);
-    display: flex; align-items: center; justify-content: center;
-    margin-bottom: 14px;
-    font-size: 22px;
-  }
-  .room-name {
-    font-family: 'Fraunces', serif;
-    font-weight: 700;
-    font-size: 19px;
-    letter-spacing: -0.01em;
-    color: var(--ink);
-    margin-bottom: 4px;
-  }
-  .room-desc {
-    font-size: 13px;
-    color: var(--ink-soft);
-    line-height: 1.4;
-    margin-bottom: 12px;
-  }
-  .room-meta {
-    display: flex; justify-content: space-between; align-items: center;
-    padding-top: 12px;
-    border-top: 1px dashed var(--rule);
-    font-size: 12px;
-  }
-  .room-status {
-    color: var(--muted);
-    font-weight: 500;
-  }
-  .room-status.done {
-    color: var(--primary);
-    font-weight: 600;
-  }
-  .room-status.coming {
-    color: var(--muted);
-    font-style: italic;
-  }
-  .room-score {
-    font-family: 'Fraunces', serif;
-    font-weight: 700;
-    color: var(--accent);
-    font-size: 14px;
-  }
-  .room-card .badge-corner {
-    position: absolute;
-    top: 12px; right: 12px;
-    background: var(--accent-soft);
-    color: var(--accent);
-    font-size: 10px;
-    font-weight: 600;
-    padding: 3px 9px;
-    border-radius: 999px;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-  }
-  .room-card .badge-corner.done {
-    background: var(--good-soft);
-    color: var(--good);
-  }
-  .room-card .badge-corner.coming {
-    background: var(--bg-2);
-    color: var(--muted);
-  }
+  .picker-head { text-align: center; margin-bottom: 24px; }
+  .picker-head h2 { font-family: 'Fraunces', serif; font-weight: 700; font-size: clamp(26px, 3.4vw, 32px); letter-spacing: -0.02em; margin: 6px 0 8px; }
+  .picker-head p { color: var(--muted); font-size: 14.5px; margin: 0; max-width: 540px; margin-left: auto; margin-right: auto; }
 
-  /* QUESTION VIEW */
-  .question-head {
-    display: flex; justify-content: space-between; align-items: baseline;
-    margin-bottom: 14px;
-    gap: 12px; flex-wrap: wrap;
-  }
-  .question-room {
-    font-size: 11px;
-    color: var(--primary);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
-  .question-counter {
-    font-size: 12px;
-    color: var(--muted);
-    font-weight: 500;
-  }
+  .group-banner { background: var(--neo-soft); border: 1px solid var(--neo); border-radius: 12px; padding: 16px 18px; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .group-banner .gb-left { display: flex; flex-direction: column; gap: 2px; }
+  .group-banner .gb-label { font-size: 10px; color: var(--neo); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; }
+  .group-banner .gb-title { font-family: 'Fraunces', serif; font-weight: 700; font-size: 18px; color: var(--ink); }
+  .group-banner .gb-code { font-family: 'Fraunces', serif; font-weight: 700; font-size: 24px; color: var(--neo); letter-spacing: 0.2em; background: white; padding: 6px 14px; border-radius: 8px; border: 1px solid var(--neo); }
+  .group-banner .gb-stats { display: flex; gap: 14px; font-size: 12px; color: var(--ink-soft); margin-top: 4px; }
+  .group-banner .gb-stats strong { color: var(--ink); font-weight: 600; }
+
+  .rooms-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+  .room-card { background: var(--surface); border: 1.5px solid var(--rule); border-radius: 14px; padding: 20px 20px 18px; cursor: pointer; transition: all .2s ease; position: relative; text-align: left; }
+  .room-card:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 12px 28px -16px rgba(45,106,79,0.3); }
+  .room-card.locked { cursor: default; opacity: 0.7; }
+  .room-card.locked:hover { border-color: var(--rule); transform: none; box-shadow: none; }
+  .room-card.mine { border-color: var(--neo); border-width: 2px; }
+  .room-card.others { opacity: 0.55; }
+  .room-icon { width: 40px; height: 40px; border-radius: 10px; background: var(--primary-soft); color: var(--primary); display: flex; align-items: center; justify-content: center; margin-bottom: 12px; font-size: 20px; }
+  .room-name { font-family: 'Fraunces', serif; font-weight: 700; font-size: 17px; letter-spacing: -0.01em; color: var(--ink); margin-bottom: 3px; line-height: 1.15; }
+  .room-desc { font-size: 12.5px; color: var(--ink-soft); line-height: 1.4; margin-bottom: 12px; }
+  .room-meta { display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px dashed var(--rule); font-size: 12px; gap: 8px; }
+  .room-status { color: var(--muted); font-weight: 500; }
+  .room-status.done { color: var(--primary); font-weight: 600; }
+  .room-status.coming { color: var(--muted); font-style: italic; }
+  .room-status.mine { color: var(--neo); font-weight: 600; }
+  .room-status.others { color: var(--muted); }
+  .room-status.in-progress { color: var(--accent); font-weight: 600; }
+  .room-score { font-family: 'Fraunces', serif; font-weight: 700; color: var(--accent); font-size: 14px; }
+  .room-card .badge-corner { position: absolute; top: 10px; right: 10px; background: var(--accent-soft); color: var(--accent); font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 999px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .room-card .badge-corner.done { background: var(--good-soft); color: var(--good); }
+  .room-card .badge-corner.mine { background: var(--neo-soft); color: var(--neo); }
+  .room-card .badge-corner.others { background: var(--bg-2); color: var(--muted); }
+  .room-card .badge-corner.progress { background: var(--accent-soft); color: var(--accent); }
+
+  .assign-note { background: var(--neo-soft); border-left: 3px solid var(--neo); border-radius: 0 8px 8px 0; padding: 12px 16px; margin-bottom: 18px; font-size: 13.5px; color: var(--ink-soft); line-height: 1.5; }
+  .assign-note strong { color: var(--neo); font-weight: 600; }
+
+  .question-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 14px; gap: 12px; flex-wrap: wrap; }
+  .question-room { font-size: 11px; color: var(--primary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+  .question-counter { font-size: 12px; color: var(--muted); font-weight: 500; }
   .question-counter strong { color: var(--ink); }
-  .question-progress {
-    height: 6px;
-    background: var(--bg-2);
-    border-radius: 999px;
-    overflow: hidden;
-    margin-bottom: 22px;
-  }
-  .question-progress-fill {
-    height: 100%;
-    background: var(--primary);
-    border-radius: 999px;
-    transition: width .4s cubic-bezier(.2,.8,.2,1);
-  }
-  .question-text {
-    font-family: 'Fraunces', serif;
-    font-weight: 600;
-    font-size: clamp(20px, 2.6vw, 24px);
-    line-height: 1.3;
-    letter-spacing: -0.01em;
-    color: var(--ink);
-    margin: 0 0 20px;
-  }
-  .question-evidence {
-    background: var(--bg);
-    border-left: 3px solid var(--accent);
-    border-radius: 0 8px 8px 0;
-    padding: 12px 16px;
-    margin-bottom: 22px;
-    font-size: 13.5px;
-    color: var(--ink-soft);
-    line-height: 1.5;
-  }
-  .question-evidence strong { color: var(--accent); font-weight: 600; }
+  .question-progress { height: 6px; background: var(--bg-2); border-radius: 999px; overflow: hidden; margin-bottom: 22px; }
+  .question-progress-fill { height: 100%; background: var(--primary); border-radius: 999px; transition: width .4s cubic-bezier(.2,.8,.2,1); }
+  .question-text { font-family: 'Fraunces', serif; font-weight: 600; font-size: clamp(18px, 2.4vw, 22px); line-height: 1.3; letter-spacing: -0.01em; color: var(--ink); margin: 0 0 20px; }
+  .answers { display: flex; flex-direction: column; gap: 10px; margin-bottom: 22px; }
+  .answer { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; background: var(--surface); border: 1.5px solid var(--rule); border-radius: 10px; cursor: pointer; transition: all .15s ease; user-select: none; text-align: left; width: 100%; font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.45; color: var(--ink); }
+  .answer:hover:not(.locked):not(.disabled) { border-color: var(--primary); background: var(--primary-soft); }
+  .answer.selected { background: var(--primary-soft); border-color: var(--primary); }
+  .answer .letter { flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; background: var(--bg); border: 1.5px solid var(--ink-soft); color: var(--ink); display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-weight: 700; font-size: 14px; transition: all .15s ease; }
+  .answer.selected .letter { background: var(--primary); border-color: var(--primary); color: white; }
+  .answer .text { flex: 1; padding-top: 3px; }
+  .answer.correct { background: var(--good-soft); border-color: var(--good); cursor: default; }
+  .answer.correct .letter { background: var(--good); border-color: var(--good); color: white; }
+  .answer.correct::after { content: "✓"; font-size: 18px; color: var(--good); font-weight: 700; margin-left: auto; align-self: center; }
+  .answer.incorrect { background: var(--bad-soft); border-color: var(--bad); cursor: default; }
+  .answer.incorrect .letter { background: var(--bad); border-color: var(--bad); color: white; }
+  .answer.incorrect::after { content: "✗"; font-size: 18px; color: var(--bad); font-weight: 700; margin-left: auto; align-self: center; }
+  .answer.disabled { opacity: 0.55; cursor: default; }
 
-  .answers {
-    display: flex; flex-direction: column;
-    gap: 10px;
-    margin-bottom: 22px;
-  }
-  .answer {
-    display: flex; align-items: flex-start;
-    gap: 12px;
-    padding: 14px 16px;
-    background: var(--surface);
-    border: 1.5px solid var(--rule);
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all .15s ease;
-    user-select: none;
-    text-align: left;
-    width: 100%;
-    font-family: 'Inter', sans-serif;
-    font-size: 15px;
-    line-height: 1.45;
-    color: var(--ink);
-  }
-  .answer:hover:not(.locked):not(.disabled) {
-    border-color: var(--primary);
-    background: var(--primary-soft);
-  }
-  .answer.selected {
-    background: var(--primary-soft);
-    border-color: var(--primary);
-  }
-  .answer .letter {
-    flex-shrink: 0;
-    width: 28px; height: 28px;
-    border-radius: 50%;
-    background: var(--bg);
-    border: 1.5px solid var(--ink-soft);
-    color: var(--ink);
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Fraunces', serif;
-    font-weight: 700;
-    font-size: 14px;
-    transition: all .15s ease;
-  }
-  .answer.selected .letter {
-    background: var(--primary);
-    border-color: var(--primary);
-    color: white;
-  }
-  .answer .text {
-    flex: 1;
-    padding-top: 3px;
-  }
-  /* After lock-in: correct */
-  .answer.correct {
-    background: var(--good-soft);
-    border-color: var(--good);
-    cursor: default;
-  }
-  .answer.correct .letter {
-    background: var(--good);
-    border-color: var(--good);
-    color: white;
-  }
-  .answer.correct::after {
-    content: "✓";
-    font-size: 18px;
-    color: var(--good);
-    font-weight: 700;
-    margin-left: auto;
-    align-self: center;
-  }
-  /* After lock-in: incorrect (the user's wrong choice) */
-  .answer.incorrect {
-    background: var(--bad-soft);
-    border-color: var(--bad);
-    cursor: default;
-  }
-  .answer.incorrect .letter {
-    background: var(--bad);
-    border-color: var(--bad);
-    color: white;
-  }
-  .answer.incorrect::after {
-    content: "✗";
-    font-size: 18px;
-    color: var(--bad);
-    font-weight: 700;
-    margin-left: auto;
-    align-self: center;
-  }
-  .answer.disabled {
-    opacity: 0.55;
-    cursor: default;
-  }
-
-  .feedback {
-    border-radius: 10px;
-    padding: 16px 18px;
-    margin-bottom: 20px;
-    display: none;
-  }
+  .feedback { border-radius: 10px; padding: 16px 18px; margin-bottom: 20px; display: none; }
   .feedback.show { display: block; animation: fade .25s ease; }
-  .feedback.correct {
-    background: var(--good-soft);
-    border-left: 3px solid var(--good);
-  }
-  .feedback.incorrect {
-    background: var(--bad-soft);
-    border-left: 3px solid var(--bad);
-  }
-  .feedback-title {
-    font-family: 'Fraunces', serif;
-    font-weight: 700;
-    font-size: 17px;
-    margin: 0 0 6px;
-  }
+  .feedback.correct { background: var(--good-soft); border-left: 3px solid var(--good); }
+  .feedback.incorrect { background: var(--bad-soft); border-left: 3px solid var(--bad); }
+  .feedback-title { font-family: 'Fraunces', serif; font-weight: 700; font-size: 17px; margin: 0 0 6px; }
   .feedback.correct .feedback-title { color: var(--good); }
   .feedback.incorrect .feedback-title { color: var(--bad); }
-  .feedback-body {
-    font-size: 14px;
-    color: var(--ink-soft);
-    line-height: 1.5;
-    margin: 0;
-  }
+  .feedback-body { font-size: 14px; color: var(--ink-soft); line-height: 1.5; margin: 0; }
 
-  /* ROOM COMPLETE */
-  .complete-card {
-    background: var(--surface);
-    border: 1.5px solid var(--primary);
-    border-radius: 14px;
-    padding: 36px 32px;
-    text-align: center;
-    background: linear-gradient(180deg, var(--primary-soft) 0%, var(--surface) 60%);
-  }
-  .complete-icon {
-    width: 72px; height: 72px;
-    background: var(--primary);
-    color: white;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 16px;
-    font-family: 'Fraunces', serif;
-    font-weight: 700;
-    font-size: 30px;
-  }
-  .complete-title {
-    font-family: 'Fraunces', serif;
-    font-weight: 700;
-    font-size: 26px;
-    letter-spacing: -0.01em;
-    margin: 0 0 8px;
-  }
-  .complete-sub {
-    color: var(--muted);
-    font-size: 14.5px;
-    margin: 0 0 22px;
-  }
-  .complete-score {
-    background: var(--bg);
-    border: 1px solid var(--rule);
-    border-radius: 12px;
-    padding: 18px 24px;
-    display: inline-block;
-    margin-bottom: 22px;
-  }
-  .complete-score .num {
-    font-family: 'Fraunces', serif;
-    font-weight: 700;
-    font-size: 38px;
-    line-height: 1;
-    color: var(--primary);
-  }
-  .complete-score .of {
-    color: var(--muted);
-    font-size: 18px;
-  }
-  .complete-score .lbl {
-    font-size: 11px;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-weight: 600;
-    margin-top: 4px;
-  }
-
-  /* LEADERBOARD */
-  .leaderboard-head {
-    text-align: center;
-    margin-bottom: 22px;
-  }
-  .leaderboard-list {
-    display: flex; flex-direction: column;
-    gap: 12px;
-  }
-  .lb-row {
-    display: grid;
-    grid-template-columns: 64px 1fr 100px;
-    gap: 14px;
-    align-items: center;
-    background: var(--surface);
-    border: 1px solid var(--rule);
-    border-radius: 12px;
-    padding: 18px 22px;
-  }
-  .lb-row.you {
-    border-color: var(--primary);
-    background: var(--primary-soft);
-  }
+  .leaderboard-head { text-align: center; margin-bottom: 22px; }
+  .leaderboard-list { display: flex; flex-direction: column; gap: 12px; }
+  .lb-row { display: grid; grid-template-columns: 64px 1fr 100px; gap: 14px; align-items: center; background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; padding: 18px 22px; }
+  .lb-row.you { border-color: var(--primary); background: var(--primary-soft); }
   .lb-row.gold { border-color: #d4a017; background: linear-gradient(135deg, #fff8e1 0%, var(--surface) 50%); }
   .lb-row.silver { border-color: #94a3b8; background: linear-gradient(135deg, #f1f5f9 0%, var(--surface) 50%); }
   .lb-row.bronze { border-color: #c97039; background: linear-gradient(135deg, #fef2e6 0%, var(--surface) 50%); }
-  .lb-rank {
-    font-family: 'Fraunces', serif;
-    font-weight: 700;
-    font-size: 28px;
-    color: var(--ink);
-    text-align: center;
-  }
+  .lb-rank { font-family: 'Fraunces', serif; font-weight: 700; font-size: 28px; color: var(--ink); text-align: center; }
   .lb-rank.medal { font-size: 34px; }
-  .lb-name {
-    font-family: 'Fraunces', serif;
-    font-weight: 600;
-    font-size: 20px;
-    color: var(--ink);
-    line-height: 1.2;
-  }
-  .lb-name .you-tag {
-    display: inline-block;
-    background: var(--primary);
-    color: white;
-    font-family: 'Inter', sans-serif;
-    font-size: 11px;
-    font-weight: 600;
-    padding: 3px 9px;
-    border-radius: 999px;
-    margin-left: 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    vertical-align: middle;
-  }
-  .lb-mode {
-    font-size: 13px;
-    color: var(--muted);
-    margin-top: 4px;
-  }
-  .lb-score {
-    text-align: right;
-  }
-  .lb-score .pts {
-    font-family: 'Fraunces', serif;
-    font-weight: 700;
-    font-size: 30px;
-    color: var(--accent);
-    line-height: 1;
-  }
-  .lb-score .rooms-completed {
-    font-size: 11px;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin-top: 6px;
-    font-weight: 500;
-  }
+  .lb-name { font-family: 'Fraunces', serif; font-weight: 600; font-size: 20px; color: var(--ink); line-height: 1.2; }
+  .lb-name .you-tag { display: inline-block; background: var(--primary); color: white; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 999px; margin-left: 8px; text-transform: uppercase; letter-spacing: 0.06em; vertical-align: middle; }
+  .lb-mode { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .lb-score { text-align: right; }
+  .lb-score .pts { font-family: 'Fraunces', serif; font-weight: 700; font-size: 30px; color: var(--accent); line-height: 1; }
+  .lb-score .rooms-completed { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 6px; font-weight: 500; }
 
-  /* FOOTER */
-  .footer-neo {
-    margin-top: 36px;
-    padding-top: 20px;
-    border-top: 1px solid var(--rule);
-    text-align: center;
-    font-size: 12px;
-    color: var(--muted);
-  }
-  .footer-neo .neo-line {
-    font-family: 'Fraunces', serif;
-    font-weight: 600;
-    font-size: 13.5px;
-    color: var(--neo);
-    margin-bottom: 4px;
-  }
-  .footer-neo .neo-line em {
-    font-style: normal;
-    color: var(--ink-soft);
-    font-weight: 400;
-  }
+  .footer-neo { margin-top: 36px; padding-top: 20px; border-top: 1px solid var(--rule); text-align: center; font-size: 12px; color: var(--muted); }
+  .footer-neo .neo-line { font-family: 'Fraunces', serif; font-weight: 600; font-size: 13.5px; color: var(--neo); margin-bottom: 4px; }
+  .footer-neo .neo-line em { font-style: normal; color: var(--ink-soft); font-weight: 400; }
 
-  /* TOAST */
-  .toast {
-    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-    background: var(--ink);
-    color: white;
-    padding: 12px 22px;
-    border-radius: 999px;
-    font-size: 13px; font-weight: 500;
-    z-index: 100;
-    opacity: 0; pointer-events: none;
-    transition: opacity .25s ease, transform .25s ease;
-    box-shadow: 0 8px 24px -8px rgba(0,0,0,0.4);
-  }
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--ink); color: white; padding: 12px 22px; border-radius: 999px; font-size: 13px; font-weight: 500; z-index: 100; opacity: 0; pointer-events: none; transition: opacity .25s ease, transform .25s ease; box-shadow: 0 8px 24px -8px rgba(0,0,0,0.4); }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(-4px); }
 
-  /* Score reveal modal — shown after completing each room */
-  .score-overlay {
-    position: fixed; inset: 0;
-    background: rgba(31,41,55,0.55);
-    backdrop-filter: blur(3px);
-    display: none;
-    align-items: center; justify-content: center;
-    z-index: 300;
-    padding: 20px;
-    animation: fade .25s ease;
-  }
-  .score-overlay.show { display: flex; }
-  .score-modal {
-    background: var(--surface);
-    border-radius: 16px;
-    width: 100%; max-width: 440px;
-    padding: 36px 32px 30px;
-    text-align: center;
-    box-shadow: 0 16px 48px -10px rgba(0,0,0,0.4);
-    border: 2px solid var(--primary);
-    background: linear-gradient(180deg, var(--primary-soft) 0%, var(--surface) 50%);
-    animation: pop .3s ease;
-  }
-  @keyframes pop {
-    from { transform: scale(0.94); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-  }
-  .score-emoji {
-    font-size: 48px;
-    line-height: 1;
-    margin-bottom: 14px;
-  }
-  .score-room-label {
-    font-size: 11px;
-    color: var(--primary);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    font-weight: 700;
-    margin-bottom: 4px;
-  }
-  .score-headline {
-    font-family: 'Fraunces', serif;
-    font-weight: 700;
-    font-size: 26px;
-    letter-spacing: -0.01em;
-    color: var(--ink);
-    margin-bottom: 22px;
-    line-height: 1.15;
-  }
-  .score-num-block {
-    background: var(--bg);
-    border: 1px solid var(--rule);
-    border-radius: 14px;
-    padding: 20px;
-    margin-bottom: 18px;
-  }
-  .score-num {
-    font-family: 'Fraunces', serif;
-    font-weight: 700;
-    font-size: 48px;
-    line-height: 1;
-    color: var(--primary);
-  }
-  .score-of {
-    color: var(--muted);
-    font-size: 28px;
-  }
-  .score-num-lbl {
-    font-size: 12px;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-weight: 600;
-    margin-top: 8px;
-  }
-  .score-running {
-    font-size: 14px;
-    color: var(--ink-soft);
-    margin-bottom: 24px;
-  }
-  .score-running strong {
-    font-family: 'Fraunces', serif;
-    font-size: 18px;
-    color: var(--accent);
-  }
-  #score-continue-btn {
-    width: 100%;
-    max-width: 240px;
-  }
-
-  /* Facilitator gear — intentionally blends with background */
-  .fac-gear {
-    position: fixed;
-    bottom: 14px; left: 14px;
-    width: 28px; height: 28px;
-    border: none;
-    background: transparent;
-    color: var(--bg-2);
-    cursor: pointer;
-    padding: 0;
-    opacity: 0.5;
-    transition: opacity .2s ease, color .2s ease, transform .2s ease;
-    z-index: 90;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .fac-gear:hover {
-    opacity: 1;
-    color: var(--ink-soft);
-    transform: rotate(30deg);
-  }
-  .fac-gear:focus { outline: none; }
-  .fac-gear:focus-visible {
-    outline: 2px solid var(--primary);
-    outline-offset: 2px;
-  }
-
-  /* Facilitator overlay & panel */
-  .fac-overlay {
-    position: fixed; inset: 0;
-    background: rgba(31,41,55,0.4);
-    backdrop-filter: blur(2px);
-    display: none;
-    align-items: center; justify-content: center;
-    z-index: 200;
-    padding: 20px;
-    animation: fade .2s ease;
-  }
-  .fac-overlay.show { display: flex; }
-  .fac-panel {
-    background: var(--surface);
-    border-radius: 14px;
-    width: 100%; max-width: 460px;
-    box-shadow: 0 12px 40px -8px rgba(0,0,0,0.3);
-    border: 1px solid var(--rule);
-    max-height: 90vh;
-    overflow-y: auto;
-  }
-  .fac-head {
-    display: flex; justify-content: space-between; align-items: flex-start;
-    padding: 22px 24px 18px;
-    border-bottom: 1px solid var(--rule);
-    gap: 14px;
-  }
-  .fac-kicker {
-    font-size: 10px;
-    color: var(--bad);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    font-weight: 700;
-    margin-bottom: 4px;
-  }
-  .fac-title {
-    font-family: 'Fraunces', serif;
-    font-weight: 700;
-    font-size: 20px;
-    color: var(--ink);
-    line-height: 1.1;
-  }
-  .fac-close {
-    background: none; border: none; cursor: pointer;
-    font-size: 28px;
-    line-height: 1;
-    color: var(--muted);
-    padding: 0;
-    width: 28px; height: 28px;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 50%;
-    transition: all .15s ease;
-  }
-  .fac-close:hover { background: var(--bg-2); color: var(--ink); }
-  .fac-body { padding: 18px 24px 22px; }
-  .fac-section {
-    padding: 14px 16px;
-    background: var(--bg);
-    border: 1px solid var(--rule);
-    border-radius: 10px;
-    margin-bottom: 12px;
-  }
-  .fac-section.fac-danger {
-    background: var(--bad-soft);
-    border-color: var(--bad);
-  }
-  .fac-section-title {
-    font-family: 'Fraunces', serif;
-    font-weight: 700;
-    font-size: 15px;
-    color: var(--ink);
-    margin-bottom: 4px;
-  }
-  .fac-danger .fac-section-title { color: var(--bad); }
-  .fac-section-desc {
-    font-size: 13px;
-    color: var(--ink-soft);
-    line-height: 1.5;
-    margin: 0 0 12px;
-  }
-  .fac-btn {
-    width: 100%;
-    font-size: 13px;
-    padding: 11px 16px;
-  }
-  .fac-btn-danger {
-    background: var(--bad);
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05), 0 4px 12px -6px rgba(185,74,72,0.5);
-  }
-  .fac-btn-danger:hover { background: #93302e; }
-  .fac-meta {
-    margin-top: 14px;
-    padding-top: 12px;
-    border-top: 1px dashed var(--rule);
-    font-size: 12px;
-    color: var(--muted);
-    display: flex; flex-direction: column; gap: 4px;
-  }
-  .fac-meta-label {
-    font-weight: 500;
-  }
-  .fac-meta code {
-    background: var(--bg-2);
-    padding: 1px 6px;
-    border-radius: 4px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--ink-soft);
-  }
-
-  /* Nav button row */
-  .nav-row {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-top: 24px;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  .nav-row .left-side, .nav-row .right-side {
-    display: flex; gap: 10px; flex-wrap: wrap;
-  }
-  .text-link {
-    background: none; border: none; cursor: pointer;
-    color: var(--primary); font-weight: 500;
-    font-family: 'Inter', sans-serif;
-    font-size: 13.5px;
-    padding: 4px 6px;
-  }
+  .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; flex-wrap: wrap; gap: 10px; }
+  .nav-row .left-side, .nav-row .right-side { display: flex; gap: 10px; flex-wrap: wrap; }
+  .text-link { background: none; border: none; cursor: pointer; color: var(--primary); font-weight: 500; font-family: 'Inter', sans-serif; font-size: 13.5px; padding: 4px 6px; }
   .text-link:hover { text-decoration: underline; }
   .text-link.muted { color: var(--muted); }
+
+  /* Facilitator gear */
+  .fac-gear { position: fixed; bottom: 14px; left: 14px; width: 28px; height: 28px; border: none; background: transparent; color: var(--bg-2); cursor: pointer; padding: 0; opacity: 0.5; transition: opacity .2s ease, color .2s ease, transform .2s ease; z-index: 90; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  .fac-gear:hover { opacity: 1; color: var(--ink-soft); transform: rotate(30deg); }
+  .fac-gear:focus { outline: none; }
+
+  .modal-overlay { position: fixed; inset: 0; background: rgba(31,41,55,0.5); backdrop-filter: blur(2px); display: none; align-items: center; justify-content: center; z-index: 200; padding: 20px; animation: fade .2s ease; }
+  .modal-overlay.show { display: flex; }
+  .modal-panel { background: var(--surface); border-radius: 14px; width: 100%; max-width: 460px; box-shadow: 0 12px 40px -8px rgba(0,0,0,0.3); border: 1px solid var(--rule); max-height: 90vh; overflow-y: auto; }
+  .fac-head { display: flex; justify-content: space-between; align-items: flex-start; padding: 22px 24px 18px; border-bottom: 1px solid var(--rule); gap: 14px; }
+  .fac-kicker { font-size: 10px; color: var(--bad); letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; margin-bottom: 4px; }
+  .fac-title { font-family: 'Fraunces', serif; font-weight: 700; font-size: 20px; color: var(--ink); line-height: 1.1; }
+  .fac-close { background: none; border: none; cursor: pointer; font-size: 28px; line-height: 1; color: var(--muted); padding: 0; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: all .15s ease; }
+  .fac-close:hover { background: var(--bg-2); color: var(--ink); }
+  .fac-body { padding: 18px 24px 22px; }
+  .fac-section { padding: 14px 16px; background: var(--bg); border: 1px solid var(--rule); border-radius: 10px; margin-bottom: 12px; }
+  .fac-section.fac-danger { background: var(--bad-soft); border-color: var(--bad); }
+  .fac-section-title { font-family: 'Fraunces', serif; font-weight: 700; font-size: 15px; color: var(--ink); margin-bottom: 4px; }
+  .fac-danger .fac-section-title { color: var(--bad); }
+  .fac-section-desc { font-size: 13px; color: var(--ink-soft); line-height: 1.5; margin: 0 0 12px; }
+  .fac-btn { width: 100%; font-size: 13px; padding: 11px 16px; }
+  .fac-btn-danger { background: var(--bad); box-shadow: 0 1px 2px rgba(0,0,0,0.05), 0 4px 12px -6px rgba(185,74,72,0.5); }
+  .fac-btn-danger:hover { background: #93302e; }
+  .fac-meta { margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--rule); font-size: 12px; color: var(--muted); display: flex; flex-direction: column; gap: 4px; }
+  .fac-meta code { background: var(--bg-2); padding: 1px 6px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-soft); }
+
+  /* Score reveal modal */
+  .score-modal { background: var(--surface); border-radius: 16px; width: 100%; max-width: 440px; padding: 36px 32px 30px; text-align: center; box-shadow: 0 16px 48px -10px rgba(0,0,0,0.4); border: 2px solid var(--primary); background: linear-gradient(180deg, var(--primary-soft) 0%, var(--surface) 50%); animation: pop .3s ease; }
+  @keyframes pop { from { transform: scale(0.94); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .score-emoji { font-size: 48px; line-height: 1; margin-bottom: 14px; }
+  .score-room-label { font-size: 11px; color: var(--primary); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; margin-bottom: 4px; }
+  .score-headline { font-family: 'Fraunces', serif; font-weight: 700; font-size: 26px; letter-spacing: -0.01em; color: var(--ink); margin-bottom: 22px; line-height: 1.15; }
+  .score-num-block { background: var(--bg); border: 1px solid var(--rule); border-radius: 14px; padding: 20px; margin-bottom: 18px; }
+  .score-num { font-family: 'Fraunces', serif; font-weight: 700; font-size: 48px; line-height: 1; color: var(--primary); }
+  .score-of { color: var(--muted); font-size: 28px; }
+  .score-num-lbl { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; margin-top: 8px; }
+  .score-running { font-size: 14px; color: var(--ink-soft); margin-bottom: 24px; }
+  .score-running strong { font-family: 'Fraunces', serif; font-size: 18px; color: var(--accent); }
+  #score-continue-btn { width: 100%; max-width: 240px; }
+
+  /* Welcome back modal */
+  .welcome-back-modal { background: var(--surface); border-radius: 14px; width: 100%; max-width: 420px; padding: 28px 24px 22px; text-align: center; box-shadow: 0 12px 40px -8px rgba(0,0,0,0.3); border: 1px solid var(--rule); }
+  .wb-emoji { font-size: 36px; margin-bottom: 10px; }
+  .wb-title { font-family: 'Fraunces', serif; font-weight: 700; font-size: 20px; margin-bottom: 6px; }
+  .wb-sub { font-size: 14px; color: var(--ink-soft); margin-bottom: 18px; line-height: 1.5; }
+  .wb-sub strong { color: var(--ink); font-weight: 600; }
+  .wb-btn-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
 </style>
 </head>
 <body>
@@ -1023,28 +250,37 @@
         <div class="brand">The <span class="em">Roundtable</span></div>
         <span class="neo-badge"><span class="neo-mark"></span>NEO</span>
       </div>
-      <div class="sub-brand">A leadership challenge for charter school changemakers</div>
+      <div class="sub-brand">Mystery Academy Performance Framework activity</div>
     </div>
     <div class="meta">
       <div id="conn-indicator" class="conn-status"><span class="dot"></span><span id="conn-text">Connecting...</span></div>
       <div id="player-info" style="margin-top:4px; display:none;">
         Playing as: <strong id="player-name-display">—</strong>
         <div class="score-chip" style="margin-top:4px;">
-          <span>Total score</span>
+          <span id="score-chip-label">Total score</span>
           <strong id="score-display">0</strong>
+        </div>
+        <div id="group-chip-wrap" style="display:none;">
+          <div class="group-chip">
+            <span>Group</span>
+            <strong id="group-chip-name">—</strong>
+            <span>·</span>
+            <span>Code</span>
+            <strong id="group-chip-code">—</strong>
+          </div>
         </div>
       </div>
     </div>
   </header>
 
-  <!-- VIEW 1: Welcome -->
+  <!-- VIEW: Welcome -->
   <section class="view active" id="view-welcome">
     <div class="hero">
       <div class="kicker">Welcome to the Roundtable</div>
       <h1>Visit each station. Examine the evidence. <em>Crack the questions.</em></h1>
       <p class="lede">
-        Five stations. Real artifacts at each table. Test your charter school leadership instincts —
-        and rack up points as you go. Play solo or with your school's team.
+        Eight stations. Real posters at each table from Mystery Academy's Performance Framework.
+        Test your charter school leadership instincts, solo or with a group, and rack up points as you go.
       </p>
       <div class="neo-credit">
         <span class="label-text">Presented by</span>
@@ -1055,19 +291,39 @@
     <div class="card">
       <div style="font-size:13px; font-weight:600; color:var(--ink); margin-bottom:14px;">Get started</div>
       <div class="field">
-        <label class="field-label" for="player-name">Your name (or your team's name)</label>
-        <input type="text" id="player-name" placeholder="e.g. Jordan, or 'Lakeview Leaders'" autocomplete="off" maxlength="60" />
+        <label class="field-label" for="player-name">Your name</label>
+        <input type="text" id="player-name" placeholder="e.g. Jordan" autocomplete="off" maxlength="40" />
       </div>
       <div class="field">
-        <label class="field-label">Playing</label>
-        <div class="play-mode-row">
+        <label class="field-label">How are you playing?</label>
+        <div class="play-mode-stack">
           <div class="play-mode selected" data-mode="solo">
-            <div class="pm-title">Solo</div>
-            <div class="pm-sub">Just me</div>
+            <div class="pm-icon">👤</div>
+            <div class="pm-body">
+              <div class="pm-title">Solo</div>
+              <div class="pm-sub">Just me, on my own phone. One score for me.</div>
+            </div>
           </div>
-          <div class="play-mode" data-mode="group">
-            <div class="pm-title">As a group</div>
-            <div class="pm-sub">With my school</div>
+          <div class="play-mode" data-mode="shared">
+            <div class="pm-icon">📱</div>
+            <div class="pm-body">
+              <div class="pm-title">One shared device</div>
+              <div class="pm-sub">A group of us take turns on this one phone. One shared score.</div>
+            </div>
+          </div>
+          <div class="play-mode" data-mode="group-create">
+            <div class="pm-icon">👥</div>
+            <div class="pm-body">
+              <div class="pm-title">Create a group (each person has their own phone)</div>
+              <div class="pm-sub">Up to 5 teammates each on their own device. Stations are split between you so every one gets covered. Scores pool into one team total.</div>
+            </div>
+          </div>
+          <div class="play-mode" data-mode="group-join">
+            <div class="pm-icon">🔑</div>
+            <div class="pm-body">
+              <div class="pm-title">Join a group with a code</div>
+              <div class="pm-sub">Someone on your team already created the group? Enter their 4 digit code.</div>
+            </div>
           </div>
         </div>
       </div>
@@ -1077,14 +333,58 @@
     </div>
   </section>
 
-  <!-- VIEW 2: Room Picker -->
+  <!-- VIEW: Create Group -->
+  <section class="view" id="view-create-group">
+    <div class="card">
+      <div class="kicker" style="color:var(--neo); background:var(--neo-soft);">Create a group</div>
+      <h2 style="font-family:'Fraunces',serif; font-size:24px; margin:8px 0 4px;">Set up your team</h2>
+      <p style="color:var(--ink-soft); font-size:14px; margin:0 0 20px;">You will get a 4 digit code to share with your teammates. The app will split the 8 stations across you so every station gets covered.</p>
+      <div class="field">
+        <label class="field-label" for="group-name-input">Group name</label>
+        <input type="text" id="group-name-input" placeholder="e.g. Lakeview Leaders" autocomplete="off" maxlength="40" />
+      </div>
+      <div class="field">
+        <label class="field-label" for="group-size-input">How many teammates will be in the group total? (2 to 5)</label>
+        <input type="number" id="group-size-input" min="2" max="5" value="3" />
+        <div id="division-preview" style="margin-top: 10px; font-size: 13px; color: var(--ink-soft); background: var(--bg); padding: 10px 14px; border-radius: 6px; border: 1px solid var(--rule);">—</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn big" id="create-group-btn">Create group →</button>
+        <button class="btn ghost" id="back-from-create-btn">← Back</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIEW: Join Group -->
+  <section class="view" id="view-join-group">
+    <div class="card">
+      <div class="kicker" style="color:var(--neo); background:var(--neo-soft);">Join a group</div>
+      <h2 style="font-family:'Fraunces',serif; font-size:24px; margin:8px 0 4px;">Enter your team's code</h2>
+      <p style="color:var(--ink-soft); font-size:14px; margin:0 0 20px;">Ask the person who created your group for the 4 digit code.</p>
+      <div class="field">
+        <label class="field-label" for="join-code-input">4 digit code</label>
+        <input type="text" id="join-code-input" placeholder="e.g. 7429" autocomplete="off" maxlength="4" inputmode="numeric" style="font-family:'Fraunces',serif; font-size:28px; letter-spacing:0.3em; text-align:center;" />
+      </div>
+      <div class="btn-row">
+        <button class="btn big" id="join-group-btn">Join group →</button>
+        <button class="btn ghost" id="back-from-join-btn">← Back</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIEW: Room Picker -->
   <section class="view" id="view-rooms">
+    <div id="group-banner-wrap"></div>
+
     <div class="picker-head">
       <div class="kicker">Choose a station</div>
-      <h2>Where will you start?</h2>
-      <p>Visit any station in any order. Each one has artifacts on the table to examine — and questions to answer.</p>
+      <h2 id="picker-heading">Where will you start?</h2>
+      <p id="picker-sub">Visit any station in any order. Each one has artifacts on the table to examine, then answer below.</p>
       <button class="btn" id="show-leaderboard-top-btn" style="margin-top: 16px;">View leaderboard →</button>
     </div>
+
+    <div id="assign-note-wrap"></div>
+
     <div class="rooms-grid" id="rooms-grid"></div>
     <div class="nav-row">
       <div class="left-side"></div>
@@ -1094,7 +394,7 @@
     </div>
   </section>
 
-  <!-- VIEW 3: Question Screen -->
+  <!-- VIEW: Question -->
   <section class="view" id="view-question">
     <div class="card">
       <div class="question-head">
@@ -1104,18 +404,12 @@
       <div class="question-progress">
         <div class="question-progress-fill" id="q-progress-fill" style="width:0%"></div>
       </div>
-
-      <div id="q-evidence" class="question-evidence" style="display:none;"></div>
-
       <p class="question-text" id="q-text">—</p>
-
       <div class="answers" id="q-answers"></div>
-
       <div class="feedback" id="q-feedback">
         <div class="feedback-title" id="q-feedback-title">—</div>
         <p class="feedback-body" id="q-feedback-body">—</p>
       </div>
-
       <div class="nav-row">
         <div class="left-side">
           <button class="text-link muted" id="back-to-rooms-btn">← Back to stations</button>
@@ -1128,41 +422,12 @@
     </div>
   </section>
 
-  <!-- VIEW 4: Room Complete -->
-  <section class="view" id="view-complete">
-    <div class="complete-card">
-      <div class="complete-icon">✓</div>
-      <h2 class="complete-title" id="complete-title">Station complete!</h2>
-      <p class="complete-sub" id="complete-sub">Nice work in the <strong id="complete-room-name">—</strong>.</p>
-      <div class="complete-score">
-        <div><span class="num" id="complete-correct">0</span><span class="of">/<span id="complete-total">5</span></span></div>
-        <div class="lbl">Correct at this station</div>
-      </div>
-      <div class="btn-row" style="justify-content:center;">
-        <button class="btn big" id="continue-btn">Pick another station →</button>
-        <button class="btn ghost" id="view-lb-btn">See leaderboard</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- VIEW 5: Coming Soon -->
-  <section class="view" id="view-coming-soon">
-    <div class="complete-card">
-      <div class="complete-icon" style="background:var(--accent);">⏳</div>
-      <h2 class="complete-title">Coming soon</h2>
-      <p class="complete-sub">Questions for the <strong id="coming-room-name">—</strong> are still being prepared. Check back during the session.</p>
-      <div class="btn-row" style="justify-content:center;">
-        <button class="btn big" id="back-from-coming-btn">← Back to stations</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- VIEW 6: Leaderboard -->
+  <!-- VIEW: Leaderboard -->
   <section class="view" id="view-leaderboard">
     <div class="leaderboard-head">
       <div class="kicker">Leaderboard</div>
       <h2 style="font-family:'Fraunces',serif; font-weight:700; font-size:clamp(26px,3.4vw,32px); letter-spacing:-0.02em; margin:6px 0 8px;">Top scores so far</h2>
-      <p style="color:var(--muted); font-size:14px; margin:0;">Updates live as players answer questions across stations.</p>
+      <p style="color:var(--muted); font-size:14px; margin:0;">Updates live as players and groups answer questions.</p>
     </div>
     <div class="leaderboard-list" id="leaderboard-list">
       <div style="text-align:center; padding:30px 20px; color:var(--muted); font-style:italic;">No scores yet. Be the first to play.</div>
@@ -1181,8 +446,8 @@
 
 <div class="toast" id="toast">Saved.</div>
 
-<!-- Score Reveal Modal (shown after completing each room) -->
-<div id="score-overlay" class="score-overlay">
+<!-- Score reveal modal -->
+<div id="score-overlay" class="modal-overlay">
   <div class="score-modal">
     <div class="score-emoji" id="score-emoji">🎉</div>
     <div class="score-room-label" id="score-room-label">—</div>
@@ -1198,7 +463,20 @@
   </div>
 </div>
 
-<!-- Facilitator gear (intentionally subtle — same color as background) -->
+<!-- Welcome back modal -->
+<div id="welcome-back-overlay" class="modal-overlay">
+  <div class="welcome-back-modal">
+    <div class="wb-emoji">👋</div>
+    <div class="wb-title">Welcome back</div>
+    <div class="wb-sub" id="wb-sub">We saved your progress as <strong id="wb-name">—</strong>. Pick up where you left off?</div>
+    <div class="wb-btn-row">
+      <button class="btn" id="wb-resume-btn">Resume</button>
+      <button class="btn ghost" id="wb-fresh-btn">Start fresh</button>
+    </div>
+  </div>
+</div>
+
+<!-- Facilitator gear -->
 <button id="fac-gear" class="fac-gear" aria-label="Settings" title="">
   <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <circle cx="12" cy="12" r="3"/>
@@ -1206,30 +484,29 @@
   </svg>
 </button>
 
-<!-- Facilitator panel -->
-<div id="fac-overlay" class="fac-overlay">
-  <div class="fac-panel" role="dialog" aria-modal="true" aria-labelledby="fac-title">
+<div id="fac-overlay" class="modal-overlay">
+  <div class="modal-panel">
     <div class="fac-head">
       <div>
         <div class="fac-kicker">Private</div>
-        <div class="fac-title" id="fac-title">Facilitator options</div>
+        <div class="fac-title">Facilitator options</div>
       </div>
       <button class="fac-close" id="fac-close" aria-label="Close">×</button>
     </div>
     <div class="fac-body">
       <div class="fac-section">
         <div class="fac-section-title">Reset my own session</div>
-        <p class="fac-section-desc">Clear just this device — keeps everyone else's progress. Use this if you want to play again as a different person.</p>
+        <p class="fac-section-desc">Clears just this device. Keeps everyone else's progress.</p>
         <button class="btn ghost fac-btn" id="fac-reset-mine">Reset this device</button>
       </div>
       <div class="fac-section fac-danger">
         <div class="fac-section-title">Restart everything</div>
-        <p class="fac-section-desc">Wipes <strong>all players, scores, and leaderboard data</strong> for everyone. Requires a passcode. Use this between sessions. Cannot be undone.</p>
+        <p class="fac-section-desc">Wipes <strong>all players, groups, and scores</strong> for everyone. Requires a passcode.</p>
         <button class="btn fac-btn fac-btn-danger" id="fac-reset-all">Restart everything</button>
       </div>
       <div class="fac-meta">
-        <div><span class="fac-meta-label">Session ID:</span> <code id="fac-session-id">—</code></div>
-        <div><span class="fac-meta-label">Players in session:</span> <strong id="fac-player-count">0</strong></div>
+        <div>Session: <code id="fac-session-id">—</code></div>
+        <div>Players: <strong id="fac-player-count">0</strong> · Groups: <strong id="fac-group-count">0</strong></div>
       </div>
     </div>
   </div>
@@ -1237,7 +514,7 @@
 
 <script>
   // ============================================================
-  // 🔥 FIREBASE CONFIG
+  // FIREBASE CONFIG
   // ============================================================
   const firebaseConfig = {
     apiKey: "AIzaSyD7NKQSuojAOzbxZxGsgRa5JMFUHHYBj6Q",
@@ -1249,645 +526,586 @@
     appId: "1:901262767504:web:2106e6872896d4b426af15"
   };
 
-  const SESSION_ID = 'roundtable-2026-event-01';
+  const SESSION_ID = 'roundtable-2026-mystery-academy';
+  const FACILITATOR_PASSCODE = '1111';
+  const MAX_GROUP_SIZE = 5;
+  const LS_KEY = 'ma-roundtable-session-v1';
 
   // ============================================================
-  // ROOM CONTENT — NEO adds questions here.
-  //
-  // Each question:
-  //   - text: the question
-  //   - evidence: optional reference to the physical exhibit (e.g. "Exhibit A")
-  //   - options: array of answer strings (any number — 3, 4, 5, etc.)
-  //   - correct: index of correct answer (0 = A, 1 = B, etc.)
-  //   - explanation: shown after lock-in (optional but recommended)
+  // STATIONS AND QUESTIONS — Mystery Academy, 2026
   // ============================================================
   const ROOMS = {
-    board: {
-      id: 'board',
-      name: 'Board Meeting Room',
-      icon: '⚖️',
-      description: 'Governance, board operations, strategic oversight.',
+    focus: {
+      id: 'focus', name: 'Focus Group Proficiency', icon: '🎯',
+      description: 'MCA Math and Reading results for the EL focus group.',
       questions: [
-        {
-          evidence: 'Exhibit A: Budget and Projection',
-          text: 'Based on inspection of Exhibit A, what should a board do next?',
-          options: [
-            'Approve the budget',
-            'Hire a new business manager',
-            'Create a finance committee',
-            'Plan for budget adjustments to address the structural deficit',
-          ],
-          correct: 3,
-          explanation: 'When a budget projection shows a structural deficit, the board\'s next action is to plan adjustments to close that gap — not just approve as-is.',
-        },
-        {
-          evidence: 'Exhibit B: Board Roster',
-          text: 'Based on inspection of Exhibit B, how could a board use the roster?',
-          options: [
-            'To verify that the board is following the structure that the bylaws require',
-            'To verify that each member meets the requirements for each seat (Community Member, Parent Member, Teacher Member)',
-            'To verify that terms for each seat are tracked to plan for elections',
-            'All of the above',
-          ],
-          correct: 3,
-          explanation: 'A board roster supports all three — bylaw compliance, seat qualifications, and term tracking for elections.',
-        },
-        {
-          evidence: 'Exhibit C: Board Minutes Template and Completed Minutes',
-          text: 'Based on inspection of Exhibit C, there is evidence that the board is…',
-          options: [
-            'intentional about meeting the requirement to post the meeting minutes within 30 days following the earlier of the date of board approval or the next regularly scheduled meeting',
-            'intentional about the quality of the minutes and the public perception of the school',
-            'intentional about the documentation that can serve as evidence of compliance',
-            'All of the above',
-          ],
-          correct: 3,
-          explanation: 'Well-kept minutes demonstrate compliance with posting requirements, professional quality, and serve as evidence of governance — all of the above.',
-        },
-        {
-          evidence: 'Exhibit D: Board Calendar',
-          text: 'Based on inspection of Exhibit D, there is evidence that the board is…',
-          options: [
-            'working meetings around the attendance needs of each individual board member',
-            'meeting a statutory requirement of having a board calendar',
-            'actively monitoring and verifying that required board actions take place',
-            'none of the above',
-          ],
-          correct: 2,
-          explanation: 'A board calendar with scheduled required actions shows the board is actively monitoring and verifying that those actions take place at the right times.',
-        },
-        {
-          evidence: 'Exhibit E: Board Training Tracker',
-          text: 'Based on inspection of Exhibit E, how should the board use the tracker?',
-          options: [
-            'To plan and verify that new board members complete required training before being seated, and complete the training that is required within the first 12 months of being seated',
-            'To plan and verify that the board completes the needs assessment, and aligned training',
-            'To maintain and organize documentation and evidence of completion of training',
-            'All of the above',
-          ],
-          correct: 3,
-          explanation: 'A training tracker supports new-member training, needs assessment alignment, and documentation — all are valid uses.',
-        },
-        {
-          evidence: 'Exhibit F: Strategic Plan and Performance Framework',
-          text: 'Based on inspection of Exhibit F, there is evidence that the board is…',
-          options: [
-            'following NEO\u2019s performance framework',
-            'monitoring progress towards contract renewal and toward meeting the mission and vision of the school',
-            'confusing the CACR long-term strategic plan with the CACR/Annual report',
-            'All of the above',
-          ],
-          correct: 1,
-          explanation: 'A strategic plan tied to a performance framework shows the board monitoring progress toward both contract renewal and mission/vision goals.',
-        },
-        {
-          evidence: 'Exhibit G: Policy Review Cycle Tracker',
-          text: 'Based on inspection of Exhibit G, there is evidence that the board is…',
-          options: [
-            'prepared to submit the updated required policies for the Annual Charter School Assurances',
-            'intentional about updating policies to comply with certain statutes',
-            'intentional about educating board members and using policies',
-            'All of the above',
-          ],
-          correct: 3,
-          explanation: 'A policy review cycle tracker supports all three — readiness for assurances, statutory compliance, and ongoing board education.',
-        },
-        {
-          evidence: 'Exhibit H: Financial Packet',
-          text: 'Based on inspection of Exhibit H, what are critical components in the financial packet?',
-          options: [
-            'the ADM and Pupil Units that the MDE is using for calculations of state aid for the school',
-            'the cash flow statement',
-            'the updated end of year projected fund balance',
-            'All of the above',
-          ],
-          correct: 3,
-          explanation: 'A complete financial packet requires all three — ADM/Pupil Units for state aid calculations, cash flow statement for liquidity, and projected fund balance for year-end planning.',
-        },
-        {
-          evidence: 'Exhibit I: Epicenter Report',
-          text: 'Based on inspection of Exhibit I, how could a board use the report?',
-          options: [
-            'Follow up to ensure that any outstanding items are submitted on time and accurate',
-            'Set a goal to maintain a three-star rating',
-            'Plan ahead and be prepared for future submissions',
-            'All of the above',
-          ],
-          correct: 3,
-          explanation: 'An Epicenter report is valuable for all three — follow-up on outstanding items, rating goals, and forward planning.',
-        },
-      ],
+        { text: "How did Mystery Academy's English Language Learner (EL) students perform in MCA Math compared with the state over the combined years?", options: ["They performed more than 10 percentage points below the state average.","They performed at exactly the state average.","They performed more than 10 percentage points above the state average.","They performed above the state average, but by fewer than 10 percentage points."], correct: 3, explanation: "EL Math proficiency was 21.18%, versus 13.05% statewide: about 8.13 percentage points higher." },
+        { text: "According to the MCA Reading section, why is 2025–2026 identified as a new baseline year?", options: ["The school's Reading proficiency increased by 10 percentage points.","The school enrolled too few English Learner students.","The state assessment changed in 2025–2026.","The school's contract began in 2025–2026."], correct: 2, explanation: "The poster identifies the revised 2025–2026 Reading MCA as the new baseline." },
+        { text: "In addition to exceeding the state average, how can Mystery Academy achieve a Satisfactory rating?", options: ["Improve the percent proficient by at least 10 percentage points from the baseline for the EL focus group.","Achieve at least ten percent of students scoring proficient for the EL focus group.","There is no other way to achieve a Satisfactory rating.","Achieve the same as the statewide average for the EL focus group."], correct: 0, explanation: "The rubric also awards Satisfactory for an improvement of at least 10 percentage points from baseline." },
+        { text: "What would happen if there were MCA results for only 9 students in one of the years?", options: ["Mystery Academy would no longer be able to use that measure of progress.","Mystery Academy would report the results for that focus group in the Performance Framework.","Mystery Academy could suppress the results for the year and roll up and report the results for the combined years.","Mystery Academy could just completely exclude the results for the 9 students."], correct: 2, explanation: "A cell under 10 is suppressed for that year, but eligible data can contribute to an aggregate that is large enough to report." }
+      ]
     },
-
+    progress: {
+      id: 'progress', name: 'Academic Progress', icon: '📈',
+      description: 'Growth of students below and at or above grade level.',
+      questions: [
+        { text: "Which statement best describes Mystery Academy's combined academic progress for students who previously scored below grade level?", options: ["Both Math and Reading results exceeded the state averages.","Math exceeded the state average, but Reading did not.","Both Math and Reading results were slightly below the state averages.","Neither measure has enough data to calculate a result."], correct: 2, explanation: "Math was 18.64% versus 19.19% statewide; Reading was 27.81% versus 27.93%." },
+        { text: "What must students who previously scored below grade level do to be counted as making academic progress on these measures?", options: ["Advance at least one MCA proficiency level.","Score proficient on the next state assessment.","Improve their test score by at least 10%.","Perform above the statewide average."], correct: 0, explanation: "The measure counts students who advance at least one MCA proficiency level." },
+        { text: "Which statement is TRUE about Mystery Academy's combined academic progress for students who were at or above grade level?", options: ["The school performed above the state average in both Math and Reading.","The school performed below the state average in both Math and Reading.","The school performed above the state average in Math but below it in Reading.","The school earned Satisfactory points in both Math and Reading."], correct: 1, explanation: "Math was 59.02% versus 71.04% statewide; Reading was 72.06% versus 75.06%." },
+        { text: "In the Reading results, why is 2025–2026 marked N/A?", options: ["The school did not administer the Reading assessment.","Too few students were tested to report results.","The school did not provide the required information.","The state revised the assessment, making the results incomparable with prior years."], correct: 3, explanation: "The revised 2025–2026 Reading assessment cannot be compared with the previous-year MCA results." }
+      ]
+    },
+    climate: {
+      id: 'climate', name: 'Climate Performance', icon: '🌤️',
+      description: 'Attendance, conferences, parent satisfaction, mobility.',
+      questions: [
+        { text: "Mystery Academy's combined attendance rate is 89.23%, yet it earned all 6 possible points. Why?", options: ["Any attendance rate above 85% earns Exemplary.","The school's attendance rate improved every year.","The school exceeded the statewide combined attendance rate by more than 10 percentage points.","Schools automatically earn full points for attendance when other climate measures are Exemplary."], correct: 2, explanation: "The combined school rate exceeded the statewide rate by 10.12 percentage points, meeting the alternative Exemplary rule." },
+        { text: "Which statement is TRUE about the Parent-Teacher Conference measure?", options: ["The school's combined attendance rate is 93.80%.","The school earned 5 of the 10 possible points.","The school had the same number of families attending conferences each year.","The school earned 10 points because its combined attendance rate exceeded 95%."], correct: 3, explanation: "Combined conference attendance was 97.99%, above the more-than-95% Exemplary standard." },
+        { text: "Which statement best describes the Parent Satisfaction Survey results?", options: ["Parent satisfaction improved every year, and survey participation increased substantially in 2025–2026.","Parent satisfaction declined each year, but survey participation increased.","Parent satisfaction remained unchanged across all three years.","Parent satisfaction increased, but survey participation declined every year."], correct: 0, explanation: "Satisfaction rose from 73.68% to 91.30% to 94.69%; participation increased sharply in 2025–2026." },
+        { text: "Which statement is TRUE about Mystery Academy's student mobility?", options: ["The school earned Satisfactory because its combined mobility rate exceeded 10%.","The school earned Exemplary because its combined mobility rate was below 10%.","The school's mobility rate increased every year.","The school earned no points because more than 30 students transferred out over the combined years."], correct: 1, explanation: "The combined mobility rate was 3.02%, below the 10% Exemplary cutoff." }
+      ]
+    },
+    operations: {
+      id: 'operations', name: 'Operations Performance', icon: '⚙️',
+      description: 'Compliance goals, ratings, Google Sheets links.',
+      questions: [
+        { text: "Under the Compliance Goals, which situation would qualify for a Satisfactory rating of 15 points?", options: ["Four infractions, all resolved before their assigned deadlines.","Two infractions, both resolved by their assigned deadlines.","One infraction that was not resolved by its assigned deadline.","No infractions during the reporting period."], correct: 1, explanation: "Two infractions resolved on time meet the limit of no more than three resolved infractions." },
+        { text: "According to the poster, which statement is TRUE about Mystery Academy's Operations Performance?", options: ["The school earned 15 of the 30 possible points.","The school earned no points because compliance information is missing.","The school earned all 30 possible points, and the analysis reports no outstanding infractions from the prior year.","The school earned 30 points because Operations Performance represents 30% of the total Framework."], correct: 2, explanation: "The poster records 30 of 30 points and no outstanding prior-year infractions." },
+        { text: "Which statement is true about Mystery Academy's status for Operations Performance?", options: ["Mystery Academy has achieved Exemplary Performance and therefore doesn't need to monitor the operations performance until the next contract begins.","Mystery Academy must continue monitoring and meeting Operations Performance indicators to maintain Exemplary performance.","Mystery Academy has three infractions.","Mystery Academy had more than three infractions in the prior year."], correct: 1, explanation: "An Exemplary result does not end the school's ongoing compliance-monitoring responsibility." },
+        { text: "In the live Google Sheets Performance Framework, what is the purpose of the blue, underlined \"Compliance Goals\" link?", options: ["To underscore that Compliance Goals are most important.","To serve as a section heading.","To indicate that Mystery Academy achieved an Exemplary rating in this section.","To provide access the list of compliance indicators with those in progress highlighted, as well as to the website compliance and policy compliance checklists."], correct: 3, explanation: "The hyperlink is intended to open the compliance indicators and linked website and policy checklists." }
+      ]
+    },
     finance: {
-      id: 'finance',
-      name: 'Finance Committee Meeting Room',
-      icon: '💰',
-      description: 'Budget, audits, financial controls, procurement.',
+      id: 'finance', name: 'Finance Performance', icon: '💰',
+      description: 'Audits, fund balance, SOD, finance awards.',
       questions: [
-        {
-          evidence: 'Exhibit A: Finance Committee Info',
-          text: 'Based on inspection of Exhibit A, there is evidence that the board is…',
-          options: [
-            'clearly communicating that the school has a finance committee in compliance with the law',
-            'ensuring that the meeting is open to the public in compliance with the law',
-            'ensuring that the committee adheres to the school\u2019s bylaws which state that committees do not have voting authority',
-            'All of the above',
-          ],
-          correct: 3,
-          explanation: 'Finance committee documentation supports legal compliance, public access, and bylaw adherence — all of the above.',
-        },
-        {
-          evidence: 'Exhibit B: Financials',
-          text: 'Based on inspection of Exhibit B, there is evidence that the board is…',
-          options: [
-            'complying with the charter contract that the school has with NEO',
-            'monitoring cash flow',
-            'aware if the school will run out of cash and not be able to make payroll in the future',
-            'All of the above',
-          ],
-          correct: 3,
-          explanation: 'Comprehensive financials let the board verify charter contract compliance, monitor cash flow, and stay aware of future payroll capacity — all of the above.',
-        },
-        {
-          evidence: 'Exhibit C: Procurement Documentation',
-          text: 'Based on inspection of Exhibit C, what should the finance committee do next?',
-          options: [
-            'vote in the committee meeting on which vendor to select after reviewing the procurement results',
-            'nothing at the upcoming board meeting because it is just a committee',
-            'present the evidence to the board of following the procurement policy and ensure the minutes document the presentation of evidence',
-            'publish minutes from the finance committee meeting on the school\u2019s website',
-          ],
-          correct: 2,
-          explanation: 'Committees cannot vote — so the finance committee should present procurement evidence to the full board and ensure board minutes document it.',
-        },
-        {
-          evidence: 'Exhibit D: Audit Finding Corrective Action Plan',
-          text: 'Based on inspection of Exhibit D, what should the finance committee do next?',
-          options: [
-            'Ensure the school has an internal control manual and run a test of the school\u2019s internal controls to help prevent misstatements and fraud',
-            'Review and verify use of the school procedure to stamp the date of invoice receipt and review a report of any outstanding invoices to ensure that they are paid within the required 35 days',
-            'Monitor the bank deposits to ensure that a plan is in place in the event that a large amount of money is going to be deposited',
-            'All of the above',
-          ],
-          correct: 3,
-          explanation: 'A corrective action plan calls for multiple safeguards — internal controls testing, invoice tracking, and deposit monitoring all apply.',
-        },
-      ],
+        { text: "How did Mystery Academy achieve an Exemplary rating for the \"Finance Awards\" measure?", options: ["Mystery Academy had no audit findings, a requirement for the NEO Stewardship Award in Finance.","Mystery Academy had a fund balance of at least 20%, a requirement for the NEO Stewardship Award in Finance.","Mystery Academy made on-time and accurate financial submissions to MDE and the authorizer and therefore achieved the Finance Award.","All of the above."], correct: 3, explanation: "The listed audit, reserve, and reporting practices are criteria for the NEO Stewardship Award in Finance." },
+        { text: "What is required to earn an Exemplary rating for the Fund Balance measure?", options: ["A fund balance sufficient to cover one full payroll.","An SOD calculation of at least 24%.","A fund balance greater than the previous year's balance.","A fund balance of at least 20%, measured using the prior fiscal year's audited fund balance."], correct: 3, explanation: "The poster sets the Exemplary fund-balance threshold at 20% of the audited prior-year amount." },
+        { text: "How does MDE calculate the SOD fund balance percent?", options: ["Subtracts the total liabilities from the total assets.","Subtracts the total assets from the total liabilities.","Divides the total audited end of year fund balance by the total audited annual expenditures.","Divides the total audited annual expenditures by the total audited end of year fund balance."], correct: 2, explanation: "The displayed percentage is audited year-end fund balance divided by audited annual expenditures (1,403,210 / 5,707,443, about 24.59%)." },
+        { text: "Which statement is TRUE about Mystery Academy's Financial Audit measure?", options: ["The FY26 results are not yet reported.","The school may have had past findings that were not repeated.","The school had no findings in its FY25 audit.","All of the above are true."], correct: 3, explanation: "The FY26 result is not shown; prior findings could have existed without recurring; FY25 had no findings." }
+      ]
     },
-
-    admin: {
-      id: 'admin',
-      name: 'Administration Office',
-      icon: '📋',
-      description: 'Leadership evaluation, licensure, school operations.',
+    unique: {
+      id: 'unique', name: 'Unique School Performance Measure', icon: '🧩',
+      description: "Grade 2 Chinese Language proficiency measure.",
       questions: [
-        {
-          evidence: 'Exhibit A: Leader Evaluation',
-          text: 'Based on inspection of Exhibit A, there is evidence that the board is…',
-          options: [
-            'micromanaging the school leader',
-            'clear about how the leader is evaluated and monitoring progress with the leader',
-            'forgetting the important responsibility of meaningfully evaluating the leader',
-            'not following the law',
-          ],
-          correct: 1,
-          explanation: 'A documented leader evaluation shows the board has clear criteria for evaluation and is actively monitoring leadership performance.',
-        },
-        {
-          evidence: 'Exhibit B: Leader Professional Development Plan',
-          text: 'Based on inspection of Exhibit B, there is evidence that the board is…',
-          options: [
-            'micromanaging the school leader',
-            'ensuring that the school leader gets the professional development and training that they need',
-            'forgetting the important responsibility of meaningfully providing professional development to the school leader',
-            'not following the law',
-          ],
-          correct: 1,
-          explanation: 'A documented PD plan for the school leader shows the board is supporting growth — providing the training and development the leader needs.',
-        },
-        {
-          evidence: 'Exhibit C: NEO and MDE Website Checklist',
-          text: 'Based on inspection of Exhibit C, how could the board most effectively and efficiently use the checklist?',
-          options: [
-            'Take time at the board meeting to examine each website requirement and the website to make sure all website requirements are met',
-            'Not use it because no one looks at the school website anyway',
-            'Not use it because monitoring the website is not a board responsibility',
-            'Check the website tracker that NEO maintains and assign one board member to use the MDE website checklist as well to verify and follow up to ensure that the website is professional and compliant',
-          ],
-          correct: 3,
-          explanation: 'The most efficient use is leveraging NEO\'s existing tracker and assigning one board member to handle MDE checklist verification — rather than spending full board time on it or skipping it.',
-        },
-        {
-          evidence: 'Exhibit D: Process to Verify Licensure Compliance',
-          text: 'Based on inspection of Exhibit D, what could the board do next?',
-          options: [
-            'Ask the school leader to present documentation to verify that new hires meet qualifications including licensure for the positions',
-            'Consider whether the board should waive the nepotism policy to be able to hire the teacher who is a spouse of another teacher',
-            'Verify that the teacher board members maintain up to date licensure and that there is a plan in place for all teachers to renew licensure for the upcoming year',
-            'All of the above',
-          ],
-          correct: 3,
-          explanation: 'Verifying licensure compliance covers new hires, board members who teach, and the full staff renewal process — all of the above.',
-        },
-        {
-          evidence: 'Exhibit E: READ Act Verification',
-          text: 'Based on inspection of Exhibit E, what could the board do next?',
-          options: [
-            'Ask the school leader to present documentation to verify that all teachers are completing required Science of Reading training',
-            'Ask the school leader to present documentation to verify that school\u2019s Literacy Lead meets requirements for the position',
-            'Ask the school leader to present documentation that the school is meeting the required student testing requirements aligned to the school\u2019s testing calendar posted on the school\u2019s website',
-            'All of the above',
-          ],
-          correct: 3,
-          explanation: 'READ Act verification requires evidence on teacher training, Literacy Lead qualifications, and student testing — all three.',
-        },
-        {
-          evidence: 'Exhibit F: Policies and Procedures Statewide Assessments Template',
-          text: 'Based on inspection of Exhibit F, what could the board do next to mitigate risk?',
-          options: [
-            'Ask the school leader or district assessment coordinator to present how the school is meeting the requirements in the Policies and Procedures Statewide Assessments Template',
-            'Wait for MDE to conduct an unannounced visit during testing and identify areas of noncompliance',
-            'Wait for MDE to request and review the Policies and Procedures Statewide Assessments Template',
-            'None of the above',
-          ],
-          correct: 0,
-          explanation: 'The proactive risk-mitigation step is to have leadership present how the school is meeting assessment requirements — not waiting for MDE.',
-        },
-      ],
+        { text: "Which statement is TRUE about Mystery Academy's combined Grade 2 Chinese Language proficiency results?", options: ["Math proficiency was higher than Reading proficiency.","Reading proficiency was higher than Math proficiency.","Both Math and Reading proficiency were above 80%.","Math and Reading proficiency were equal."], correct: 0, explanation: "Grade 2 Chinese Language Math proficiency was 64.71% versus Reading at 57.35%." },
+        { text: "The Grade 2 Chinese Language Reading measure reports 57.35% combined proficiency and 2 points earned. However, the printed Satisfactory standard begins at 58%. What is the most appropriate conclusion?", options: ["The school achieved a Satisfactory rating.","The point value should be accepted without examining the rubric.","The measure must be permanently removed from the Framework.","There appears to be a discrepancy between the reported result, and the points earned that should be clarified."], correct: 3, explanation: "The poster reports 57.35% and 2 points even though Satisfactory starts at 58%; that mismatch calls for clarification." },
+        { text: "Why are two lines highlighted yellow?", options: ["Because those years are exempt from inclusion in the Performance Framework.","Because either Mystery Academy still needs to provide the results to the authorizer along with the supporting documentation, or the authorizer still needs to input the results.","Because the measure is being revised.","Because the group size was too small to report results."], correct: 1, explanation: "Yellow cells mark results or supporting information still to be submitted or entered." }
+      ]
     },
-
-    classroom: {
-      id: 'classroom',
-      name: 'Teacher Classroom',
-      icon: '📚',
-      description: 'Instruction, student progress, classroom systems.',
+    dashboard: {
+      id: 'dashboard', name: 'Dashboard', icon: '📊',
+      description: 'Weighting versus points earned, renewal eligibility.',
       questions: [
-        {
-          evidence: 'Exhibit A: Progress Monitoring',
-          text: 'Based on inspection of Exhibit A, there is evidence that the school is…',
-          options: [
-            'monitoring progress toward class goals and empowering students to monitor their own progress toward their goals',
-            'violating Minnesota Data Practices',
-            'clearly aligning goals to Minnesota state standards',
-            'all of the above',
-          ],
-          correct: 0,
-          explanation: 'A progress monitoring tool used in the classroom shows the school is monitoring progress toward class goals and empowering students to track their own learning.',
-        },
-        {
-          evidence: 'Exhibit B: Behavior Expectations, Routine, Groupings',
-          text: 'Based on inspection of Exhibit B, there is evidence that the school is…',
-          options: [
-            'providing multi-tiered system of supports',
-            'providing clear expectations for behavior, routines for transitions',
-            'implementing a clear routine/schedule of instruction for meeting student needs',
-            'All of the above',
-          ],
-          correct: 3,
-          explanation: 'Documented behavior expectations, routines, and groupings demonstrate MTSS, clear expectations, and structured instruction — all of the above.',
-        },
-        {
-          evidence: 'Exhibit C: Emergency Procedures',
-          text: 'Based on inspection of Exhibit C, there is evidence that the school is…',
-          options: [
-            'ready in case of any emergency',
-            'not completely prepared in case of emergency',
-            'intentional about reviewing emergency readiness plans',
-            'None of the above',
-          ],
-          correct: 1,
-          explanation: 'An emergency flip chart missing the lockdown protocol shows the school is not completely prepared — a critical safety procedure is absent.',
-        },
-        {
-          evidence: 'Exhibit D: Private Educational Data on Wall',
-          text: 'Based on inspection of Exhibit D, there is evidence that the school is…',
-          options: [
-            'likely not providing required or adequate training on Data Practices',
-            'following MN Data Practices law regarding Educational Data',
-            'intentional about reviewing Data Practices and monitoring implementation',
-            'None of the above',
-          ],
-          correct: 0,
-          explanation: 'Private educational data displayed publicly violates MN Data Practices law — indicating staff likely haven\'t received adequate training on data privacy requirements.',
-        },
-      ],
+        { text: "Which statement is TRUE about the difference between Academic Weighting and Academic Points Achieved?", options: ["The school earned 58.33% of its possible Academic Performance points.","Academics accounts for 58.33% of the total Framework points, while the school earned 49.21% of its possible Academic points.","Academics accounts for 49.21% of the Framework points, while the school earned 58.33% of its possible Academic points.","Both percentages represent the school's overall Academic Performance rating."], correct: 1, explanation: "58.33% is Academic weighting; 49.21% is the portion of possible Academic points earned." },
+        { text: "Based on the results reported to date, which statement is TRUE about Mystery Academy's eligibility for an automatic renewal recommendation?", options: ["The school currently meets all requirements for an automatic five-year renewal.","The school currently meets all requirements for an automatic three-year renewal.","The school must automatically close because Academic Performance is below 50%.","The school has exceeded 70% overall but has not yet met the 50% requirement in every performance area."], correct: 3, explanation: "Overall performance is 70.37%, but Academic Performance is 49.21%, below the 50% area minimum." }
+      ]
     },
-
-    frontoffice: {
-      id: 'frontoffice',
-      name: 'Front Office',
-      icon: '🏛️',
-      description: 'Visitor management, enrollment, attendance, data practices.',
+    monitoring: {
+      id: 'monitoring', name: 'Progress Monitoring', icon: '📉',
+      description: 'Reading the Performance Framework bar graph.',
       questions: [
-        {
-          evidence: 'Exhibit A: Sign in Sheet for Parents and for Visitors/Volunteers, Background Check Forms',
-          text: 'Based on inspection of Exhibit A, there is evidence that the school is…',
-          options: [
-            'not requiring parents to sign in because all parents should be trusted',
-            'becoming overly bureaucratic in visitor management',
-            'unaware of what volunteers are in the school and if they meet background checks',
-            'prioritizing student safety and security',
-          ],
-          correct: 3,
-          explanation: 'Sign-in sheets and background check forms for visitors and volunteers demonstrate the school is prioritizing student safety and security.',
-        },
-        {
-          evidence: 'Exhibit B: Admissions Form and Enrollment Packet',
-          text: 'Based on inspection of Exhibit B, there is evidence that the school is…',
-          options: [
-            'not open to all students to apply and enroll',
-            'wasteful because the application and enrollment forms should be combined',
-            'following the law which requires blind admissions prior to completion of enrollment paperwork',
-            'not including enough information on the application form',
-          ],
-          correct: 2,
-          explanation: 'Keeping the admissions application and enrollment paperwork separate is required by law — admissions must be blind to demographic info before enrollment.',
-        },
-        {
-          evidence: 'Exhibit C: Data Request Form',
-          text: 'Based on inspection of Exhibit C, there is evidence that the school is…',
-          options: [
-            'following laws related to Minnesota Data Practices',
-            'overly bureaucratic',
-            'not in compliance with laws related to Minnesota Data Practices',
-            'None of the above',
-          ],
-          correct: 0,
-          explanation: 'A formal data request form is exactly what MN Data Practices law requires — evidence the school is following the law.',
-        },
-        {
-          evidence: 'Exhibit D: Attendance Monitoring',
-          text: 'Based on inspection of Exhibit D, there is evidence that the school is…',
-          options: [
-            'following up on student absences',
-            'monitoring attendance daily',
-            'ensuring that MARSS reporting is accurate',
-            'All of the above',
-          ],
-          correct: 3,
-          explanation: 'A robust attendance monitoring system supports absence follow-up, daily monitoring, and accurate MARSS reporting — all of the above.',
-        },
-      ],
-    },
-
-    cafeteria: {
-      id: 'cafeteria',
-      name: 'Cafeteria',
-      icon: '🍎',
-      description: 'Civil rights compliance, food service, meal program.',
-      questions: [
-        {
-          evidence: 'Exhibit A: Civil Rights Compliance Checklist',
-          text: 'Based on inspection of Exhibit A, what could the board do next?',
-          options: [
-            'Take time at the board meeting to examine each checklist requirement to make sure that the school meets all the requirements',
-            'Wait for a complaint or MDE to find a compliance issue',
-            'Nothing because monitoring civil rights compliance is not a board responsibility',
-            'Assign one board member to use the Civil Rights Checklist to verify and follow up to ensure that the school meets the requirements',
-          ],
-          correct: 3,
-          explanation: 'Most efficient governance: assign one board member to handle the civil rights checklist verification — not consume full board time, but also not wait passively.',
-        },
-        {
-          evidence: 'Exhibit B: Food Protection Manager Certificate',
-          text: 'Based on inspection of Exhibit B, what could the board do next to mitigate risk?',
-          options: [
-            'Take time at the board meeting to verify that the school has the required Certified Food Protection Manager onsite for meal service',
-            'Assign one board member to use the licensure lookup site to verify and follow up to ensure that the school has the required Certified Food Protection Manager onsite for meal service',
-            'Wait for a complaint or MDE to find a compliance issue',
-            'Nothing because monitoring compliance is not a board responsibility',
-          ],
-          correct: 1,
-          explanation: 'Assigning one board member to verify Food Protection Manager certification via the licensure lookup is efficient risk mitigation — not full board time, not passive waiting.',
-        },
-        {
-          evidence: 'Exhibit C: Food Service License (out of date)',
-          text: 'Based on inspection of Exhibit C, there is evidence that the school is…',
-          options: [
-            'carefully monitoring compliance with inspection and licensing requirements',
-            'meeting inspection and licensing requirements',
-            'serving healthy food that meets federal requirements',
-            'is at risk of losing money allocated for meals for students',
-          ],
-          correct: 3,
-          explanation: 'An out-of-date food service license puts the school at risk of losing federal meal program funding — a serious financial consequence.',
-        },
-      ],
-    },
+        { text: "Based on the bar graph, which performance areas have achieved 100% of their possible points thus far?", options: ["Academic, Climate, and Finance.","Climate, Operations, and Finance.","Academic, Operations, and Finance.","Climate, Academic, and Overall."], correct: 1, explanation: "Climate, Operations, and Finance each show 100% of possible points earned." },
+        { text: "What does the yellow portion of the Academic Performance bar represent?", options: ["Points already earned in Academic Performance.","The amount needed to reach the minimum 50% threshold.","The additional percentage needed to reach 70% Exemplary performance.","The percentage of academic measures that have not yet been submitted."], correct: 2, explanation: "Yellow shows the additional Academic percentage needed to reach 70% Exemplary." },
+        { text: "What does the red portion of the Academic Performance bar represent?", options: ["Points already earned in Academic Performance.","The amount needed to reach the minimum 50% threshold.","The additional percentage needed to reach 70% Exemplary performance.","The percentage of academic measures that have not yet been submitted."], correct: 1, explanation: "Red denotes the remaining Academic percentage needed to reach the 50% renewal minimum." }
+      ]
+    }
   };
-
-  // Display order
-  const ROOM_ORDER = ['board', 'finance', 'admin', 'classroom', 'frontoffice', 'cafeteria'];
+  const ROOM_ORDER = ['focus','progress','climate','operations','finance','unique','dashboard','monitoring'];
+  const NUM_STATIONS = ROOM_ORDER.length;
 
   // ============================================================
-  // FIREBASE INIT (uses compat SDK loaded via script tags in <head>)
+  // DIVISION LOGIC — distribute N stations across M members
   // ============================================================
-  let db, playersRef;
-  let pushFn, setFn, removeFn, onValueFn, refFn, updateFn;
+  function divideStations(numMembers) {
+    const total = NUM_STATIONS;
+    const base = Math.floor(total / numMembers);
+    const extras = total % numMembers;
+    const buckets = [];
+    let cursor = 0;
+    for (let i = 0; i < numMembers; i++) {
+      const count = base + (i < extras ? 1 : 0);
+      buckets.push(ROOM_ORDER.slice(cursor, cursor + count));
+      cursor += count;
+    }
+    return buckets;
+  }
+  function describeDivision(numMembers) {
+    const buckets = divideStations(numMembers);
+    const counts = buckets.map(b => b.length).join(' + ');
+    return `${numMembers} teammates will each cover: ${counts} stations (total ${NUM_STATIONS}).`;
+  }
+
+  // ============================================================
+  // FIREBASE
+  // ============================================================
+  let db, playersRef, groupsRef;
   let CONFIG_OK = firebaseConfig.apiKey && !firebaseConfig.apiKey.startsWith('PASTE_');
 
   function initializeApp() {
     try {
-      if (typeof firebase === 'undefined') {
-        throw new Error('Firebase SDK did not load. Check your network connection or browser extensions blocking gstatic.com.');
-      }
+      if (typeof firebase === 'undefined') throw new Error('Firebase SDK did not load.');
       firebase.initializeApp(firebaseConfig);
       db = firebase.database();
-
-      // Wrap compat API in the same call-shape the rest of the app expects
-      refFn = (database, path) => database.ref(path);
-      pushFn = (refObj) => refObj.push();
-      setFn = (refObj, value) => refObj.set(value);
-      removeFn = (refObj) => refObj.remove();
-      updateFn = (refObj, value) => refObj.update(value);
-      onValueFn = (refObj, success, error) => {
-        refObj.on('value',
-          (snapshot) => success(snapshot),
-          (err) => error && error(err)
-        );
-      };
-
       playersRef = db.ref(`sessions/${SESSION_ID}/players`);
-
-      onValueFn(playersRef, (snapshot) => {
-        const data = snapshot.val() || {};
-        const list = Object.entries(data).map(([key, p]) => ({ ...p, _key: key }));
-        renderLeaderboard(list);
-        document.getElementById('conn-text').textContent = 'Connected';
-        document.getElementById('conn-indicator').classList.remove('error');
-        document.getElementById('conn-indicator').classList.add('connected');
-      }, (error) => {
-        console.error('Firebase listener error:', error);
-        document.getElementById('conn-text').textContent = 'Connection error';
-        document.getElementById('conn-indicator').classList.add('error');
-      });
+      groupsRef = db.ref(`sessions/${SESSION_ID}/groups`);
+      playersRef.on('value', snap => { cachedPlayers = snapToList(snap); refreshAll(); setConnected(true); }, err => setConnected(false, err));
+      groupsRef.on('value', snap => { cachedGroups = snapToList(snap); refreshAll(); setConnected(true); }, err => setConnected(false, err));
     } catch (e) {
-      console.error('Firebase init failed:', e);
-      document.getElementById('conn-text').textContent = 'Setup error';
-      document.getElementById('conn-indicator').classList.add('error');
+      console.error('Firebase init failed', e);
+      setConnected(false, e);
     }
   }
-
-  if (CONFIG_OK) initializeApp();
-  else {
-    document.getElementById('conn-text').textContent = 'Not configured';
-    document.getElementById('conn-indicator').classList.add('error');
+  function setConnected(ok, err) {
+    const el = document.getElementById('conn-indicator');
+    el.classList.remove('connected','error');
+    if (ok) { el.classList.add('connected'); document.getElementById('conn-text').textContent = 'Connected'; }
+    else { el.classList.add('error'); document.getElementById('conn-text').textContent = err ? 'Connection error' : 'Not configured'; }
   }
+  function snapToList(snap) {
+    const d = snap.val() || {};
+    return Object.entries(d).map(([key, v]) => ({ ...v, _key: key }));
+  }
+  let cachedPlayers = [];
+  let cachedGroups = [];
 
   // ============================================================
-  // STATE
+  // STATE + localStorage recovery
   // ============================================================
   let player = {
-    key: null,
-    name: '',
-    mode: 'solo',
-    totalScore: 0,
-    roomsCompleted: {}, // roomId -> { correct, total, locked: true }
+    key: null, name: '', mode: 'solo',
+    totalScore: 0, roomsCompleted: {},
+    groupCode: null, assignedStations: null,
+    isGroupCreator: false
   };
   let currentRoom = null;
   let currentQIndex = 0;
   let currentSelection = null;
   let currentLocked = false;
-  let cachedLeaderboard = [];
 
-  // ============================================================
-  // VIEW MGMT
-  // ============================================================
-  const views = {
-    welcome: document.getElementById('view-welcome'),
-    rooms: document.getElementById('view-rooms'),
-    question: document.getElementById('view-question'),
-    complete: document.getElementById('view-complete'),
-    coming: document.getElementById('view-coming-soon'),
-    leaderboard: document.getElementById('view-leaderboard'),
-  };
-  function showView(name) {
-    Object.values(views).forEach(v => v.classList.remove('active'));
-    views[name].classList.add('active');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    // Prevent ghost/double-tap clicks from carrying over into the new view's buttons
-    document.body.style.pointerEvents = 'none';
-    setTimeout(() => { document.body.style.pointerEvents = ''; }, 450);
+  function saveSession() {
+    try {
+      localStorage.setItem(LS_KEY, JSON.stringify({
+        key: player.key, name: player.name, mode: player.mode,
+        groupCode: player.groupCode, assignedStations: player.assignedStations
+      }));
+    } catch (e) {}
+  }
+  function loadSession() {
+    try {
+      const raw = localStorage.getItem(LS_KEY);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch (e) { return null; }
+  }
+  function clearSession() {
+    try { localStorage.removeItem(LS_KEY); } catch (e) {}
   }
 
   // ============================================================
-  // WELCOME — pick mode, enter name
+  // INIT
   // ============================================================
+  if (CONFIG_OK) initializeApp();
+  else setConnected(false);
+
+  // Try to recover a saved session
+  const saved = loadSession();
+  if (saved && saved.name && saved.key) {
+    document.getElementById('wb-name').textContent = saved.name;
+    document.getElementById('welcome-back-overlay').classList.add('show');
+    document.getElementById('wb-resume-btn').addEventListener('click', () => {
+      document.getElementById('welcome-back-overlay').classList.remove('show');
+      resumeSession(saved);
+    });
+    document.getElementById('wb-fresh-btn').addEventListener('click', () => {
+      document.getElementById('welcome-back-overlay').classList.remove('show');
+      clearSession();
+    });
+  }
+
+  async function resumeSession(saved) {
+    player.key = saved.key;
+    player.name = saved.name;
+    player.mode = saved.mode;
+    player.groupCode = saved.groupCode || null;
+    player.assignedStations = saved.assignedStations || null;
+    // Try to pull latest from Firebase
+    if (CONFIG_OK && db) {
+      try {
+        const snap = await db.ref(`sessions/${SESSION_ID}/players/${player.key}`).once('value');
+        const data = snap.val();
+        if (data) {
+          player.totalScore = data.totalScore || 0;
+          player.roomsCompleted = data.roomsCompleted || {};
+          player.isGroupCreator = !!data.isGroupCreator;
+          updatePlayerHeader();
+          renderRoomsGrid();
+          showView('rooms');
+          toast('Welcome back!');
+          return;
+        }
+      } catch (e) {
+        console.error('Failed to restore', e);
+      }
+    }
+    // If record missing, start over
+    clearSession();
+    showView('welcome');
+  }
+
+  // ============================================================
+  // WELCOME SCREEN
+  // ============================================================
+  let selectedMode = 'solo';
   document.querySelectorAll('.play-mode').forEach(el => {
     el.addEventListener('click', () => {
       document.querySelectorAll('.play-mode').forEach(p => p.classList.remove('selected'));
       el.classList.add('selected');
-      player.mode = el.dataset.mode;
+      selectedMode = el.dataset.mode;
     });
   });
 
   document.getElementById('start-btn').addEventListener('click', async () => {
     const name = document.getElementById('player-name').value.trim();
-    if (!name) { toast('Enter your name or team name first'); return; }
+    if (!name) { toast('Enter your name first'); return; }
     if (!CONFIG_OK) { toast('Database not connected'); return; }
-
     player.name = name;
-    document.getElementById('player-name-display').textContent = name;
-    document.getElementById('player-info').style.display = 'block';
 
-    try {
-      const newRef = pushFn(playersRef);
-      player.key = newRef.key;
-      await setFn(newRef, {
-        name: player.name,
-        mode: player.mode,
-        totalScore: 0,
-        roomsCompleted: {},
-        startedAt: Date.now(),
-        lastActive: Date.now(),
-      });
+    if (selectedMode === 'solo' || selectedMode === 'shared') {
+      player.mode = selectedMode;
+      player.groupCode = null;
+      player.assignedStations = null;
+      await createPlayerRecord();
+      updatePlayerHeader();
       renderRoomsGrid();
       showView('rooms');
-    } catch (e) {
-      console.error(e);
-      toast('Could not start session — check connection');
+    } else if (selectedMode === 'group-create') {
+      updateDivisionPreview();
+      showView('create-group');
+    } else if (selectedMode === 'group-join') {
+      showView('join-group');
     }
   });
 
   // ============================================================
-  // ROOMS PICKER
+  // CREATE GROUP
+  // ============================================================
+  function updateDivisionPreview() {
+    const n = parseInt(document.getElementById('group-size-input').value, 10);
+    const el = document.getElementById('division-preview');
+    if (!n || n < 2 || n > MAX_GROUP_SIZE) {
+      el.innerHTML = `Pick between 2 and ${MAX_GROUP_SIZE} teammates.`;
+      return;
+    }
+    const buckets = divideStations(n);
+    const lines = buckets.map((b, i) => {
+      const names = b.map(id => ROOMS[id].name).join(', ');
+      return `<div style="margin-top:4px;"><strong>Teammate ${i+1}:</strong> ${names}</div>`;
+    }).join('');
+    el.innerHTML = `<div style="font-weight:600; color:var(--ink);">Here is how the ${NUM_STATIONS} stations will be split:</div>${lines}`;
+  }
+  document.getElementById('group-size-input').addEventListener('input', updateDivisionPreview);
+
+  document.getElementById('back-from-create-btn').addEventListener('click', () => showView('welcome'));
+  document.getElementById('back-from-join-btn').addEventListener('click', () => showView('welcome'));
+
+  document.getElementById('create-group-btn').addEventListener('click', async () => {
+    const groupName = document.getElementById('group-name-input').value.trim();
+    const size = parseInt(document.getElementById('group-size-input').value, 10);
+    if (!groupName) { toast('Enter a group name'); return; }
+    if (!size || size < 2 || size > MAX_GROUP_SIZE) { toast(`Pick 2 to ${MAX_GROUP_SIZE} teammates`); return; }
+
+    // Generate a unique 4 digit code
+    let code;
+    let tries = 0;
+    while (tries < 20) {
+      code = String(Math.floor(1000 + Math.random() * 9000));
+      const existing = cachedGroups.find(g => g._key === code);
+      if (!existing) break;
+      tries++;
+    }
+
+    const buckets = divideStations(size);
+    const groupData = {
+      name: groupName,
+      size: size,
+      createdAt: Date.now(),
+      createdBy: player.name,
+      slots: buckets.map(b => ({ stations: b, memberKey: null, memberName: null }))
+    };
+    // Claim slot 0 for the creator
+    groupData.slots[0].memberName = player.name;
+    try {
+      await db.ref(`sessions/${SESSION_ID}/groups/${code}`).set(groupData);
+      player.mode = 'group-individual';
+      player.groupCode = code;
+      player.assignedStations = buckets[0];
+      player.isGroupCreator = true;
+      await createPlayerRecord({ slot: 0 });
+      // Now update slot with player's key
+      await db.ref(`sessions/${SESSION_ID}/groups/${code}/slots/0/memberKey`).set(player.key);
+      updatePlayerHeader();
+      renderRoomsGrid();
+      showView('rooms');
+      toast(`Group created! Code: ${code}`);
+    } catch (e) {
+      console.error(e);
+      toast('Could not create group');
+    }
+  });
+
+  // ============================================================
+  // JOIN GROUP
+  // ============================================================
+  document.getElementById('join-group-btn').addEventListener('click', async () => {
+    const code = document.getElementById('join-code-input').value.trim();
+    if (!/^\d{4}$/.test(code)) { toast('Enter a 4 digit code'); return; }
+    try {
+      const snap = await db.ref(`sessions/${SESSION_ID}/groups/${code}`).once('value');
+      const grp = snap.val();
+      if (!grp) { toast('No group found with that code'); return; }
+      // Find first empty slot
+      let targetSlot = -1;
+      for (let i = 0; i < grp.slots.length; i++) {
+        if (!grp.slots[i].memberKey) { targetSlot = i; break; }
+      }
+      if (targetSlot === -1) { toast('This group is already full'); return; }
+      player.mode = 'group-individual';
+      player.groupCode = code;
+      player.assignedStations = grp.slots[targetSlot].stations;
+      await createPlayerRecord({ slot: targetSlot });
+      await db.ref(`sessions/${SESSION_ID}/groups/${code}/slots/${targetSlot}`).update({
+        memberKey: player.key,
+        memberName: player.name
+      });
+      updatePlayerHeader();
+      renderRoomsGrid();
+      showView('rooms');
+      toast(`Joined ${grp.name}!`);
+    } catch (e) {
+      console.error(e);
+      toast('Could not join group');
+    }
+  });
+
+  // ============================================================
+  // CREATE PLAYER RECORD
+  // ============================================================
+  async function createPlayerRecord(extra = {}) {
+    const newRef = playersRef.push();
+    player.key = newRef.key;
+    const data = {
+      name: player.name,
+      mode: player.mode,
+      totalScore: 0,
+      roomsCompleted: {},
+      startedAt: Date.now(),
+      lastActive: Date.now(),
+      groupCode: player.groupCode || null,
+      assignedStations: player.assignedStations || null,
+      isGroupCreator: !!player.isGroupCreator,
+      ...extra
+    };
+    await newRef.set(data);
+    saveSession();
+  }
+
+  // ============================================================
+  // PLAYER HEADER
+  // ============================================================
+  function updatePlayerHeader() {
+    document.getElementById('player-name-display').textContent = player.name;
+    document.getElementById('player-info').style.display = 'block';
+    document.getElementById('score-display').textContent = player.totalScore || 0;
+    if (player.mode === 'group-individual' && player.groupCode) {
+      const grp = cachedGroups.find(g => g._key === player.groupCode);
+      document.getElementById('group-chip-wrap').style.display = 'block';
+      document.getElementById('group-chip-name').textContent = grp ? grp.name : '—';
+      document.getElementById('group-chip-code').textContent = player.groupCode;
+      document.getElementById('score-chip-label').textContent = 'My points';
+    } else {
+      document.getElementById('group-chip-wrap').style.display = 'none';
+      document.getElementById('score-chip-label').textContent = 'Total score';
+    }
+  }
+
+  // ============================================================
+  // VIEWS
+  // ============================================================
+  const views = {
+    welcome: document.getElementById('view-welcome'),
+    'create-group': document.getElementById('view-create-group'),
+    'join-group': document.getElementById('view-join-group'),
+    rooms: document.getElementById('view-rooms'),
+    question: document.getElementById('view-question'),
+    leaderboard: document.getElementById('view-leaderboard')
+  };
+  function showView(name) {
+    Object.values(views).forEach(v => v.classList.remove('active'));
+    views[name].classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.body.style.pointerEvents = 'none';
+    setTimeout(() => { document.body.style.pointerEvents = ''; }, 450);
+  }
+
+  // ============================================================
+  // ROOMS GRID
   // ============================================================
   function renderRoomsGrid() {
+    const inGroup = player.mode === 'group-individual' && player.groupCode;
+    const grp = inGroup ? cachedGroups.find(g => g._key === player.groupCode) : null;
+
+    // Group banner
+    const bannerWrap = document.getElementById('group-banner-wrap');
+    const noteWrap = document.getElementById('assign-note-wrap');
+    if (inGroup && grp) {
+      const myRooms = (player.assignedStations || []).map(id => ROOMS[id].name).join(', ');
+      const filledSlots = grp.slots.filter(s => s.memberKey).length;
+      // Calculate group total score
+      let groupTotal = 0;
+      grp.slots.forEach(s => {
+        if (s.memberKey) {
+          const p = cachedPlayers.find(pp => pp._key === s.memberKey);
+          if (p) groupTotal += (p.totalScore || 0);
+        }
+      });
+      bannerWrap.innerHTML = `
+        <div class="group-banner">
+          <div class="gb-left">
+            <div class="gb-label">Your group</div>
+            <div class="gb-title">${escapeHtml(grp.name)}</div>
+            <div class="gb-stats">
+              <span><strong>${filledSlots}/${grp.size}</strong> joined</span>
+              <span><strong>${groupTotal}</strong> team points</span>
+            </div>
+          </div>
+          <div style="text-align:center;">
+            <div class="gb-label" style="margin-bottom:4px;">Join code</div>
+            <div class="gb-code">${player.groupCode}</div>
+          </div>
+        </div>
+      `;
+      noteWrap.innerHTML = `
+        <div class="assign-note">
+          <strong>Your assigned stations:</strong> ${escapeHtml(myRooms)}.<br>
+          Other teammates have their own. Stations you cannot start are grayed out.
+        </div>
+      `;
+      document.getElementById('picker-heading').textContent = 'Your stations';
+      document.getElementById('picker-sub').textContent = 'Each teammate has their own stations. Finish yours to help the team.';
+    } else {
+      bannerWrap.innerHTML = '';
+      noteWrap.innerHTML = '';
+      document.getElementById('picker-heading').textContent = 'Where will you start?';
+      document.getElementById('picker-sub').textContent = 'Visit any station in any order. Each one has artifacts on the table to examine, then answer below.';
+    }
+
     const grid = document.getElementById('rooms-grid');
     grid.innerHTML = '';
     ROOM_ORDER.forEach(roomId => {
       const room = ROOMS[roomId];
-      const completion = player.roomsCompleted[roomId];
+      const myCompletion = player.roomsCompleted[roomId];
       const isComingSoon = !room.questions || room.questions.length === 0;
-      const isDone = !!completion;
+
+      // In group mode: find who is assigned this station, and whether they finished
+      let assignedTo = null;
+      let assignedCompletion = null;
+      if (inGroup && grp) {
+        for (let i = 0; i < grp.slots.length; i++) {
+          if (grp.slots[i].stations && grp.slots[i].stations.includes(roomId)) {
+            assignedTo = grp.slots[i];
+            if (assignedTo.memberKey) {
+              const assignedPlayer = cachedPlayers.find(pp => pp._key === assignedTo.memberKey);
+              if (assignedPlayer && assignedPlayer.roomsCompleted && assignedPlayer.roomsCompleted[roomId]) {
+                assignedCompletion = assignedPlayer.roomsCompleted[roomId];
+              }
+            }
+            break;
+          }
+        }
+      }
+
+      const isMine = inGroup ? (player.assignedStations && player.assignedStations.includes(roomId)) : true;
+      const isDone = myCompletion || (!isMine && assignedCompletion);
+      const myDone = !!myCompletion;
 
       const card = document.createElement('div');
-      card.className = 'room-card' + (isDone || isComingSoon ? ' locked' : '');
-      card.dataset.room = roomId;
+      let cardClass = 'room-card';
+      if (isComingSoon) cardClass += ' locked';
+      else if (inGroup && !isMine) cardClass += ' locked others';
+      else if (myDone) cardClass += ' locked';
+      if (inGroup && isMine) cardClass += ' mine';
+      card.className = cardClass;
 
-      let badgeHtml = '';
-      let statusHtml = '';
-      let scoreHtml = '';
+      let badge = '';
+      let status = '';
+      let score = '';
 
       if (isComingSoon) {
-        badgeHtml = '<div class="badge-corner coming">Coming soon</div>';
-        statusHtml = '<div class="room-status coming">Content in progress</div>';
-      } else if (isDone) {
-        badgeHtml = '<div class="badge-corner done">Completed</div>';
-        statusHtml = '<div class="room-status done">Done · locked in</div>';
-        scoreHtml = `<div class="room-score">${completion.correct}/${completion.total} ★</div>`;
+        badge = '<div class="badge-corner coming">Coming soon</div>';
+        status = '<div class="room-status coming">Content in progress</div>';
+      } else if (myDone) {
+        badge = '<div class="badge-corner done">You completed</div>';
+        status = '<div class="room-status done">Done · locked in</div>';
+        score = `<div class="room-score">${myCompletion.correct}/${myCompletion.total} ★</div>`;
+      } else if (inGroup && !isMine) {
+        // Someone else's station
+        const otherName = assignedTo && assignedTo.memberName ? assignedTo.memberName : null;
+        if (assignedCompletion) {
+          badge = '<div class="badge-corner done">Done</div>';
+          status = `<div class="room-status done">Done by ${escapeHtml(otherName || 'teammate')}</div>`;
+          score = `<div class="room-score">${assignedCompletion.correct}/${assignedCompletion.total} ★</div>`;
+        } else if (otherName) {
+          badge = '<div class="badge-corner others">Teammate</div>';
+          status = `<div class="room-status others">${escapeHtml(otherName)}'s station</div>`;
+        } else {
+          badge = '<div class="badge-corner others">Waiting</div>';
+          status = '<div class="room-status others">Teammate not joined yet</div>';
+        }
+      } else if (inGroup && isMine) {
+        badge = '<div class="badge-corner mine">Yours</div>';
+        status = `<div class="room-status mine">${room.questions.length} questions · yours to answer</div>`;
       } else {
-        statusHtml = `<div class="room-status">${room.questions.length} questions</div>`;
+        status = `<div class="room-status">${room.questions.length} questions</div>`;
       }
 
       card.innerHTML = `
-        ${badgeHtml}
+        ${badge}
         <div class="room-icon">${room.icon}</div>
         <div class="room-name">${room.name}</div>
         <div class="room-desc">${room.description}</div>
-        <div class="room-meta">
-          ${statusHtml}
-          ${scoreHtml}
-        </div>
+        <div class="room-meta">${status}${score}</div>
       `;
 
-      if (!isComingSoon && !isDone) {
+      if (isComingSoon) {
+        card.addEventListener('click', () => toast(`${room.name} content coming soon`));
+      } else if (myDone) {
+        card.addEventListener('click', () => toast(`You already completed ${room.name}`));
+      } else if (inGroup && !isMine) {
+        const otherName = assignedTo && assignedTo.memberName ? assignedTo.memberName : 'another teammate';
+        card.addEventListener('click', () => toast(`${room.name} is ${otherName}'s station`));
+      } else {
         card.addEventListener('click', () => enterRoom(roomId));
-      } else if (isComingSoon) {
-        card.addEventListener('click', () => {
-          document.getElementById('coming-room-name').textContent = room.name;
-          showView('coming');
-        });
-      } else if (isDone) {
-        card.addEventListener('click', () => toast(`${room.name} is already complete`));
       }
 
       grid.appendChild(card);
     });
   }
 
-  document.getElementById('show-leaderboard-btn').addEventListener('click', () => {
-    renderLeaderboard(cachedLeaderboard);
-    showView('leaderboard');
-  });
+  // Re-render rooms grid whenever Firebase data changes and we're on rooms view
+  function refreshAll() {
+    if (views.rooms.classList.contains('active')) renderRoomsGrid();
+    if (views.leaderboard.classList.contains('active')) renderLeaderboard();
+    if (document.getElementById('fac-overlay').classList.contains('show')) updateFacCounts();
+  }
 
-  document.getElementById('show-leaderboard-top-btn').addEventListener('click', () => {
-    renderLeaderboard(cachedLeaderboard);
-    showView('leaderboard');
-  });
-
-  document.getElementById('back-from-lb-btn').addEventListener('click', () => {
-    renderRoomsGrid();
-    showView('rooms');
-  });
-
-  document.getElementById('back-from-coming-btn').addEventListener('click', () => {
-    showView('rooms');
-  });
+  document.getElementById('show-leaderboard-btn').addEventListener('click', () => { renderLeaderboard(); showView('leaderboard'); });
+  document.getElementById('show-leaderboard-top-btn').addEventListener('click', () => { renderLeaderboard(); showView('leaderboard'); });
+  document.getElementById('back-from-lb-btn').addEventListener('click', () => { renderRoomsGrid(); showView('rooms'); });
 
   // ============================================================
-  // ENTER ROOM
+  // ENTER + PLAY ROOM
   // ============================================================
   function enterRoom(roomId) {
     currentRoom = ROOMS[roomId];
@@ -1895,106 +1113,67 @@
     loadQuestion();
     showView('question');
   }
-
   function loadQuestion() {
     const q = currentRoom.questions[currentQIndex];
     if (!q) return;
     currentSelection = null;
     currentLocked = false;
-
     document.getElementById('q-room-name').textContent = currentRoom.name;
     document.getElementById('q-current').textContent = currentQIndex + 1;
     document.getElementById('q-total').textContent = currentRoom.questions.length;
-    document.getElementById('q-progress-fill').style.width =
-      `${((currentQIndex) / currentRoom.questions.length) * 100}%`;
+    document.getElementById('q-progress-fill').style.width = `${((currentQIndex) / currentRoom.questions.length) * 100}%`;
     document.getElementById('q-text').textContent = q.text;
-
-    const ev = document.getElementById('q-evidence');
-    ev.style.display = 'none';
-
     const answersEl = document.getElementById('q-answers');
     answersEl.innerHTML = '';
     q.options.forEach((opt, i) => {
-      const letter = String.fromCharCode(65 + i); // A, B, C, ...
+      const letter = String.fromCharCode(65 + i);
       const btn = document.createElement('button');
       btn.className = 'answer';
-      btn.dataset.index = i;
-      btn.innerHTML = `
-        <span class="letter">${letter}</span>
-        <span class="text">${escapeHtml(opt)}</span>
-      `;
+      btn.innerHTML = `<span class="letter">${letter}</span><span class="text">${escapeHtml(opt)}</span>`;
       btn.addEventListener('click', () => selectAnswer(i));
       answersEl.appendChild(btn);
     });
-
-    document.getElementById('q-feedback').classList.remove('show', 'correct', 'incorrect');
+    document.getElementById('q-feedback').classList.remove('show','correct','incorrect');
     document.getElementById('lock-in-btn').disabled = true;
     document.getElementById('lock-in-btn').style.display = '';
     document.getElementById('next-q-btn').style.display = 'none';
   }
-
   function selectAnswer(i) {
     if (currentLocked) return;
     currentSelection = i;
-    document.querySelectorAll('#q-answers .answer').forEach((el, idx) => {
-      el.classList.toggle('selected', idx === i);
-    });
+    document.querySelectorAll('#q-answers .answer').forEach((el, idx) => el.classList.toggle('selected', idx === i));
     document.getElementById('lock-in-btn').disabled = false;
   }
-
   document.getElementById('lock-in-btn').addEventListener('click', () => {
     if (currentSelection === null || currentLocked) return;
     currentLocked = true;
     const q = currentRoom.questions[currentQIndex];
     const correct = currentSelection === q.correct;
-
     document.querySelectorAll('#q-answers .answer').forEach((el, idx) => {
       el.classList.remove('selected');
-      if (idx === q.correct) {
-        el.classList.add('correct');
-      } else if (idx === currentSelection) {
-        el.classList.add('incorrect');
-      } else {
-        el.classList.add('disabled');
-      }
+      if (idx === q.correct) el.classList.add('correct');
+      else if (idx === currentSelection) el.classList.add('incorrect');
+      else el.classList.add('disabled');
     });
-
     const fb = document.getElementById('q-feedback');
     fb.classList.add('show', correct ? 'correct' : 'incorrect');
     document.getElementById('q-feedback-title').textContent = correct ? '✓ Correct' : '✗ Not quite';
     document.getElementById('q-feedback-body').textContent = q.explanation || (correct ? 'Nice work.' : `The correct answer is: ${q.options[q.correct]}`);
-
-    // Track for end-of-room score
     if (!currentRoom._sessionAnswers) currentRoom._sessionAnswers = [];
-    currentRoom._sessionAnswers.push({ qIndex: currentQIndex, selected: currentSelection, correct });
-
+    currentRoom._sessionAnswers.push({ correct });
     document.getElementById('lock-in-btn').style.display = 'none';
     document.getElementById('next-q-btn').style.display = '';
-    if (currentQIndex === currentRoom.questions.length - 1) {
-      document.getElementById('next-q-btn').textContent = 'See your score →';
-    } else {
-      document.getElementById('next-q-btn').textContent = 'Next question →';
-    }
+    document.getElementById('next-q-btn').textContent = currentQIndex === currentRoom.questions.length - 1 ? 'See your score →' : 'Next question →';
   });
-
   let processingClick = false;
   document.getElementById('next-q-btn').addEventListener('click', () => {
-    // Prevent double-fire from ghost clicks / double taps
     if (processingClick) return;
     processingClick = true;
     setTimeout(() => { processingClick = false; }, 500);
-
-    // If we've already finished and left the room, just ignore
     if (!currentRoom) return;
-
-    if (currentQIndex < currentRoom.questions.length - 1) {
-      currentQIndex++;
-      loadQuestion();
-    } else {
-      finishRoom();
-    }
+    if (currentQIndex < currentRoom.questions.length - 1) { currentQIndex++; loadQuestion(); }
+    else finishRoom();
   });
-
   document.getElementById('back-to-rooms-btn').addEventListener('click', () => {
     if (confirm('Leave this station without finishing? Your progress here will be lost.')) {
       currentRoom._sessionAnswers = null;
@@ -2013,207 +1192,158 @@
     const completedRoomId = currentRoom.id;
     const completedRoomName = currentRoom.name;
 
-    // Update local state
-    player.roomsCompleted[completedRoomId] = { correct, total, locked: true };
-    player.totalScore = Object.values(player.roomsCompleted).reduce((sum, r) => sum + (r.correct || 0), 0);
+    player.roomsCompleted[completedRoomId] = { correct, total };
+    player.totalScore = Object.values(player.roomsCompleted).reduce((s, r) => s + (r.correct || 0), 0);
     document.getElementById('score-display').textContent = player.totalScore;
 
-    // Reset state
     currentRoom._sessionAnswers = null;
     currentRoom = null;
 
-    // Go back to the rooms picker FIRST, then show the score modal on top
     renderRoomsGrid();
     showView('rooms');
 
-    // Pick an emoji based on performance
     const pct = total > 0 ? correct / total : 0;
-    let emoji = '✨';
-    let headline = 'Nice work!';
+    let emoji = '✨', headline = 'Nice work!';
     if (pct === 1) { emoji = '🌟'; headline = 'Perfect score!'; }
     else if (pct >= 0.75) { emoji = '🎉'; headline = 'Great work!'; }
     else if (pct >= 0.5) { emoji = '👍'; headline = 'Nice work!'; }
     else { emoji = '💡'; headline = 'Good effort!'; }
 
-    // Fill in modal content
     document.getElementById('score-emoji').textContent = emoji;
     document.getElementById('score-room-label').textContent = completedRoomName;
     document.getElementById('score-headline').textContent = headline;
     document.getElementById('score-correct').textContent = correct;
     document.getElementById('score-total-q').textContent = total;
     document.getElementById('score-running-val').textContent = player.totalScore;
+    setTimeout(() => { document.getElementById('score-overlay').classList.add('show'); }, 500);
 
-    // Show modal — delayed slightly so any ghost-tap from "See your score" lands harmlessly
-    setTimeout(() => {
-      document.getElementById('score-overlay').classList.add('show');
-    }, 500);
-
-    // Save to Firebase in the background
     if (player.key && CONFIG_OK && db) {
       try {
         db.ref(`sessions/${SESSION_ID}/players/${player.key}`).update({
           totalScore: player.totalScore,
           roomsCompleted: player.roomsCompleted,
-          lastActive: Date.now(),
-        }).catch(e => {
-          console.error('Background score save failed:', e);
-        });
-      } catch (e) {
-        console.error('Could not initiate background save:', e);
-      }
+          lastActive: Date.now()
+        }).catch(e => console.error('Save failed', e));
+      } catch (e) { console.error(e); }
     }
   }
-
-  // Score modal continue button
   document.getElementById('score-continue-btn').addEventListener('click', () => {
     document.getElementById('score-overlay').classList.remove('show');
-  });
-
-  document.getElementById('continue-btn').addEventListener('click', () => {
-    renderRoomsGrid();
-    showView('rooms');
-  });
-
-  document.getElementById('view-lb-btn').addEventListener('click', () => {
-    renderLeaderboard(cachedLeaderboard);
-    showView('leaderboard');
   });
 
   // ============================================================
   // LEADERBOARD
   // ============================================================
-  function renderLeaderboard(list) {
-    cachedLeaderboard = list;
+  function renderLeaderboard() {
     const el = document.getElementById('leaderboard-list');
-    if (!list.length) {
+    // Build entries: solo + shared players as individuals, groups as combined
+    const entries = [];
+    // Groups
+    cachedGroups.forEach(grp => {
+      const members = (grp.slots || []).filter(s => s.memberKey);
+      if (!members.length) return;
+      let groupScore = 0;
+      let roomsDone = 0;
+      let memberNames = [];
+      members.forEach(s => {
+        const p = cachedPlayers.find(pp => pp._key === s.memberKey);
+        if (p) {
+          groupScore += p.totalScore || 0;
+          roomsDone += Object.keys(p.roomsCompleted || {}).length;
+          memberNames.push(p.name);
+        }
+      });
+      entries.push({
+        isGroup: true, groupKey: grp._key, name: grp.name,
+        score: groupScore, roomsDone, size: grp.size,
+        isYou: player.groupCode === grp._key,
+        memberNames
+      });
+    });
+    // Individuals (solo or shared) — not in a group
+    cachedPlayers.forEach(p => {
+      if (p.groupCode) return;
+      entries.push({
+        isGroup: false, name: p.name, mode: p.mode,
+        score: p.totalScore || 0,
+        roomsDone: Object.keys(p.roomsCompleted || {}).length,
+        isYou: p._key === player.key
+      });
+    });
+
+    if (!entries.length) {
       el.innerHTML = '<div style="text-align:center; padding:30px 20px; color:var(--muted); font-style:italic;">No scores yet. Be the first to play.</div>';
       return;
     }
-    const sorted = [...list].sort((a, b) => {
-      if (b.totalScore !== a.totalScore) return (b.totalScore||0) - (a.totalScore||0);
-      // Tiebreak: rooms completed, then earliest finish
-      const aRooms = Object.keys(a.roomsCompleted || {}).length;
-      const bRooms = Object.keys(b.roomsCompleted || {}).length;
-      if (bRooms !== aRooms) return bRooms - aRooms;
-      return (a.lastActive||0) - (b.lastActive||0);
-    });
-
-    el.innerHTML = sorted.map((p, idx) => {
+    entries.sort((a,b) => (b.score||0) - (a.score||0) || (b.roomsDone||0) - (a.roomsDone||0));
+    el.innerHTML = entries.map((e, idx) => {
       const rank = idx + 1;
-      const isYou = p._key === player.key;
-      const rooms = Object.keys(p.roomsCompleted || {}).length;
-      const medalCls = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : '';
-      const rankDisplay = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
+      const medal = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : '';
+      const rankDisp = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
       const rankCls = rank <= 3 ? 'medal' : '';
-      const modeLabel = p.mode === 'group' ? 'Group' : 'Solo';
-      return `
-        <div class="lb-row ${medalCls} ${isYou ? 'you' : ''}">
-          <div class="lb-rank ${rankCls}">${rankDisplay}</div>
-          <div>
-            <div class="lb-name">${escapeHtml(p.name || 'Anonymous')}${isYou ? '<span class="you-tag">You</span>' : ''}</div>
-            <div class="lb-mode">${modeLabel} · ${rooms} ${rooms === 1 ? 'station' : 'stations'} complete</div>
-          </div>
-          <div class="lb-score">
-            <div class="pts">${p.totalScore||0}</div>
-            <div class="rooms-completed">points</div>
-          </div>
+      let subLine;
+      if (e.isGroup) {
+        subLine = `Group of ${e.size} · ${e.roomsDone}/${NUM_STATIONS} stations complete`;
+      } else {
+        const modeLabel = e.mode === 'shared' ? 'Shared device' : 'Solo';
+        subLine = `${modeLabel} · ${e.roomsDone} ${e.roomsDone === 1 ? 'station' : 'stations'} complete`;
+      }
+      return `<div class="lb-row ${medal} ${e.isYou ? 'you' : ''}">
+        <div class="lb-rank ${rankCls}">${rankDisp}</div>
+        <div>
+          <div class="lb-name">${e.isGroup ? '👥 ' : ''}${escapeHtml(e.name || 'Anonymous')}${e.isYou ? '<span class="you-tag">You</span>' : ''}</div>
+          <div class="lb-mode">${subLine}</div>
         </div>
-      `;
+        <div class="lb-score">
+          <div class="pts">${e.score || 0}</div>
+          <div class="rooms-completed">points</div>
+        </div>
+      </div>`;
     }).join('');
   }
 
   // ============================================================
   // FACILITATOR GEAR
   // ============================================================
-  const facGear = document.getElementById('fac-gear');
   const facOverlay = document.getElementById('fac-overlay');
-  const facClose = document.getElementById('fac-close');
-  const facResetMine = document.getElementById('fac-reset-mine');
-  const facResetAll = document.getElementById('fac-reset-all');
   document.getElementById('fac-session-id').textContent = SESSION_ID;
-
-  function openFacPanel() {
-    document.getElementById('fac-player-count').textContent = cachedLeaderboard.length;
-    facOverlay.classList.add('show');
+  document.getElementById('fac-gear').addEventListener('click', () => { updateFacCounts(); facOverlay.classList.add('show'); });
+  document.getElementById('fac-close').addEventListener('click', () => facOverlay.classList.remove('show'));
+  facOverlay.addEventListener('click', (e) => { if (e.target === facOverlay) facOverlay.classList.remove('show'); });
+  function updateFacCounts() {
+    document.getElementById('fac-player-count').textContent = cachedPlayers.length;
+    document.getElementById('fac-group-count').textContent = cachedGroups.length;
   }
-  function closeFacPanel() {
-    facOverlay.classList.remove('show');
-  }
-
-  facGear.addEventListener('click', openFacPanel);
-  facClose.addEventListener('click', closeFacPanel);
-  facOverlay.addEventListener('click', (e) => {
-    if (e.target === facOverlay) closeFacPanel();
-  });
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && facOverlay.classList.contains('show')) closeFacPanel();
-  });
-
-  // Reset just my own session
-  facResetMine.addEventListener('click', async () => {
-    const confirmed = confirm('Reset just THIS device? Your local progress will be cleared, but everyone else\'s scores stay.');
-    if (!confirmed) return;
+  document.getElementById('fac-reset-mine').addEventListener('click', async () => {
+    if (!confirm('Reset just THIS device? Your local progress will be cleared.')) return;
     try {
-      // Remove this player from Firebase if we have a key
-      if (player.key && CONFIG_OK && db) {
-        await db.ref(`sessions/${SESSION_ID}/players/${player.key}`).remove();
-      }
-    } catch (e) {
-      console.error('Failed to remove player record', e);
-    }
-    // Wipe local state and start over
-    player = { key: null, name: '', mode: 'solo', totalScore: 0, roomsCompleted: {} };
+      if (player.key && CONFIG_OK && db) await db.ref(`sessions/${SESSION_ID}/players/${player.key}`).remove();
+    } catch (e) { console.error(e); }
+    clearSession();
+    player = { key:null, name:'', mode:'solo', totalScore:0, roomsCompleted:{}, groupCode:null, assignedStations:null, isGroupCreator:false };
     currentRoom = null;
-    currentQIndex = 0;
-    currentSelection = null;
-    currentLocked = false;
-    // Reset any room session answers
-    Object.values(ROOMS).forEach(r => { r._sessionAnswers = null; });
     document.getElementById('player-name').value = '';
     document.getElementById('player-info').style.display = 'none';
-    document.querySelectorAll('.play-mode').forEach(p => p.classList.remove('selected'));
-    document.querySelector('.play-mode[data-mode="solo"]').classList.add('selected');
-    closeFacPanel();
+    facOverlay.classList.remove('show');
     showView('welcome');
-    toast('This device has been reset.');
+    toast('Device reset.');
   });
-
-  // Reset EVERYTHING — wipe all Firebase data
-  // 🔒 FACILITATOR PASSCODE — change this 4-digit code to whatever you want.
-  // Anyone who finds the gear must enter this to wipe the leaderboard.
-  const FACILITATOR_PASSCODE = '1111';
-
-  facResetAll.addEventListener('click', async () => {
-    const entered = prompt('Enter the 4-digit facilitator passcode to restart everything:');
-    if (entered === null) return; // user cancelled
-    if (entered.trim() !== FACILITATOR_PASSCODE) {
-      toast('Incorrect passcode');
-      return;
-    }
-    const confirmed = confirm('Passcode accepted. Wipe ALL players and scores for this session? This cannot be undone.');
-    if (!confirmed) return;
+  document.getElementById('fac-reset-all').addEventListener('click', async () => {
+    const entered = prompt('Enter the 4 digit facilitator passcode:');
+    if (entered === null) return;
+    if (entered.trim() !== FACILITATOR_PASSCODE) { toast('Incorrect passcode'); return; }
+    if (!confirm('Passcode accepted. Wipe EVERYTHING for all players and groups?')) return;
     try {
-      if (CONFIG_OK && db) {
-        await db.ref(`sessions/${SESSION_ID}`).remove();
-      }
-      // Also reset this device's local state
-      player = { key: null, name: '', mode: 'solo', totalScore: 0, roomsCompleted: {} };
+      if (CONFIG_OK && db) await db.ref(`sessions/${SESSION_ID}`).remove();
+      clearSession();
+      player = { key:null, name:'', mode:'solo', totalScore:0, roomsCompleted:{}, groupCode:null, assignedStations:null, isGroupCreator:false };
       currentRoom = null;
-      currentQIndex = 0;
-      currentSelection = null;
-      currentLocked = false;
-      Object.values(ROOMS).forEach(r => { r._sessionAnswers = null; });
       document.getElementById('player-name').value = '';
       document.getElementById('player-info').style.display = 'none';
-      document.querySelectorAll('.play-mode').forEach(p => p.classList.remove('selected'));
-      document.querySelector('.play-mode[data-mode="solo"]').classList.add('selected');
-      closeFacPanel();
+      facOverlay.classList.remove('show');
       showView('welcome');
-      toast('Everything has been reset.');
-    } catch (e) {
-      console.error('Failed to wipe session', e);
-      toast('Reset failed — check connection');
-    }
+      toast('Everything reset.');
+    } catch (e) { console.error(e); toast('Reset failed'); }
   });
 
   // ============================================================
@@ -2222,15 +1352,17 @@
   function escapeHtml(s) {
     return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
-
   let toastTimer = null;
   function toast(msg) {
     const t = document.getElementById('toast');
     t.textContent = msg;
     t.classList.add('show');
     if (toastTimer) clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
   }
+
+  // Initialize division preview
+  updateDivisionPreview();
 </script>
 </body>
 </html>
