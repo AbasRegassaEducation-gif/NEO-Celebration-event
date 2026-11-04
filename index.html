@@ -610,9 +610,19 @@
         { text: "What does the yellow portion of the Academic Performance bar represent?", options: ["Points already earned in Academic Performance.","The amount needed to reach the minimum 50% threshold.","The additional percentage needed to reach 70% Exemplary performance.","The percentage of academic measures that have not yet been submitted."], correct: 2, explanation: "Yellow shows the additional Academic percentage needed to reach 70% Exemplary." },
         { text: "What does the red portion of the Academic Performance bar represent?", options: ["Points already earned in Academic Performance.","The amount needed to reach the minimum 50% threshold.","The additional percentage needed to reach 70% Exemplary performance.","The percentage of academic measures that have not yet been submitted."], correct: 1, explanation: "Red denotes the remaining Academic percentage needed to reach the 50% renewal minimum." }
       ]
+    },
+    bonus: {
+      id: 'bonus', name: 'Bonus Questions', icon: '⭐',
+      description: 'Framework access, unique measures, informal hearings.',
+      questions: [
+        { text: "When and how can board members access the Performance Framework?", options: ["Only quarterly","Only once during the Annual Formal Compliance Site Visit","Only once during the final year of the contract","Any time"], correct: 3, explanation: "The Performance Framework is maintained in a Google Sheet that is shared with all board members, so they can access it any time." },
+        { text: "Schools can include unique measures in the Performance Framework as long as:", options: ["the school signs a data-sharing agreement and provides supporting documentation.","the school agrees it will not be included in the evaluation scoring.","the MN Dept of Education agrees with the inclusion of the unique measure.","the unique measure is a nationally normed test."], correct: 0, explanation: "A data-sharing agreement plus supporting documentation is required so the authorizer can verify the results." },
+        { text: "If a school doesn't reach at least 50% of points possible in a performance section (Academic, Climate, Operations, or Finance), the school must:", options: ["have a public hearing to convince the authorizer not to close the school.","may request an informal hearing to present supplemental evidence of progress to the authorizer for consideration in the renewal decision.","close.","merge with another more successful school."], correct: 1, explanation: "Statute permits a school to have an informal hearing where additional information about improvement can be shared with the authorizer." },
+        { text: "When a school proposes including a unique measure, it is important to consider:", options: ["how difficult it will be to collect and report the results.","whether it is possible to consistently collect and report the results.","who will be responsible for collecting and reporting the results.","all of the above"], correct: 3, explanation: "All three considerations matter: feasibility, consistency, and ownership of reporting." }
+      ]
     }
   };
-  const ROOM_ORDER = ['focus','progress','climate','operations','finance','unique','dashboard','monitoring'];
+  const ROOM_ORDER = ['focus','progress','climate','operations','finance','unique','dashboard','monitoring','bonus'];
   const NUM_STATIONS = ROOM_ORDER.length;
 
   // ============================================================
